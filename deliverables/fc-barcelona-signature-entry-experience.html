@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>FC Barcelona Dashboard — Signature Entry Experience</title>
+  <style>
+    @page { size: A4; margin: 20mm 18mm 20mm 18mm; }
+    body {
+      color: #172033;
+      font-family: Aptos, "Segoe UI", Arial, sans-serif;
+      font-size: 10.5pt;
+      line-height: 1.48;
+      margin: 0 auto;
+      max-width: 178mm;
+    }
+    h2 {
+      border-bottom: 1px solid #c9a45b;
+      color: #0b1a30;
+      font-size: 17pt;
+      margin: 25pt 0 10pt;
+      padding-bottom: 4pt;
+      page-break-after: avoid;
+    }
+    h3 {
+      color: #6b1d2f;
+      font-size: 13pt;
+      margin: 19pt 0 7pt;
+      page-break-after: avoid;
+    }
+    p { margin: 0 0 9pt; }
+    ul, ol { margin: 4pt 0 10pt 21pt; padding: 0; }
+    li { margin: 0 0 4pt; }
+    table {
+      border-collapse: collapse;
+      font-size: 9.25pt;
+      margin: 9pt 0 14pt;
+      page-break-inside: auto;
+      width: 100%;
+    }
+    tr { page-break-inside: avoid; }
+    th {
+      background: #0b1a30;
+      color: #ffffff;
+      font-weight: 600;
+      padding: 7pt 6pt;
+      text-align: left;
+      vertical-align: top;
+    }
+    td {
+      border: 1px solid #cfd6df;
+      padding: 7pt 6pt;
+      vertical-align: top;
+    }
+    th { border: 1px solid #0b1a30; }
+    a { color: #315f9b; text-decoration: underline; }
+    strong { color: #0b1a30; }
+    code {
+      background: #f1f3f6;
+      border: 1px solid #d9dee6;
+      border-radius: 2px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 9pt;
+      padding: 1px 3px;
+    }
+  </style>
+</head>
+<body>
+  <p>My recommendation is Concept 1, “The Threshold”: a continuous first-person passage through the current players’ tunnel whose physical lines resolve directly into the existing Match Stage and dashboard grid. It is the best balance of authenticity, cinematic impact, and a transition that feels designed specifically for this dashboard.</p>
+
+  <p>No files were changed.</p>
+
+  <h2>What the repository tells us</h2>
+
+  <p>The intro should be an entry layer around the current dashboard, not a new splash page.</p>
+
+  <ul>
+    <li><a href="C:/Users/User/barca-dashboard/src/components/dashboard/DashboardClient.tsx">DashboardClient.tsx</a> already owns the selected kit, reads it from <code>localStorage</code>, and composes the full responsive shell. The intro should mount only after that kit has been restored, avoiding a flash of the Home palette for Away/Third users.</li>
+    <li>The dashboard is already rendered as a 1700px architectural grid: Stadium Rail, central Match Stage, Barça Pulse, then Season Story.</li>
+    <li><a href="C:/Users/User/barca-dashboard/src/components/match/MatchStage.tsx">MatchStage.tsx</a> is the natural destination. Its hard rectangular frame and central pitch-derived linework give the 3D scene something precise to become.</li>
+    <li><a href="C:/Users/User/barca-dashboard/src/components/shell/StadiumRail.tsx">StadiumRail.tsx</a> and <a href="C:/Users/User/barca-dashboard/src/components/shell/BarcaPulse.tsx">BarcaPulse.tsx</a> are defined primarily by vertical rules and small accent markers.</li>
+    <li><a href="C:/Users/User/barca-dashboard/src/components/season/SeasonStory.tsx">SeasonStory.tsx</a> is a horizontal architectural timeline. A touchline, tunnel threshold, or glass sill can naturally become its upper rule.</li>
+    <li>Existing animation is restrained: short opacity/translation transitions, a spring-selected rail marker, and no decorative spectacle.</li>
+    <li><a href="C:/Users/User/barca-dashboard/package.json">package.json</a> contains Motion, but no Three.js/R3F stack.</li>
+    <li><a href="C:/Users/User/barca-dashboard/src/app/globals.css">globals.css</a> applies smooth kit-color transitions globally. The 3D scene should receive the resolved palette as data rather than trying to inherit CSS colors from the canvas.</li>
+  </ul>
+
+  <p>The installed Next.js 16.3.5 guide confirms that a browser-only scene should be isolated in a Client Component and loaded with <code>next/dynamic({ ssr: false })</code>; that option cannot live in a Server Component. See the installed <a href="C:/Users/User/barca-dashboard/node_modules/next/dist/docs/01-app/02-guides/lazy-loading.md">lazy-loading guidance</a>.</p>
+
+  <h2>Tunnel research: old versus 2026/27</h2>
+
+  <p>The familiar mural tunnel and the operational renovated tunnel should not be conflated.</p>
+
+  <table>
+    <thead>
+      <tr><th>Era</th><th>Documented characteristics</th><th>Design implication</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Older Camp Nou</td>
+        <td>A narrower stair-based route from dressing rooms to the pitch, with player imagery, Barça murals, warm rectangular ceiling lights, metal handrails, saturated red/blaugrana surfaces, slogans and Nike branding. The club’s older annual reporting specifically describes the dressing-room-to-field stairs being decorated with squad imagery; the <a href="https://barcaacademy.fcbarcelona.com/en/news/1493442/spotify-camp-nou-tour">older official tour imagery</a> shows the mural-heavy stair environment.</td>
+        <td>Valuable as heritage, but it should not be presented as the literal 2026/27 tunnel.</td>
+      </tr>
+      <tr>
+        <td>Renovated Spotify Camp Nou</td>
+        <td>FC Barcelona officially confirmed the new players’ tunnel was operational for the November 2025 return, together with new dressing rooms. <a href="https://www.fcbarcelona.com/en/news/4404004/fc-barcelona-official-statement">Official confirmation</a>.</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Current public visuals</td>
+        <td>Public stills appear to show deep-blue surfaces, grey flooring transitioning to green turf, broad stone steps/ramp elements, stainless rails and a cleaner, more modern opening. Press access also described a wider tunnel with lateral glass allowing VIP guests to watch players emerge. <a href="https://lapopularsport.com/2025/09/23/el-spotify-camp-nou-abre-sus-puertas-a-la-prensa-avances-visibles-y-la-esperanza-de-volver-pronto/">Press description</a> and <a href="https://www.sport.es/es/videos/barca/20250909/nuevas-imagenes-tunel-vestuarios-spotify-camp-nou/121383958.shtml">September 2025 tunnel footage</a>.</td>
+        <td>This should be the architectural base. The glazing is especially useful because it can become the dashboard’s column system.</td>
+      </tr>
+      <tr>
+        <td>2026/27 stadium state</td>
+        <td>The bowl is open progressively, but the roof was still scheduled for a summer 2027 “big lift.” <a href="https://www.fcbarcelona.com/en/club/news/4368085/fc-barcelona-invite-the-media-for-exclusive-spotify-camp-nou-visit">Official construction update</a>. Phase 1C brought operational capacity to 62,652 in March 2026. <a href="https://www.fcbarcelona.com/en/news/4465846/fc-barcelona-official-statement">Official Phase 1C statement</a>.</td>
+        <td>Avoid a detailed, supposedly final roof or upper-bowl reconstruction. Keep distant stadium architecture soft, cropped, or daylight-silhouetted.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>There is no reliable public dimensioned plan or comprehensive finish schedule for the new players’ route. Widths, ceiling height, glass-bay spacing and exact ramp geometry would therefore be visually inferred from references—not presented as measured facts.</p>
+
+  <p>For the dashboard, I would use the renovated tunnel as the truth layer and introduce heritage only through replaceable graphics or reflections:</p>
+
+  <ul>
+    <li>Home: existing deep-blue architecture, restrained Barça-red panels, warm gold threshold markers.</li>
+    <li>Away: charcoal surfaces, purple wayfinding panels, aged gold metal accents.</li>
+    <li>Third: dark petrol architecture, mint line reflections, teal fixtures, one restrained Gym Red marker and Loyal Blue panel.</li>
+    <li>The actual architecture remains plausible; only signage, light temperature and replaceable wall graphics respond to kit selection.</li>
+  </ul>
+
+  <h2>Concept 1 — The Threshold</h2>
+
+  <p>A continuous player-height walk through the renovated tunnel. The daylight at the opening is literally the live dashboard waiting behind the 3D scene.</p>
+
+  <h3>What we see</h3>
+
+  <p>The camera begins inside the deep-blue new tunnel. No logo animation and no floating title. Rectangular ceiling fittings recede ahead; brushed rails and glass panels catch narrow highlights. The opening reveals turf and the lower stadium bowl. As we reach the threshold, the dashboard becomes visible inside the tunnel mouth. Pitch markings become the Match Stage geometry, and the surrounding architecture resolves into the existing dashboard dividers.</p>
+
+  <h3>Timing</h3>
+
+  <table>
+    <thead><tr><th>Time</th><th>Sequence</th></tr></thead>
+    <tbody>
+      <tr><td>0.0–0.5s</td><td>A quiet establishing beat at approximately human eye height. The nearest ceiling light wakes naturally; blue-painted surfaces and one kit-colored directional panel establish the selected theme. Forward movement begins immediately.</td></tr>
+      <tr><td>0.5–1.5s</td><td>The camera walks past the lateral glazing and stainless rails. Reflections move across the glass; a restrained wall graphic passes in peripheral vision. No players, particles or animated signage are needed.</td></tr>
+      <tr><td>1.5–2.5s</td><td>The route opens toward the pitch. Grey flooring becomes green turf. Exposure rises gradually, revealing the touchline, halfway line and a soft impression of the lower stands. Camera speed increases by roughly 10–15%, without shake.</td></tr>
+      <tr><td>2.5–3.5s</td><td>The live Match Stage appears inside the physical tunnel opening. Its border aligns with the exit frame. A pitch line and distant center-circle arc interpolate into the existing Stage Architecture; the left rail extends into the Stadium Rail rule, a right glass mullion lands on the Barça Pulse divider, and the threshold line becomes the Season Story border. Tunnel foreground passes beyond the viewport and the 3D canvas unmounts.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Real elements reproduced</h3>
+
+  <ul>
+    <li>The renovated tunnel’s cleaner blue material language.</li>
+    <li>Wider proportions rather than the narrow historical mural corridor.</li>
+    <li>Lateral glazing associated with VIP viewing.</li>
+    <li>Stainless handrails.</li>
+    <li>Grey circulation surface transitioning to turf.</li>
+    <li>Broad step/ramp-like pitch exit.</li>
+    <li>Restrained rectangular overhead lighting.</li>
+    <li>A partially resolved stadium bowl rather than a fictional finished 2027 roof.</li>
+  </ul>
+
+  <p>The exact number of glass bays, steps and lights would remain an artistic reconstruction until better references are acquired.</p>
+
+  <h3>Scene and implementation architecture</h3>
+
+  <ul>
+    <li>A custom Blender-built tunnel shell, not a downloaded generic corridor.</li>
+    <li>Modular wall, glass, rail and ceiling-light sections so geometry can be simplified for mobile.</li>
+    <li>A lightweight lower-bowl fragment outside the opening; only the portion visible for about one second needs to exist.</li>
+    <li>A Catmull–Rom camera spline with a subtle, sub-centimetric walking cadence. No handheld shake.</li>
+    <li>Mostly baked illumination, one soft exit light and emissive ceiling panels. Real-time shadows should be limited or absent.</li>
+    <li>Painted wall, concrete/rubber floor, brushed metal and tempered glass PBR materials.</li>
+    <li>Optional high-tier bloom only on the sunlit threshold, below the point where it looks like a special effect. No global bloom or DOF during the handoff.</li>
+    <li>One normalized <code>progress</code> value drives camera, exposure, WebGL geometry and Motion-based DOM masks.</li>
+    <li>The actual dashboard remains mounted behind the canvas. It is revealed through a CSS mask matching the projected exit; it is never rasterized into a fake texture.</li>
+    <li>The Match Stage bounding box is measured before playback, allowing the tunnel portal to land on its real responsive position.</li>
+    <li>Canvas background stays transparent during the final composite. There is no fade to black.</li>
+  </ul>
+
+  <h3>Assets</h3>
+
+  <table>
+    <thead><tr><th>Asset</th><th>Source type</th></tr></thead>
+    <tbody>
+      <tr><td>Renovated tunnel shell, ramp/steps and exit portal</td><td><strong>MODEL OURSELVES</strong></td></tr>
+      <tr><td>Glass bays, rails, ceiling housings and door details</td><td><strong>MODEL OURSELVES</strong></td></tr>
+      <tr><td>Cropped lower bowl, bench/touchline area and stadium mouth</td><td><strong>MODEL OURSELVES</strong></td></tr>
+      <tr><td>Concrete/floor normal and roughness maps from a CC0 source</td><td><strong>DOWNLOAD</strong></td></tr>
+      <tr><td>Neutral stadium or tunnel HDRI used only for lighting reference/IBL</td><td><strong>DOWNLOAD</strong></td></tr>
+      <tr><td>Original kit-responsive wall bands and directional panels</td><td><strong>GENERATE</strong></td></tr>
+      <tr><td>Minor wear, smudge and roughness masks without identifiable imagery</td><td><strong>GENERATE</strong></td></tr>
+      <tr><td>Turf plane, line markings, light fixtures and seat instancing</td><td><strong>PROCEDURAL</strong></td></tr>
+      <tr><td>Camera spline, exit mask and dashboard-line interpolation</td><td><strong>PROCEDURAL</strong></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Cost</h3>
+
+  <ul>
+    <li>Transfer target: 5–7 MB for scene assets, plus roughly 250–400 KB gzip for the isolated Three/R3F client chunk.</li>
+    <li>Geometry: approximately 100–180k visible triangles.</li>
+    <li>Draw calls: 20–35.</li>
+    <li>Texture budget: mostly 1K, at most two 2K sets, delivered as KTX2/Basis.</li>
+    <li>Estimated active GPU memory: roughly 35–60 MB.</li>
+    <li>Desktop target: 60fps at DPR capped around 1.5; integrated-GPU tier can target 30–45fps at DPR 1.</li>
+    <li>Complexity: <strong>high</strong>. The 3D scene itself is manageable; exact projection of the tunnel portal into the responsive DOM and the line-to-line handoff require careful calibration.</li>
+  </ul>
+
+  <h3>Degraded behavior</h3>
+
+  <ul>
+    <li>Weak hardware: remove glass transmission, use a simple reflective material, 1K textures, no post-processing, 30fps cap.</li>
+    <li>Mobile: shorter 2.6–2.9 second path, fewer glass bays and seats, DPR 1, no real-time shadows. The Match Stage handoff remains intact.</li>
+    <li><code>prefers-reduced-motion</code>: show a still, theme-colored tunnel threshold for about 200ms, then reveal the dashboard without camera movement.</li>
+    <li>WebGL failure, Save-Data, decoder failure or an excessive loading delay: use the same static threshold and proceed immediately.</li>
+  </ul>
+
+  <h2>Concept 2 — Behind the Glass</h2>
+
+  <p>This is an architectural side-on experience built around the new tunnel’s most distinctive reported feature: VIP viewing through glass.</p>
+
+  <p>Instead of pretending to be a player walking dead-center, the camera travels parallel to the route, separated from it by glass. The dashboard first appears as real content framed inside the glass bays.</p>
+
+  <h3>What we see</h3>
+
+  <p>The camera starts close to a glass seam and brushed-metal mullion. The empty player route stretches diagonally behind it toward the turf. As the camera tracks along the gallery, successive panes frame the tunnel, a kit-colored wall panel, and the brighter pitch exit. The reflections then recede and each glass bay reveals a section of the live dashboard.</p>
+
+  <h3>Timing</h3>
+
+  <table>
+    <thead><tr><th>Time</th><th>Sequence</th></tr></thead>
+    <tbody>
+      <tr><td>0.0–0.5s</td><td>Macro architectural opening: blue wall, glass edge, brushed rail and a narrow reflection from an overhead panel. The tunnel route is initially only partially legible.</td></tr>
+      <tr><td>0.5–1.5s</td><td>A smooth lateral track reveals three or four glass bays. Through them we see the player route moving toward daylight. Theme color appears only in signage strips and reflected accents.</td></tr>
+      <tr><td>1.5–2.5s</td><td>The pitch becomes visible at the end of the route. The camera eases closer to the glass; reflections darken so the panes become clearer compositional windows.</td></tr>
+      <tr><td>2.5–3.5s</td><td>Live dashboard regions appear inside the panes: Stadium Rail, Match Stage and Barça Pulse. Glass mullions align with the desktop grid columns. The lower sill extends into the Season Story rule; reflections lift away, leaving the dashboard.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Real elements reproduced</h3>
+
+  <ul>
+    <li>The widened renovated route.</li>
+    <li>Lateral VIP glazing.</li>
+    <li>Deep-blue architectural surfaces.</li>
+    <li>Stainless rails and clean modern finishes.</li>
+    <li>A distant pitch exit rather than a mural-heavy historical corridor.</li>
+  </ul>
+
+  <p>This concept intentionally emphasizes a documented feature that makes the new tunnel different from the old one.</p>
+
+  <h3>Scene and transition</h3>
+
+  <ul>
+    <li>Shorter physical scene than Concept 1: no detailed stadium bowl is required.</li>
+    <li>Camera motion is lateral and composed, closer to an architectural film than a videogame walk.</li>
+    <li>Glass should be faked with restrained reflection, roughness and fresnel—not expensive multi-pass refraction.</li>
+    <li>The live dashboard is revealed by DOM clipping polygons aligned with the glass panes.</li>
+    <li>Pane one becomes the Stadium Rail; the largest center pane becomes Match Stage; the narrow right pane becomes Barça Pulse.</li>
+    <li>The canvas preserves only mullions and reflections during the final 400ms. Once the real UI grid is completely aligned, those foreground elements disappear and the canvas unmounts.</li>
+    <li>This avoids trying to copy the live DOM into a WebGL texture.</li>
+  </ul>
+
+  <h3>Assets</h3>
+
+  <table>
+    <thead><tr><th>Asset</th><th>Source type</th></tr></thead>
+    <tbody>
+      <tr><td>VIP-side glass gallery and tunnel route</td><td><strong>MODEL OURSELVES</strong></td></tr>
+      <tr><td>Glass mullions, rails, wall trims and light housings</td><td><strong>MODEL OURSELVES</strong></td></tr>
+      <tr><td>Limited pitch-exit/turf fragment</td><td><strong>MODEL OURSELVES</strong></td></tr>
+      <tr><td>CC0 concrete/floor roughness and neutral HDRI</td><td><strong>DOWNLOAD</strong></td></tr>
+      <tr><td>Theme-responsive wall panel and frosted-glass pattern</td><td><strong>GENERATE</strong></td></tr>
+      <tr><td>Subtle fingerprints/smudges and reflected-light masks</td><td><strong>GENERATE</strong></td></tr>
+      <tr><td>Repeating ceiling modules and distant seating bands</td><td><strong>PROCEDURAL</strong></td></tr>
+      <tr><td>Glass-pane DOM masks and responsive grid alignment</td><td><strong>PROCEDURAL</strong></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Cost</h3>
+
+  <ul>
+    <li>Transfer target: 4–6 MB.</li>
+    <li>Geometry: approximately 80–150k triangles.</li>
+    <li>Draw calls: 20–30.</li>
+    <li>Estimated GPU memory: 45–75 MB; transparent full-screen layers make fill rate more important than polygon count.</li>
+    <li>Complexity: <strong>high</strong>. It uses less geometry than Concept 1 but requires more delicate WebGL/DOM compositing.</li>
+  </ul>
+
+  <h3>Degraded behavior</h3>
+
+  <ul>
+    <li>Weak hardware: opaque rough glass with a simple environment reflection; no transmission or post-processing.</li>
+    <li>Mobile: only two large panes, a shorter lateral move and direct Match Stage reveal.</li>
+    <li>Reduced motion: a static glass composition reveals the UI pane-by-pane without moving the camera.</li>
+    <li>Fallback: a CSS/DOM glass frame using the actual dashboard beneath it; no faux tunnel animation.</li>
+  </ul>
+
+  <p>This concept is elegant and highly specific to the renovated stadium, but it feels more like entering a premium stadium space than personally walking out onto the pitch.</p>
+
+  <h2>Concept 3 — The Architect’s Cutaway</h2>
+
+  <p>The tunnel begins as a physical architectural section model, then becomes full-scale around the camera. This is the most distinctive and most technically ambitious direction.</p>
+
+  <p>It is not a glowing wireframe or hologram. Think dark presentation table, painted model surfaces, exposed section cuts and precisely machined edges.</p>
+
+  <h3>What we see</h3>
+
+  <p>We begin close to a cut concrete edge and a thin painted route line. The camera pulls back just enough to reveal a sectional model of the tunnel beneath the first stadium tier. The ceiling and one wall are absent, exposing the route toward the pitch. The camera then enters the model; without a cut, the space becomes full-scale. On exit, the cut-section edges flatten into the dashboard’s grid.</p>
+
+  <h3>Timing</h3>
+
+  <table>
+    <thead><tr><th>Time</th><th>Sequence</th></tr></thead>
+    <tbody>
+      <tr><td>0.0–0.5s</td><td>Extreme close-up of physical material: dark blue painted surface, cut concrete edge and a single route line. Scale is intentionally ambiguous.</td></tr>
+      <tr><td>0.5–1.5s</td><td>The camera reveals a three-quarter architectural section of the tunnel and lower stand. Ceiling lights illuminate the route like a museum model. Theme colors appear on removable graphic panels.</td></tr>
+      <tr><td>1.5–2.5s</td><td>The camera follows the route line into the section. A seamless scale transition turns the model into a full-size tunnel; the physical materials gain full PBR detail as we approach the pitch opening.</td></tr>
+      <tr><td>2.5–3.5s</td><td>At the threshold, section-cut edges rotate and settle into the Match Stage border and dashboard dividers. The route line becomes the central Match Stage axis. The stadium mass drops behind the live UI without darkness or a hard cut.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Real elements reproduced</h3>
+
+  <ul>
+    <li>The known wider route, glazing, rails, pitch threshold and lower-tier relationship.</li>
+    <li>The stadium’s actual architectural character—concrete structure and large sectional masses—rather than invented futuristic technology.</li>
+    <li>The section remains interpretive because no complete public construction drawings for the player route were found.</li>
+  </ul>
+
+  <h3>Scene and transition</h3>
+
+  <ul>
+    <li>A single Blender asset with two coordinated representations: presentation-scale section and full-scale interior.</li>
+    <li>The transition can use matched duplicate geometry rather than a costly continuous morph: the camera crosses a section plane while the full-scale version replaces the maquette at the same projected scale.</li>
+    <li>Clipping planes reveal cut surfaces with a darker physical cap material.</li>
+    <li>The section’s vertical cuts are designed from the beginning to match the desktop dashboard columns.</li>
+    <li>At the final threshold, these cuts become CSS rules while Match Stage appears inside the central section.</li>
+    <li>Mobile fallback should be a pre-rendered, self-hosted 720p sequence rather than attempting the full cutaway transition in real time.</li>
+  </ul>
+
+  <h3>Assets</h3>
+
+  <table>
+    <thead><tr><th>Asset</th><th>Source type</th></tr></thead>
+    <tbody>
+      <tr><td>Full tunnel and cropped lower-tier section</td><td><strong>MODEL OURSELVES</strong></td></tr>
+      <tr><td>Maquette/full-scale paired geometry and section caps</td><td><strong>MODEL OURSELVES</strong></td></tr>
+      <tr><td>Glass, rails, pitch mouth and structural slabs</td><td><strong>MODEL OURSELVES</strong></td></tr>
+      <tr><td>CC0 concrete, metal and floor PBR source maps</td><td><strong>DOWNLOAD</strong></td></tr>
+      <tr><td>Neutral stadium HDRI for lighting, not visible scenery</td><td><strong>DOWNLOAD</strong></td></tr>
+      <tr><td>Theme panels, route graphics and section labels</td><td><strong>GENERATE</strong></td></tr>
+      <tr><td>Cut-surface hatching and subtle material variation</td><td><strong>GENERATE</strong></td></tr>
+      <tr><td>Clipping system, seat instancing and line-to-grid transformation</td><td><strong>PROCEDURAL</strong></td></tr>
+      <tr><td>Mobile prerender generated from our own Blender scene</td><td><strong>GENERATE</strong></td></tr>
+    </tbody>
+  </table>
+
+  <h3>Cost</h3>
+
+  <ul>
+    <li>Transfer target: 7–10 MB for desktop; 1.5–3 MB for the mobile prerender.</li>
+    <li>Geometry: approximately 180–280k visible triangles.</li>
+    <li>Draw calls: 35–60.</li>
+    <li>Estimated GPU memory: 60–100 MB.</li>
+    <li>Complexity: <strong>very high</strong> because scale continuity, clipping surfaces, model/full-scale replacement and responsive UI alignment all have to withstand close scrutiny.</li>
+  </ul>
+
+  <h3>Degraded behavior</h3>
+
+  <ul>
+    <li>Weak hardware: skip the real-time scale transition and use a short pre-rendered section sequence.</li>
+    <li>Mobile: prerendered neutral architecture with a live theme-colored DOM layer over it.</li>
+    <li>Reduced motion: display the completed physical cutaway as a still, then reveal the dashboard along its existing section lines.</li>
+    <li>If the prerender is not ready quickly, bypass it; the dashboard should never wait for the intro.</li>
+  </ul>
+
+  <h2>Asset and licensing plan</h2>
+
+  <h3>Suitable downloads</h3>
+
+  <table>
+    <thead><tr><th>Candidate</th><th>Status</th><th>Recommended use</th></tr></thead>
+    <tbody>
+      <tr><td><a href="https://polyhaven.com/a/stadium_01">Poly Haven Stadium 01 HDRI</a></td><td>CC0. Poly Haven states its assets may be used commercially, modified and redistributed without attribution. <a href="https://polyhaven.com/license">License</a>.</td><td>Download only the 1K or 2K version and use it as lighting/IBL. Do not expose it as though it were Camp Nou.</td></tr>
+      <tr><td><a href="https://polyhaven.com/a/concrete_tunnel_02">Poly Haven Concrete Tunnel 02 HDRI</a></td><td>CC0</td><td>Lighting reference or temporary blockout IBL; not visible scenery.</td></tr>
+      <tr><td><a href="https://polyhaven.com/a/concrete">Poly Haven Concrete material</a></td><td>CC0</td><td>Normal/roughness source for structural concrete, reduced to 1K/2K and repacked.</td></tr>
+      <tr><td><a href="https://3dtextures.me/2018/04/12/concrete-010/">3DTextures Concrete 010</a></td><td>CC0, available at 1K</td><td>Lightweight alternative for concrete/floor maps.</td></tr>
+      <tr><td><a href="https://sketchfab.com/3d-models/camp-nou-stadium-37c9bfbd9ee64b90bd67ab7f500317e1">Camp Nou Stadium by farhad.Guli</a></td><td>Downloadable CC BY; about 1.9k triangles. Attribution, license link and change notice are required under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY</a>.</td><td>Useful as an old-bowl proportion proxy or reference only. It is too old and too simple to serve as the renovated stadium. A CC license also does not grant trademark or endorsement rights.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Assets to model ourselves</h3>
+
+  <ul>
+    <li>Renovated tunnel shell.</li>
+    <li>Glazed VIP wall.</li>
+    <li>Rails, lighting housings and portal.</li>
+    <li>Pitch threshold.</li>
+    <li>Only the visible fragments of the lower bowl and seating.</li>
+    <li>Architectural maquette/cutaway pieces if Concept 3 is selected.</li>
+    <li>Any object that must align precisely to the dashboard.</li>
+  </ul>
+
+  <p>This is more efficient than repairing a generic tunnel model and produces a much more recognizable result.</p>
+
+  <h3>Assets we can generate</h3>
+
+  <ul>
+    <li>Original blaugrana/purple/mint architectural graphics based on the existing theme tokens.</li>
+    <li>Neutral wayfinding arrows, bay numbers and route markings.</li>
+    <li>Roughness variation, floor wear and glass smudges.</li>
+    <li>A stylized daylight curtain at the exit.</li>
+    <li>Baked-light atlases and mobile prerenders.</li>
+  </ul>
+
+  <p>Generated graphics should not contain player likenesses, copied photographs or unofficially reproduced sponsor artwork.</p>
+
+  <h3>Assets to avoid</h3>
+
+  <ul>
+    <li>The 1.4-million-triangle <a href="https://sketchfab.com/3d-models/new-camp-nou-stadium-barcelona-spain-80ec3790f97f4bbcb8990c04b0b6fb85">New Camp Nou model</a>: no usable download/license is displayed, and it is far too heavy.</li>
+    <li>The paid 1.93-million-polygon Camp Nou models found on commercial marketplaces unless separately procured and legally reviewed.</li>
+    <li>Getty, Reuters, FC Barcelona, Sport or tour-company photography as textures.</li>
+    <li>Ripped videogame stadium models.</li>
+    <li>Player portraits, official murals, the crest, Nike marks or Spotify marks without permission.</li>
+  </ul>
+
+  <p>FC Barcelona’s own legal notice says its imagery, designs and trademarks require authorization for reproduction or modification. <a href="https://www.fcbarcelona.com/en/news/698590/legal-notices/amp">FC Barcelona legal notice</a>. Spotify also imposes explicit logo and co-branding rules. <a href="https://developer.spotify.com/documentation/design">Spotify branding guidance</a>.</p>
+
+  <p>For an internal personal dashboard, risk and enforcement context may differ, but the clean production recommendation is still: use original theme-driven architectural graphics and obtain authorization before shipping official marks publicly.</p>
+
+  <h2>Technical package plan</h2>
+
+  <p>Required when implementation begins:</p>
+
+  <ul>
+    <li><code>three</code></li>
+    <li><code>@react-three/fiber</code></li>
+    <li><code>@react-three/drei</code></li>
+    <li>Existing <code>motion</code> package for DOM choreography</li>
+    <li><code>@gltf-transform/cli</code> as a development dependency for pruning, deduplication, animation resampling, Meshopt/Draco and texture processing</li>
+    <li>Blender for tunnel modeling, UVs and baked lighting</li>
+  </ul>
+
+  <p>Optional:</p>
+
+  <ul>
+    <li><code>@react-three/postprocessing</code>, only if a restrained high-quality threshold bloom or very brief DOF proves materially better. It should not be required for the core experience.</li>
+    <li>No physics package, particle library or second general animation library is necessary.</li>
+  </ul>
+
+  <p>Drei’s <code>useGLTF</code> supports preloading, Draco and Meshopt, including KTX2 extension wiring. <a href="https://drei.docs.pmnd.rs/loaders/gltf-use-gltf">Drei GLTF guidance</a>. glTF Transform provides pruning, deduplication, Meshopt/Draco and KTX2/Basis workflows. <a href="https://gltf-transform.dev/">glTF Transform</a>.</p>
+
+  <h2>Runtime behavior</h2>
+
+  <p>The eventual integration should be an explicit state machine:</p>
+
+  <ol>
+    <li>The existing Server Component fetches dashboard data normally.</li>
+    <li><code>DashboardClient</code> restores the saved kit.</li>
+    <li>An <code>IntroGate</code> checks the future preference, <code>sessionStorage</code>, reduced motion, Save-Data and WebGL support.</li>
+    <li>Only eligible users cause the dynamically imported 3D chunk and assets to download.</li>
+    <li>The real dashboard is mounted behind the intro but made <code>inert</code>; focus begins on the visible Skip button.</li>
+    <li>Escape or Skip sets the session flag and jumps directly to the completed composition.</li>
+    <li>Completion sets the same flag, restores dashboard interactivity and unmounts the Canvas.</li>
+    <li>Loaded GLTF caches, render targets, textures, geometries and materials are explicitly cleared/disposed.</li>
+  </ol>
+
+  <p>R3F can render on demand outside the active animation, and its performance model supports changing DPR/quality. <a href="https://r3f.docs.pmnd.rs/advanced/scaling-performance">R3F performance guidance</a>. Three.js resources do not automatically disappear merely because JavaScript references are gone; geometries, materials, textures and special render targets need disposal. <a href="https://threejs.org/manual/pages/cleanup.html">Three.js cleanup guidance</a>.</p>
+
+  <p>Important details:</p>
+
+  <ul>
+    <li><code>sessionStorage</code> is the appropriate initial interpretation of “once per browser session.” Finish, Skip and Escape all set the same versioned key.</li>
+    <li>Introduce a version in the key, such as <code>barca-entry-v1-seen</code>, so a future redesigned intro can be shown once without clearing all storage.</li>
+    <li>If the tab becomes hidden during playback, complete or skip the intro and release the renderer.</li>
+    <li>Never wait indefinitely for a cinematic. If first meaningful 3D content misses a strict loading budget, use the fallback.</li>
+    <li>The Skip control must be normal DOM, keyboard reachable and readable against every theme.</li>
+    <li>The canvas should be <code>aria-hidden</code>; no essential information lives inside it.</li>
+    <li>Do not mutate the existing dashboard layout merely to serve the intro. Measure it and align to it.</li>
+  </ul>
+
+  <h2>Final recommendation</h2>
+
+  <p>Concept 1, “The Threshold,” fits this dashboard best.</p>
+
+  <p>It is not the easiest concept—the live tunnel-mouth-to-Match-Stage handoff is still high-complexity—but its difficulty produces visible value:</p>
+
+  <ul>
+    <li>It delivers the requested player-walk sensation most directly.</li>
+    <li>It is grounded in the renovated 2026/27 tunnel rather than nostalgia or a generic football corridor.</li>
+    <li>The new glass, rails, threshold and pitch markings all have exact counterparts in the existing dashboard structure.</li>
+    <li>The dashboard reveal is physical and continuous: portal to Match Stage, rail to Stadium Rail, mullion to Barça Pulse, threshold to Season Story.</li>
+    <li>Kit themes can change replaceable graphics and light accents without making the real architecture implausibly change color.</li>
+    <li>It remains achievable within a disciplined 5–7 MB asset budget and scales down gracefully.</li>
+  </ul>
+
+  <p>Concept 2 is the strongest alternative if the goal becomes “premium architectural access” rather than “player emergence.” Concept 3 is the most artistically distinctive, but it risks making the architectural idea more memorable than the Camp Nou walk itself.</p>
+
+  <p>The right next step—before production code—would be a grayscale Blender/R3F blockout of Concept 1 with the exact camera timing and a mocked responsive Match Stage alignment. That prototype should validate the transition before any detailed textures, branding or stadium modeling are commissioned.</p>
+</body>
+</html>

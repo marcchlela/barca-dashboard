@@ -1,0 +1,774 @@
+// use prisma-8
+
+enum Era {
+  @@type("pg/text@1")
+  Modern   = "modern"
+  Older    = "older"
+  Historic = "historic"
+}
+
+enum KitType {
+  @@type("pg/text@1")
+  Home       = "home"
+  Away       = "away"
+  Third      = "third"
+  Goalkeeper = "goalkeeper"
+  Special    = "special"
+}
+
+enum CompetitionType {
+  @@type("pg/text@1")
+  League      = "league"
+  Cup         = "cup"
+  SuperCup    = "super_cup"
+  Continental = "continental"
+  Friendly    = "friendly"
+  Other       = "other"
+}
+
+enum PlayerPosition {
+  @@type("pg/text@1")
+  Goalkeeper = "goalkeeper"
+  Defender   = "defender"
+  Midfielder = "midfielder"
+  Forward    = "forward"
+  Unknown    = "unknown"
+}
+
+enum MatchStatus {
+  @@type("pg/text@1")
+  Scheduled = "scheduled"
+  Postponed = "postponed"
+  Cancelled = "cancelled"
+  Live      = "live"
+  Halftime  = "halftime"
+  ExtraTime = "extra_time"
+  Penalties = "penalties"
+  Finished  = "finished"
+  Abandoned = "abandoned"
+}
+
+enum LineupRole {
+  @@type("pg/text@1")
+  Starter    = "starter"
+  Substitute = "substitute"
+}
+
+enum MatchEventType {
+  @@type("pg/text@1")
+  PeriodStart   = "period_start"
+  PeriodEnd     = "period_end"
+  Kickoff       = "kickoff"
+  Goal          = "goal"
+  OwnGoal       = "own_goal"
+  PenaltyGoal   = "penalty_goal"
+  MissedPenalty = "missed_penalty"
+  Shot          = "shot"
+  Pass          = "pass"
+  Carry         = "carry"
+  Assist        = "assist"
+  YellowCard    = "yellow_card"
+  RedCard       = "red_card"
+  Substitution  = "substitution"
+  Injury        = "injury"
+  Offside       = "offside"
+  Foul          = "foul"
+  Save          = "save"
+  Other         = "other"
+}
+
+enum DataConfidence {
+  @@type("pg/text@1")
+  ExactProvider  = "exact_provider"
+  Derived        = "derived"
+  ManualVerified = "manual_verified"
+  Reconstructed  = "reconstructed"
+  Approximate    = "approximate"
+  Unknown        = "unknown"
+}
+
+enum MediaType {
+  @@type("pg/text@1")
+  MatchHighlight  = "match_highlight"
+  GoalClip        = "goal_clip"
+  Interview       = "interview"
+  PressConference = "press_conference"
+  Training        = "training"
+  Historical      = "historical"
+  Other           = "other"
+}
+
+enum WatchType {
+  @@type("pg/text@1")
+  Live           = "live"
+  Replay         = "replay"
+  HighlightsOnly = "highlights_only"
+}
+
+enum ProviderEntityType {
+  @@type("pg/text@1")
+  Season      = "season"
+  Competition = "competition"
+  Team        = "team"
+  Player      = "player"
+  Match       = "match"
+  Event       = "event"
+  Media       = "media"
+  Trophy      = "trophy"
+}
+
+enum SeasonMomentType {
+  @@type("pg/text@1")
+  Match      = "match"
+  Trophy     = "trophy"
+  Injury     = "injury"
+  Debut      = "debut"
+  Transfer   = "transfer"
+  Record     = "record"
+  KeyMoment  = "key_moment"
+  Historical = "historical"
+  Personal   = "personal"
+  Other      = "other"
+}
+
+enum AbsenceType {
+  @@type("pg/text@1")
+  Injury     = "injury"
+  Suspension = "suspension"
+  Illness    = "illness"
+  Rest       = "rest"
+  Other      = "other"
+}
+
+enum AbsenceStatus {
+  @@type("pg/text@1")
+  Active    = "active"
+  Recovered = "recovered"
+  Unknown   = "unknown"
+}
+
+model Season {
+  id Uuid @id @default(uuid())
+  label String @unique
+  startYear Int
+  endYear Int
+  startDate DateTime?
+  endDate DateTime?
+  era Era
+  isCurrent Boolean @default(false)
+  visualKey String?
+  createdAt temporal.createdAt()
+  updatedAt temporal.updatedAt()
+
+  squadMemberships SquadMembership[]
+  matches Match[]
+  standings StandingSnapshot[]
+  kitThemes KitTheme[]
+  trophyWins TrophyWin[]
+  mediaItems MediaItem[]
+  moments SeasonMoment[]
+  absences PlayerAbsence[]
+
+  @@index([startYear])
+  @@index([isCurrent])
+  @@map("season")
+}
+
+model Competition {
+  id Uuid @id @default(uuid())
+  name String
+  shortName String?
+  code String @unique
+  type CompetitionType
+  country String?
+  logoUrl String?
+  createdAt temporal.createdAt()
+  updatedAt temporal.updatedAt()
+
+  matches Match[]
+  standings StandingSnapshot[]
+  trophyWins TrophyWin[]
+
+  @@map("competition")
+}
+
+model Team {
+  id Uuid @id @default(uuid())
+  name String
+  shortName String?
+  code String @unique
+  country String?
+  crestUrl String?
+  isBarcelona Boolean @default(false)
+  createdAt temporal.createdAt()
+  updatedAt temporal.updatedAt()
+
+  homeMatches Match[] @relation("HomeTeam")
+  awayMatches Match[] @relation("AwayTeam")
+  squadMemberships SquadMembership[]
+  lineups Lineup[]
+  events MatchEvent[]
+  matchStats MatchStatistic[]
+  playerMatchStats PlayerMatchStatistic[]
+  standings StandingSnapshot[]
+
+  @@index([isBarcelona])
+  @@map("team")
+}
+
+model Player {
+  id Uuid @id @default(uuid())
+  firstName String?
+  lastName String?
+  displayName String
+  birthDate DateTime?
+  nationality String?
+  primaryPosition PlayerPosition @default(Unknown)
+  preferredFoot String?
+  portraitUrl String?
+  isActive Boolean @default(true)
+  createdAt temporal.createdAt()
+  updatedAt temporal.updatedAt()
+
+  squadMemberships SquadMembership[]
+  lineupEntries LineupPlayer[]
+  primaryEvents MatchEvent[] @relation("PrimaryEventPlayer")
+  relatedEvents MatchEvent[] @relation("RelatedEventPlayer")
+  matchStats PlayerMatchStatistic[]
+  mediaItems MediaItem[]
+  favouriteRecord FavouritePlayer?
+  diaryFavouriteEntries MatchDiaryEntry[] @relation("DiaryFavouritePlayer")
+  seasonMoments SeasonMoment[]
+  absences PlayerAbsence[]
+
+  @@index([displayName])
+  @@index([isActive])
+  @@map("player")
+}
+
+model SquadMembership {
+  id Uuid @id @default(uuid())
+  seasonId Uuid
+  teamId Uuid
+  playerId Uuid
+  shirtNumber Int?
+  position PlayerPosition @default(Unknown)
+  isCaptain Boolean @default(false)
+  joinedAt DateTime?
+  leftAt DateTime?
+  createdAt temporal.createdAt()
+  updatedAt temporal.updatedAt()
+
+  season Season @relation(fields: [seasonId], references: [id])
+  team Team @relation(fields: [teamId], references: [id])
+  player Player @relation(fields: [playerId], references: [id])
+
+  @@unique([seasonId, teamId, playerId])
+  @@index([seasonId, teamId])
+  @@index([playerId])
+  @@map("squad_membership")
+}
+
+model Match {
+  id Uuid @id @default(uuid())
+  seasonId Uuid
+  competitionId Uuid
+  homeTeamId Uuid
+  awayTeamId Uuid
+  kickoff DateTime
+  status MatchStatus @default(Scheduled)
+  matchday Int?
+  stage String?
+  round String?
+  leg Int?
+  venue String?
+  neutralVenue Boolean @default(false)
+  homeScore Int?
+  awayScore Int?
+  homeExtraTimeScore Int?
+  awayExtraTimeScore Int?
+  homePenaltyScore Int?
+  awayPenaltyScore Int?
+  attendance Int?
+  createdAt temporal.createdAt()
+  updatedAt temporal.updatedAt()
+
+  season Season @relation(fields: [seasonId], references: [id])
+  competition Competition @relation(fields: [competitionId], references: [id])
+  homeTeam Team @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeam Team @relation("AwayTeam", fields: [awayTeamId], references: [id])
+  lineups Lineup[]
+  events MatchEvent[]
+  teamStats MatchStatistic[]
+  playerStats PlayerMatchStatistic[]
+  mediaItems MediaItem[]
+  predictions Prediction[]
+  diaryEntry MatchDiaryEntry?
+  seasonMoments SeasonMoment[]
+
+  @@index([seasonId, competitionId])
+  @@index([kickoff])
+  @@index([status, kickoff])
+  @@index([homeTeamId])
+  @@index([awayTeamId])
+  @@map("football_match")
+}
+
+model Lineup {
+  id Uuid @id @default(uuid())
+  matchId Uuid
+  teamId Uuid
+  formation String?
+  coachName String?
+  isConfirmed Boolean @default(false)
+  createdAt temporal.createdAt()
+  updatedAt temporal.updatedAt()
+
+  match Match @relation(fields: [matchId], references: [id])
+  team Team @relation(fields: [teamId], references: [id])
+  players LineupPlayer[]
+
+  @@unique([matchId, teamId])
+  @@index([teamId])
+  @@map("lineup")
+}
+
+model LineupPlayer {
+  id Uuid @id @default(uuid())
+  lineupId Uuid
+  playerId Uuid
+  role LineupRole
+  shirtNumber Int?
+  position String?
+  positionX Float?
+  positionY Float?
+  enteredMinute Int?
+  leftMinute Int?
+  createdAt temporal.createdAt()
+  updatedAt temporal.updatedAt()
+
+  lineup Lineup @relation(fields: [lineupId], references: [id])
+  player Player @relation(fields: [playerId], references: [id])
+
+  @@unique([lineupId, playerId])
+  @@index([playerId])
+  @@map("lineup_player")
+}
+
+model MatchEvent {
+  id Uuid @id @default(uuid())
+  matchId Uuid
+  teamId Uuid?
+  primaryPlayerId Uuid?
+  relatedPlayerId Uuid?
+  dataSourceId Uuid?
+  type MatchEventType
+  period Int?
+  minute Int?
+  second Int?
+  eventOrder Int?
+  startX Float?
+  startY Float?
+  endX Float?
+  endY Float?
+  xG Float?
+  outcome String?
+  bodyPart String?
+  playPattern String?
+  sequenceId String?
+  coordinateSystem String?
+  confidence DataConfidence @default(Unknown)
+  rawData Json?
+  createdAt temporal.createdAt()
+  updatedAt temporal.updatedAt()
+
+  match Match @relation(fields: [matchId], references: [id])
+  team Team? @relation(fields: [teamId], references: [id])
+  primaryPlayer Player? @relation("PrimaryEventPlayer", fields: [primaryPlayerId], references: [id])
+  relatedPlayer Player? @relation("RelatedEventPlayer", fields: [relatedPlayerId], references: [id])
+  dataSource DataSource? @relation(fields: [dataSourceId], references: [id])
+  diaryFavouriteIn MatchDiaryEntry[] @relation("DiaryFavouriteGoal")
+
+  @@index([matchId, eventOrder])
+  @@index([matchId, type])
+  @@index([primaryPlayerId])
+  @@index([sequenceId])
+  @@map("match_event")
+}
+
+model MatchStatistic {
+  id Uuid @id @default(uuid())
+  matchId Uuid
+  teamId Uuid
+  dataSourceId Uuid?
+  possession Float?
+  shots Int?
+  shotsOnTarget Int?
+  xG Float?
+  passes Int?
+  completedPasses Int?
+  passAccuracy Float?
+  corners Int?
+  fouls Int?
+  offsides Int?
+  yellowCards Int?
+  redCards Int?
+  tackles Int?
+  interceptions Int?
+  clearances Int?
+  rawData Json?
+  createdAt temporal.createdAt()
+  updatedAt temporal.updatedAt()
+
+  match Match @relation(fields: [matchId], references: [id])
+  team Team @relation(fields: [teamId], references: [id])
+  dataSource DataSource? @relation(fields: [dataSourceId], references: [id])
+
+  @@unique([matchId, teamId])
+  @@index([teamId])
+  @@map("match_statistic")
+}
+
+model PlayerMatchStatistic {
+  id Uuid @id @default(uuid())
+  matchId Uuid
+  playerId Uuid
+  teamId Uuid
+  dataSourceId Uuid?
+  minutes Int?
+  goals Int?
+  assists Int?
+  shots Int?
+  shotsOnTarget Int?
+  xG Float?
+  xA Float?
+  touches Int?
+  passes Int?
+  completedPasses Int?
+  passAccuracy Float?
+  keyPasses Int?
+  progressivePasses Int?
+  carries Int?
+  progressiveCarries Int?
+  tackles Int?
+  interceptions Int?
+  recoveries Int?
+  duelsWon Int?
+  duelsTotal Int?
+  yellowCards Int?
+  redCards Int?
+  rating Float?
+  rawData Json?
+  createdAt temporal.createdAt()
+  updatedAt temporal.updatedAt()
+
+  match Match @relation(fields: [matchId], references: [id])
+  player Player @relation(fields: [playerId], references: [id])
+  team Team @relation(fields: [teamId], references: [id])
+  dataSource DataSource? @relation(fields: [dataSourceId], references: [id])
+
+  @@unique([matchId, playerId])
+  @@index([playerId])
+  @@index([teamId])
+  @@map("player_match_statistic")
+}
+
+model StandingSnapshot {
+  id Uuid @id @default(uuid())
+  seasonId Uuid
+  competitionId Uuid
+  teamId Uuid
+  matchday Int
+  position Int
+  played Int
+  won Int
+  drawn Int
+  lost Int
+  goalsFor Int
+  goalsAgainst Int
+  goalDifference Int
+  points Int
+  snapshotAt DateTime?
+  createdAt temporal.createdAt()
+  updatedAt temporal.updatedAt()
+
+  season Season @relation(fields: [seasonId], references: [id])
+  competition Competition @relation(fields: [competitionId], references: [id])
+  team Team @relation(fields: [teamId], references: [id])
+
+  @@unique([seasonId, competitionId, matchday, teamId])
+  @@index([seasonId, competitionId, matchday])
+  @@index([teamId])
+  @@map("standing_snapshot")
+}
+
+model MediaItem {
+  id Uuid @id @default(uuid())
+  type MediaType
+  title String
+  description String?
+  url String
+  externalMediaId String?
+  thumbnailUrl String?
+  isOfficial Boolean @default(false)
+  publishedAt DateTime?
+  seasonId Uuid?
+  matchId Uuid?
+  playerId Uuid?
+  dataSourceId Uuid?
+  createdAt temporal.createdAt()
+  updatedAt temporal.updatedAt()
+
+  season Season? @relation(fields: [seasonId], references: [id])
+  match Match? @relation(fields: [matchId], references: [id])
+  player Player? @relation(fields: [playerId], references: [id])
+  dataSource DataSource? @relation(fields: [dataSourceId], references: [id])
+
+  @@index([matchId])
+  @@index([seasonId])
+  @@index([playerId])
+  @@map("media_item")
+}
+
+model KitTheme {
+  id Uuid @id @default(uuid())
+  seasonId Uuid
+  type KitType
+  name String
+  primaryColor String
+  secondaryColor String
+  accentColor String
+  backgroundColor String?
+  surfaceColor String?
+  textColor String?
+  palette Json?
+  effects Json?
+  assets Json?
+  textureUrl String?
+  createdAt temporal.createdAt()
+  updatedAt temporal.updatedAt()
+
+  season Season @relation(fields: [seasonId], references: [id])
+
+  @@unique([seasonId, type])
+  @@index([seasonId])
+  @@map("kit_theme")
+}
+
+model Trophy {
+  id Uuid @id @default(uuid())
+  name String
+  shortName String?
+  category String?
+  imageUrl String?
+  modelUrl String?
+  createdAt temporal.createdAt()
+  updatedAt temporal.updatedAt()
+
+  wins TrophyWin[]
+
+  @@map("trophy")
+}
+
+model TrophyWin {
+  id Uuid @id @default(uuid())
+  trophyId Uuid
+  seasonId Uuid
+  competitionId Uuid?
+  wonAt DateTime?
+  notes String?
+  createdAt temporal.createdAt()
+  updatedAt temporal.updatedAt()
+
+  trophy Trophy @relation(fields: [trophyId], references: [id])
+  season Season @relation(fields: [seasonId], references: [id])
+  competition Competition? @relation(fields: [competitionId], references: [id])
+
+  @@index([seasonId])
+  @@index([trophyId])
+  @@map("trophy_win")
+}
+
+model FavouritePlayer {
+  id Uuid @id @default(uuid())
+  playerId Uuid @unique
+  sortOrder Int @default(0)
+  pinnedAt temporal.createdAt()
+
+  player Player @relation(fields: [playerId], references: [id])
+
+  @@map("favourite_player")
+}
+
+model MatchDiaryEntry {
+  id Uuid @id @default(uuid())
+  matchId Uuid @unique
+  watched Boolean @default(true)
+  watchType WatchType?
+  watchedAt DateTime?
+  rating Float?
+  favouritePlayerId Uuid?
+  favouriteGoalEventId Uuid?
+  notes String?
+  createdAt temporal.createdAt()
+  updatedAt temporal.updatedAt()
+
+  match Match @relation(fields: [matchId], references: [id])
+  favouritePlayer Player? @relation("DiaryFavouritePlayer", fields: [favouritePlayerId], references: [id])
+  favouriteGoalEvent MatchEvent? @relation("DiaryFavouriteGoal", fields: [favouriteGoalEventId], references: [id])
+
+  @@index([watchedAt])
+  @@map("match_diary_entry")
+}
+
+model ModelVersion {
+  id Uuid @id @default(uuid())
+  version String @unique
+  name String
+  algorithm String?
+  trainedAt DateTime?
+  metrics Json?
+  notes String?
+  createdAt temporal.createdAt()
+  updatedAt temporal.updatedAt()
+
+  predictions Prediction[]
+
+  @@map("model_version")
+}
+
+model Prediction {
+  id Uuid @id @default(uuid())
+  matchId Uuid
+  modelVersionId Uuid
+  generatedAt DateTime @default(now())
+  barcaWinProbability Float
+  drawProbability Float
+  opponentWinProbability Float
+  scoreDistribution Json?
+  featureSnapshot Json?
+  analysisSnapshot Json?
+  isFinalPreKickoff Boolean @default(false)
+  lockedAt DateTime?
+  createdAt temporal.createdAt()
+  updatedAt temporal.updatedAt()
+
+  match Match @relation(fields: [matchId], references: [id])
+  modelVersion ModelVersion @relation(fields: [modelVersionId], references: [id])
+
+  @@index([matchId, generatedAt])
+  @@index([modelVersionId])
+  @@map("prediction")
+}
+
+model DataSource {
+  id Uuid @id @default(uuid())
+  code String @unique
+  name String
+  baseUrl String?
+  isOfficial Boolean @default(false)
+  isEnabled Boolean @default(true)
+  licenseNotes String?
+  createdAt temporal.createdAt()
+  updatedAt temporal.updatedAt()
+
+  mappings ProviderMapping[]
+  matchEvents MatchEvent[]
+  matchStats MatchStatistic[]
+  playerMatchStats PlayerMatchStatistic[]
+  mediaItems MediaItem[]
+  seasonMoments SeasonMoment[]
+  absences PlayerAbsence[]
+
+  @@map("data_source")
+}
+
+model ProviderMapping {
+  id Uuid @id @default(uuid())
+  dataSourceId Uuid
+  entityType ProviderEntityType
+  internalId Uuid
+  providerId String
+  metadata Json?
+  createdAt temporal.createdAt()
+  updatedAt temporal.updatedAt()
+
+  dataSource DataSource @relation(fields: [dataSourceId], references: [id])
+
+  @@unique([dataSourceId, entityType, providerId])
+
+  @@index(
+    [dataSourceId, entityType, internalId],
+    name: "pm_source_type_internal"
+  )
+
+  @@index([internalId], name: "pm_internal")
+  @@map("provider_mapping")
+}
+
+model SeasonMoment {
+  id Uuid @id @default(uuid())
+  seasonId Uuid
+  matchId Uuid?
+  playerId Uuid?
+  dataSourceId Uuid?
+  type SeasonMomentType
+  title String
+  description String?
+  occurredAt DateTime
+  importance Int @default(1)
+  imageUrl String?
+  metadata Json?
+  createdAt temporal.createdAt()
+  updatedAt temporal.updatedAt()
+
+  season Season @relation(fields: [seasonId], references: [id])
+  match Match? @relation(fields: [matchId], references: [id])
+  player Player? @relation(fields: [playerId], references: [id])
+  dataSource DataSource? @relation(fields: [dataSourceId], references: [id])
+
+  @@index([seasonId, occurredAt])
+  @@index([matchId])
+  @@index([playerId])
+  @@map("season_moment")
+}
+
+model PlayerAbsence {
+  id Uuid @id @default(uuid())
+  seasonId Uuid
+  playerId Uuid
+  dataSourceId Uuid?
+  type AbsenceType
+  status AbsenceStatus @default(Unknown)
+  startDate DateTime?
+  endDate DateTime?
+  reason String?
+  notes String?
+  createdAt temporal.createdAt()
+  updatedAt temporal.updatedAt()
+
+  season Season @relation(fields: [seasonId], references: [id])
+  player Player @relation(fields: [playerId], references: [id])
+  dataSource DataSource? @relation(fields: [dataSourceId], references: [id])
+
+  @@index([seasonId])
+  @@index([playerId])
+  @@index([status])
+  @@map("player_absence")
+}
+
+model ManualOverride {
+  id Uuid @id @default(uuid())
+  entityType String
+  entityId Uuid
+  fieldName String?
+  payload Json
+  reason String?
+  sourceUrl String?
+  confidence DataConfidence @default(ManualVerified)
+  createdAt temporal.createdAt()
+  updatedAt temporal.updatedAt()
+
+  @@index([entityType, entityId])
+  @@map("manual_override")
+}

@@ -1,0 +1,129 @@
+[
+  {
+    "id": "dropConstraint.provider_mapping.provider_mapping_dataSourceId_entityType_internalId_key",
+    "label": "Drop constraint \"provider_mapping_dataSourceId_entityType_internalId_key\" on \"provider_mapping\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "provider_mapping_dataSourceId_entityType_internalId_key",
+        "table": "provider_mapping"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"provider_mapping_dataSourceId_entityType_internalId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "provider_mapping_dataSourceId_entityType_internalId_key",
+          "public",
+          "\"public\".\"provider_mapping\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop constraint \"provider_mapping_dataSourceId_entityType_internalId_key\"",
+        "sql": "ALTER TABLE \"public\".\"provider_mapping\" DROP CONSTRAINT \"provider_mapping_dataSourceId_entityType_internalId_key\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"provider_mapping_dataSourceId_entityType_internalId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "provider_mapping_dataSourceId_entityType_internalId_key",
+          "public",
+          "\"public\".\"provider_mapping\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.provider_mapping.pm_source_type_internal_61d4b70f",
+    "label": "Create index \"pm_source_type_internal_61d4b70f\" on \"provider_mapping\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "pm_source_type_internal_61d4b70f",
+        "table": "provider_mapping"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"pm_source_type_internal_61d4b70f\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"pm_source_type_internal_61d4b70f\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"pm_source_type_internal_61d4b70f\"",
+        "sql": "CREATE INDEX \"pm_source_type_internal_61d4b70f\" ON \"public\".\"provider_mapping\" (\"dataSourceId\", \"entityType\", \"internalId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"pm_source_type_internal_61d4b70f\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"pm_source_type_internal_61d4b70f\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.public.provider_mapping.provider_mapping_internalId_idx_1e636b89.rename",
+    "label": "Rename index \"provider_mapping_internalId_idx_1e636b89\" to \"pm_internal_1e636b89\" on \"provider_mapping\"",
+    "operationClass": "widening",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "pm_internal_1e636b89",
+        "table": "provider_mapping"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"provider_mapping_internalId_idx_1e636b89\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"provider_mapping_internalId_idx_1e636b89\""
+        ]
+      },
+      {
+        "description": "ensure index \"pm_internal_1e636b89\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"pm_internal_1e636b89\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "rename index \"provider_mapping_internalId_idx_1e636b89\" to \"pm_internal_1e636b89\"",
+        "sql": "ALTER INDEX \"public\".\"provider_mapping_internalId_idx_1e636b89\" RENAME TO \"pm_internal_1e636b89\"",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"pm_internal_1e636b89\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"pm_internal_1e636b89\""
+        ]
+      }
+    ]
+  }
+]
