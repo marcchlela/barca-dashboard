@@ -3,7 +3,10 @@ import "server-only";
 import { db } from "../../../prisma/db";
 import type { BigBallsPlayerStatistic } from "../big-balls/types";
 import { fetchGoalMatchBundle } from "../goal-api/fetch";
-import type { GoalLineupPlayer, GoalLineupSide } from "../goal-api/types";
+import type {
+  GoalLineupPlayer,
+  GoalLineupSide,
+} from "../goal-api/types";
 import { formationPosition } from "../shared/formation-layout";
 import type { MatchIdentityInput } from "../shared/match-identity";
 import {
@@ -11,7 +14,7 @@ import {
   normalizedPersonName,
   splitDisplayName,
 } from "../shared/normalization";
-import { RICH_DATA_SOURCES, RICH_MATCH_TARGET } from "./constants";
+import { RICH_DATA_SOURCES } from "./constants";
 import { bigBallsPlayerStatisticsProvider } from "./player-stat-provider";
 import {
   emptySyncCounts,
@@ -53,72 +56,102 @@ function changed(
   count[kind] += 1;
 }
 
-async function targetMatch() {
-  const match = await db.orm.public.Match
-    .where({ id: RICH_MATCH_TARGET.id })
-    .include("homeTeam")
-    .include("awayTeam")
-    .include("competition")
-    .first();
+async function loadMatchContext(
+  matchId: string,
+) {
+  const match =
+    await db.orm.public.Match
+      .where({
+        id: matchId,
+      })
+      .include("homeTeam")
+      .include("awayTeam")
+      .include("competition")
+      .first();
 
   if (!match) {
     throw new Error(
-      `Target match ${RICH_MATCH_TARGET.id} was not found.`,
+      `Match ${matchId} was not found.`,
     );
   }
-
-  const actual = {
-    kickoff: match.kickoff.toString(),
-    homeTeam: match.homeTeam.name,
-    awayTeam: match.awayTeam.name,
-    homeScore: match.homeScore,
-    awayScore: match.awayScore,
-  };
 
   if (
-    actual.kickoff !== RICH_MATCH_TARGET.kickoff ||
-    actual.homeTeam !== RICH_MATCH_TARGET.homeTeam ||
-    actual.awayTeam !== RICH_MATCH_TARGET.awayTeam ||
-    actual.homeScore !== RICH_MATCH_TARGET.homeScore ||
-    actual.awayScore !== RICH_MATCH_TARGET.awayScore
+    !match.homeTeam.isBarcelona &&
+    !match.awayTeam.isBarcelona
   ) {
     throw new Error(
-      `Target match immutable facts do not match the approved fixture: ${JSON.stringify(
-        actual,
-      )}`,
+      `Match ${matchId} is not an FC Barcelona fixture.`,
     );
   }
 
-  const mappings = await db.orm.public.ProviderMapping
-    .where({
-      internalId: match.id,
-      entityType: "match",
-    })
-    .include("dataSource")
-    .all();
+  if (
+    match.status !== "finished"
+  ) {
+    throw new Error(
+      `Rich-match ingestion currently accepts finished matches only. Match ${matchId} has status "${match.status}".`,
+    );
+  }
 
-  const internal: MatchIdentityInput = {
-    kickoff: match.kickoff.toString(),
-    competition: {
-      name: match.competition.name,
-    },
-    homeTeam: {
-      name: match.homeTeam.name,
-    },
-    awayTeam: {
-      name: match.awayTeam.name,
-    },
-    score: {
-      home: match.homeScore,
-      away: match.awayScore,
-    },
-    providerIds: Object.fromEntries(
-      mappings.map((mapping) => [
-        mapping.dataSource.code,
-        mapping.providerId,
-      ]),
-    ),
-  };
+  if (
+    match.homeScore === null ||
+    match.awayScore === null
+  ) {
+    throw new Error(
+      `Finished match ${matchId} is missing its final score.`,
+    );
+  }
+
+  const mappings =
+    await db.orm.public.ProviderMapping
+      .where({
+        internalId:
+          match.id,
+        entityType:
+          "match",
+      })
+      .include(
+        "dataSource",
+      )
+      .all();
+
+  const internal: MatchIdentityInput =
+    {
+      kickoff:
+        match.kickoff.toString(),
+
+      competition: {
+        name:
+          match.competition.name,
+      },
+
+      homeTeam: {
+        name:
+          match.homeTeam.name,
+      },
+
+      awayTeam: {
+        name:
+          match.awayTeam.name,
+      },
+
+      score: {
+        home:
+          match.homeScore,
+
+        away:
+          match.awayScore,
+      },
+
+      providerIds:
+        Object.fromEntries(
+          mappings.map(
+            (mapping) => [
+              mapping.dataSource.code,
+              mapping.providerId,
+            ],
+          ),
+        ),
+    };
 
   return {
     match,
@@ -128,44 +161,75 @@ async function targetMatch() {
 
 async function ensureDataSource(
   orm: Orm,
-  definition: (typeof RICH_DATA_SOURCES)[keyof typeof RICH_DATA_SOURCES],
+  definition:
+    (typeof RICH_DATA_SOURCES)[keyof typeof RICH_DATA_SOURCES],
   counts: RichSyncCounts,
 ) {
-  const existing = await orm.public.DataSource
-    .where({
-      code: definition.code,
-    })
-    .first();
+  const existing =
+    await orm.public.DataSource
+      .where({
+        code:
+          definition.code,
+      })
+      .first();
 
   const data = {
-    name: definition.name,
-    baseUrl: definition.baseUrl,
-    isOfficial: definition.isOfficial,
-    isEnabled: definition.isEnabled,
-    licenseNotes: definition.licenseNotes,
+    name:
+      definition.name,
+
+    baseUrl:
+      definition.baseUrl,
+
+    isOfficial:
+      definition.isOfficial,
+
+    isEnabled:
+      definition.isEnabled,
+
+    licenseNotes:
+      definition.licenseNotes,
   };
 
   if (!existing) {
-    changed(counts.dataSources, "created");
+    changed(
+      counts.dataSources,
+      "created",
+    );
 
     return orm.public.DataSource.create({
-      code: definition.code,
+      code:
+        definition.code,
+
       ...data,
     });
   }
 
-  if (recordMatches(existing, data)) {
-    changed(counts.dataSources, "unchanged");
+  if (
+    recordMatches(
+      existing,
+      data,
+    )
+  ) {
+    changed(
+      counts.dataSources,
+      "unchanged",
+    );
+
     return existing;
   }
 
-  changed(counts.dataSources, "updated");
+  changed(
+    counts.dataSources,
+    "updated",
+  );
 
-  const updated = await orm.public.DataSource
-    .where({
-      id: existing.id,
-    })
-    .update(data);
+  const updated =
+    await orm.public.DataSource
+      .where({
+        id:
+          existing.id,
+      })
+      .update(data);
 
   if (!updated) {
     throw new Error(
@@ -181,24 +245,40 @@ async function ensureMapping(
   counts: RichSyncCounts,
   input: {
     dataSourceId: string;
-    entityType: "team" | "player" | "match" | "event";
+
+    entityType:
+      | "team"
+      | "player"
+      | "match"
+      | "event";
+
     internalId: string;
     providerId: string;
     metadata?: JsonValue;
   },
 ) {
-  const existing = await orm.public.ProviderMapping
-    .where({
-      dataSourceId: input.dataSourceId,
-      entityType: input.entityType,
-      providerId: input.providerId,
-    })
-    .first();
+  const existing =
+    await orm.public.ProviderMapping
+      .where({
+        dataSourceId:
+          input.dataSourceId,
 
-  const metadata = input.metadata ?? null;
+        entityType:
+          input.entityType,
+
+        providerId:
+          input.providerId,
+      })
+      .first();
+
+  const metadata =
+    input.metadata ?? null;
 
   if (!existing) {
-    changed(counts.providerMappings, "created");
+    changed(
+      counts.providerMappings,
+      "created",
+    );
 
     return orm.public.ProviderMapping.create({
       ...input,
@@ -206,26 +286,43 @@ async function ensureMapping(
     });
   }
 
-  if (existing.internalId !== input.internalId) {
+  if (
+    existing.internalId !==
+    input.internalId
+  ) {
     throw new Error(
       `Provider identity collision for ${input.entityType} ${input.providerId}: ${existing.internalId} != ${input.internalId}`,
     );
   }
 
-  if (jsonEqual(existing.metadata, metadata)) {
-    changed(counts.providerMappings, "unchanged");
+  if (
+    jsonEqual(
+      existing.metadata,
+      metadata,
+    )
+  ) {
+    changed(
+      counts.providerMappings,
+      "unchanged",
+    );
+
     return existing;
   }
 
-  changed(counts.providerMappings, "updated");
+  changed(
+    counts.providerMappings,
+    "updated",
+  );
 
-  const updated = await orm.public.ProviderMapping
-    .where({
-      id: existing.id,
-    })
-    .update({
-      metadata,
-    });
+  const updated =
+    await orm.public.ProviderMapping
+      .where({
+        id:
+          existing.id,
+      })
+      .update({
+        metadata,
+      });
 
   if (!updated) {
     throw new Error(
@@ -246,9 +343,13 @@ async function ensureSimpleRow<
   update: () => Promise<T | null>,
 ): Promise<T> {
   if (!existing) {
-    changed(count, "created");
+    changed(
+      count,
+      "created",
+    );
 
-    const created = await create();
+    const created =
+      await create();
 
     if (!created) {
       throw new Error(
@@ -259,14 +360,27 @@ async function ensureSimpleRow<
     return created;
   }
 
-  if (recordMatches(existing, data)) {
-    changed(count, "unchanged");
+  if (
+    recordMatches(
+      existing,
+      data,
+    )
+  ) {
+    changed(
+      count,
+      "unchanged",
+    );
+
     return existing;
   }
 
-  changed(count, "updated");
+  changed(
+    count,
+    "updated",
+  );
 
-  const updated = await update();
+  const updated =
+    await update();
 
   if (!updated) {
     throw new Error(
@@ -277,22 +391,16 @@ async function ensureSimpleRow<
   return updated;
 }
 
-/**
- * Before creating a new internal Player, check whether the
- * player already exists in this exact team + season squad.
- *
- * This protects us from creating a second Pedri / Lamine /
- * Cubarsí later if another data source seeded the squad first.
- */
 async function findExistingTeamSeasonPlayer(
   orm: Orm,
   seasonId: string,
   teamId: string,
   input: GoalLineupPlayer,
 ) {
-  const normalized = normalizedPersonName(
-    input.name,
-  );
+  const normalized =
+    normalizedPersonName(
+      input.name,
+    );
 
   const memberships =
     await orm.public.SquadMembership
@@ -303,20 +411,26 @@ async function findExistingTeamSeasonPlayer(
       .include("player")
       .all();
 
-  const matches = memberships.filter(
-    (membership) =>
-      normalizedPersonName(
-        membership.player.displayName,
-      ) === normalized,
-  );
+  const matches =
+    memberships.filter(
+      (membership) =>
+        normalizedPersonName(
+          membership.player.displayName,
+        ) === normalized,
+    );
 
-  if (matches.length > 1) {
+  if (
+    matches.length > 1
+  ) {
     throw new Error(
       `Ambiguous existing player identity for ${input.name} in team ${teamId} / season ${seasonId}.`,
     );
   }
 
-  return matches[0]?.player ?? null;
+  return (
+    matches[0]
+      ?.player ?? null
+  );
 }
 
 async function ensureGoalPlayer(
@@ -333,56 +447,64 @@ async function ensureGoalPlayer(
     await orm.public.ProviderMapping
       .where({
         dataSourceId,
-        entityType: "player",
-        providerId: input.providerId,
+
+        entityType:
+          "player",
+
+        providerId:
+          input.providerId,
       })
       .first();
 
-  let existing = canonicalMapping
-    ? await orm.public.Player
-        .where({
-          id: canonicalMapping.internalId,
-        })
-        .first()
-    : null;
+  let existing =
+    canonicalMapping
+      ? await orm.public.Player
+          .where({
+            id:
+              canonicalMapping.internalId,
+          })
+          .first()
+      : null;
 
-  if (canonicalMapping && !existing) {
+  if (
+    canonicalMapping &&
+    !existing
+  ) {
     throw new Error(
       `GOAL player mapping ${input.providerId} points to a missing player.`,
     );
   }
 
-  /*
-   * First check players already resolved during THIS sync.
-   * This avoids accidentally creating the same person twice
-   * if the provider repeats them in the payload.
-   */
   if (!existing) {
-    const normalized = normalizedPersonName(
-      input.name,
-    );
+    const normalized =
+      normalizedPersonName(
+        input.name,
+      );
 
-    const localMatches = knownPlayers.filter(
-      (candidate) =>
-        candidate.teamId === teamId &&
-        normalizedPersonName(
-          candidate.player.name,
-        ) === normalized,
-    );
+    const localMatches =
+      knownPlayers.filter(
+        (candidate) =>
+          candidate.teamId ===
+            teamId &&
+          normalizedPersonName(
+            candidate.player.name,
+          ) === normalized,
+      );
 
-    if (localMatches.length === 1) {
-      existing = await orm.public.Player
-        .where({
-          id: localMatches[0].playerId,
-        })
-        .first();
+    if (
+      localMatches.length ===
+      1
+    ) {
+      existing =
+        await orm.public.Player
+          .where({
+            id:
+              localMatches[0].playerId,
+          })
+          .first();
     }
   }
 
-  /*
-   * Then check our already-known squad for this exact
-   * team + season before creating a brand-new Player.
-   */
   if (!existing) {
     existing =
       await findExistingTeamSeasonPlayer(
@@ -393,15 +515,11 @@ async function ensureGoalPlayer(
       );
   }
 
-  const names = splitDisplayName(
-    input.name,
-  );
+  const names =
+    splitDisplayName(
+      input.name,
+    );
 
-  /*
-   * GOAL owns match-lineup identity, not the global player
-   * profile. If another trusted/manual source already gave
-   * us richer profile information, do not destroy it.
-   */
   const data = {
     firstName:
       existing?.firstName ??
@@ -417,7 +535,8 @@ async function ensureGoalPlayer(
 
     primaryPosition:
       existing &&
-      existing.primaryPosition !== "unknown"
+      existing.primaryPosition !==
+        "unknown"
         ? existing.primaryPosition
         : input.primaryPosition,
 
@@ -425,35 +544,45 @@ async function ensureGoalPlayer(
       existing?.portraitUrl ??
       input.imageUrl,
 
-    isActive: true,
+    isActive:
+      true,
   };
 
-  const player = await ensureSimpleRow(
-    counts.players,
-    existing,
-    data,
-    () =>
-      orm.public.Player.create(
-        data,
-      ),
-    () =>
-      orm.public.Player
-        .where({
-          id: existing!.id,
-        })
-        .update(data),
-  );
+  const player =
+    await ensureSimpleRow(
+      counts.players,
+      existing,
+      data,
+
+      () =>
+        orm.public.Player.create(
+          data,
+        ),
+
+      () =>
+        orm.public.Player
+          .where({
+            id:
+              existing!.id,
+          })
+          .update(data),
+    );
 
   await ensureMapping(
     orm,
     counts,
     {
       dataSourceId,
-      entityType: "player",
+
+      entityType:
+        "player",
+
       internalId:
         player.id as string,
+
       providerId:
         input.providerId,
+
       metadata: {
         identityKey:
           "canonical",
@@ -471,11 +600,16 @@ async function ensureGoalPlayer(
       counts,
       {
         dataSourceId,
-        entityType: "player",
+
+        entityType:
+          "player",
+
         internalId:
           player.id as string,
+
         providerId:
           input.legacyEventKey,
+
         metadata: {
           identityKey:
             "legacy_event_key",
@@ -487,9 +621,13 @@ async function ensureGoalPlayer(
   return {
     playerId:
       player.id as string,
+
     teamId,
+
     providerTeamId,
-    player: input,
+
+    player:
+      input,
   } satisfies GoalResolvedPlayer;
 }
 
@@ -510,9 +648,14 @@ async function ensureLineupSide(
       .first();
 
   const data = {
-    formation: side.formation,
-    coachName: side.coachName,
-    isConfirmed: true,
+    formation:
+      side.formation,
+
+    coachName:
+      side.coachName,
+
+    isConfirmed:
+      true,
   };
 
   const lineup =
@@ -520,28 +663,37 @@ async function ensureLineupSide(
       counts.lineups,
       existing,
       data,
+
       () =>
         orm.public.Lineup.create({
           matchId,
           teamId,
           ...data,
         }),
+
       () =>
         orm.public.Lineup
           .where({
-            id: existing!.id,
+            id:
+              existing!.id,
           })
           .update(data),
     );
 
-  for (const resolved of players.filter(
-    (row) => row.teamId === teamId,
-  )) {
+  for (
+    const resolved
+    of players.filter(
+      (row) =>
+        row.teamId ===
+        teamId,
+    )
+  ) {
     const entry =
       await orm.public.LineupPlayer
         .where({
           lineupId:
             lineup.id as string,
+
           playerId:
             resolved.playerId,
         })
@@ -552,8 +704,10 @@ async function ensureLineupSide(
       "starter"
         ? formationPosition(
             side.formation,
+
             resolved.player
-              .lineupOrdinal ?? 0,
+              .lineupOrdinal ??
+              0,
           )
         : null;
 
@@ -562,45 +716,50 @@ async function ensureLineupSide(
         resolved.player.role,
 
       shirtNumber:
-        resolved.player
-          .shirtNumber,
+        resolved.player.shirtNumber,
 
       position:
-        resolved.player
-          .matchPosition,
+        resolved.player.matchPosition,
 
       lineupOrdinal:
-        resolved.player
-          .lineupOrdinal,
+        resolved.player.lineupOrdinal,
 
       positionX:
-        position?.x ?? null,
+        position?.x ??
+        null,
 
       positionY:
-        position?.y ?? null,
+        position?.y ??
+        null,
 
-      enteredMinute: null,
-      leftMinute: null,
+      enteredMinute:
+        null,
+
+      leftMinute:
+        null,
     };
 
     await ensureSimpleRow(
       counts.lineupPlayers,
       entry,
       entryData,
+
       () =>
-        orm.public.LineupPlayer.create(
-          {
-            lineupId:
-              lineup.id as string,
-            playerId:
-              resolved.playerId,
-            ...entryData,
-          },
-        ),
+        orm.public.LineupPlayer.create({
+          lineupId:
+            lineup.id as string,
+
+          playerId:
+            resolved.playerId,
+
+          ...entryData,
+        }),
+
       () =>
         orm.public.LineupPlayer
           .where({
-            id: entry!.id,
+            id:
+              entry!.id,
           })
           .update(
             entryData,
@@ -620,14 +779,88 @@ function compatiblePosition(
   );
 }
 
+function nameParts(
+  value: string,
+) {
+  return normalizedPersonName(
+    value,
+  )
+    .split(" ")
+    .filter(Boolean);
+}
+
+function surnameOf(
+  value: string,
+) {
+  return (
+    nameParts(
+      value,
+    ).at(-1) ??
+    ""
+  );
+}
+
+/**
+ * Conservative identity rule for providers that abbreviate names
+ * or disagree on broad football positions.
+ *
+ * Requirements:
+ *
+ * - player must already belong to the same confirmed match team
+ * - both providers must expose the same shirt number
+ * - normalized surname must match
+ * - exactly ONE GOAL lineup player may satisfy those conditions
+ *
+ * We deliberately do NOT match on shirt number alone.
+ * We deliberately do NOT match on surname alone.
+ */
+function uniqueSurnameShirtMatch(
+  input: BigBallsPlayerStatistic,
+  sameTeam: GoalResolvedPlayer[],
+) {
+  if (
+    input.shirtNumber ===
+    null
+  ) {
+    return null;
+  }
+
+  const surname =
+    surnameOf(
+      input.name,
+    );
+
+  if (!surname) {
+    return null;
+  }
+
+  const matches =
+    sameTeam.filter(
+      (candidate) =>
+        candidate.player
+          .shirtNumber ===
+          input.shirtNumber &&
+        surnameOf(
+          candidate.player.name,
+        ) === surname,
+    );
+
+  return matches.length ===
+    1
+    ? matches[0]
+    : null;
+}
+
 function abbreviatedIdentityMatches(
   provider: BigBallsPlayerStatistic,
   candidate: GoalResolvedPlayer,
 ) {
   if (
-    provider.shirtNumber === null ||
+    provider.shirtNumber ===
+      null ||
     candidate.player
-      .shirtNumber === null ||
+      .shirtNumber ===
+      null ||
     provider.shirtNumber !==
       candidate.player
         .shirtNumber ||
@@ -641,22 +874,20 @@ function abbreviatedIdentityMatches(
   }
 
   const providerParts =
-    normalizedPersonName(
+    nameParts(
       provider.name,
-    )
-      .split(" ")
-      .filter(Boolean);
+    );
 
   const candidateParts =
-    normalizedPersonName(
+    nameParts(
       candidate.player.name,
-    )
-      .split(" ")
-      .filter(Boolean);
+    );
 
   if (
-    providerParts.length < 2 ||
-    candidateParts.length < 2
+    providerParts.length <
+      2 ||
+    candidateParts.length <
+      2
   ) {
     return false;
   }
@@ -666,9 +897,8 @@ function abbreviatedIdentityMatches(
 
   return (
     first.length === 1 &&
-    candidateParts[0].startsWith(
-      first,
-    ) &&
+    candidateParts[0]
+      .startsWith(first) &&
     providerParts.at(-1) ===
       candidateParts.at(-1)
   );
@@ -691,22 +921,35 @@ function matchBigBallsPlayer(
       input.name,
     );
 
+  /*
+   * Strongest non-mapping evidence:
+   * exact normalized full name inside the correct match team.
+   */
   const exact =
     sameTeam.filter(
       (candidate) =>
         normalizedPersonName(
           candidate.player.name,
-        ) === normalized,
+        ) ===
+        normalized,
     );
 
-  if (exact.length === 1) {
+  if (
+    exact.length === 1
+  ) {
     return {
-      resolved: exact[0],
+      resolved:
+        exact[0],
+
       method:
         "exact_normalized_name" as const,
     };
   }
 
+  /*
+   * Next: traditional abbreviated identity:
+   * initial + surname + shirt + compatible broad position.
+   */
   const abbreviated =
     sameTeam.filter(
       (candidate) =>
@@ -717,19 +960,62 @@ function matchBigBallsPlayer(
     );
 
   if (
-    abbreviated.length === 1
+    abbreviated.length ===
+    1
   ) {
     return {
       resolved:
         abbreviated[0],
+
       method:
         "initial_surname_shirt_position" as const,
     };
   }
 
+  /*
+   * Final safe fallback:
+   *
+   * same confirmed fixture team
+   * + same shirt number
+   * + same normalized surname
+   * + exactly one GOAL candidate.
+   *
+   * This handles real provider disagreements such as:
+   *
+   * Big Balls: K. Adeyemi, #14, midfielder
+   * GOAL:      Karim Adeyemi, #14, forward
+   *
+   * and:
+   *
+   * Big Balls: M. Zabiri, #21
+   * GOAL:      Yassir Zabiri, #21
+   *
+   * without resorting to surname-only matching.
+   */
+  const surnameShirt =
+    uniqueSurnameShirtMatch(
+      input,
+      sameTeam,
+    );
+
+  if (
+    surnameShirt
+  ) {
+    return {
+      resolved:
+        surnameShirt,
+
+      method:
+        "unique_team_surname_shirt" as const,
+    };
+  }
+
   return {
-    resolved: null,
-    method: null,
+    resolved:
+      null,
+
+    method:
+      null,
   };
 }
 
@@ -744,7 +1030,10 @@ async function resolveBigBallsPlayer(
     await orm.public.ProviderMapping
       .where({
         dataSourceId,
-        entityType: "player",
+
+        entityType:
+          "player",
+
         providerId:
           input.providerId,
       })
@@ -767,7 +1056,9 @@ async function resolveBigBallsPlayer(
     }
 
     return {
-      resolved: mapped,
+      resolved:
+        mapped,
+
       method:
         "provider_mapping" as const,
     };
@@ -786,69 +1077,111 @@ export async function syncRichMatch(
     dryRun: boolean;
   },
 ) {
-  if (
-    input.matchId !==
-    RICH_MATCH_TARGET.id
-  ) {
-    throw new Error(
-      `Only approved target match ${RICH_MATCH_TARGET.id} may be synced.`,
+  const {
+    match,
+    internal,
+  } =
+    await loadMatchContext(
+      input.matchId,
     );
-  }
 
-  const { match, internal } =
-    await targetMatch();
-
-  const [goal, bigBalls] =
+  const [
+    goal,
+    bigBalls,
+  ] =
     await Promise.all([
       fetchGoalMatchBundle(
         internal,
       ),
+
       bigBallsPlayerStatisticsProvider.fetchMatch(
         internal,
       ),
     ]);
 
+  const expectedGoalCount =
+    (match.homeScore ??
+      0) +
+    (match.awayScore ??
+      0);
+
   if (
     goal.events.length !==
-    RICH_MATCH_TARGET.homeScore +
-      RICH_MATCH_TARGET.awayScore
+    expectedGoalCount
   ) {
     throw new Error(
-      `GOAL returned ${goal.events.length} scoring events; expected 4.`,
+      `GOAL returned ${goal.events.length} scoring events; final score requires ${expectedGoalCount}.`,
     );
   }
 
   const preview = {
+    fixture: {
+      matchId:
+        match.id,
+
+      kickoff:
+        match.kickoff.toString(),
+
+      competition:
+        match.competition.name,
+
+      home:
+        match.homeTeam.name,
+
+      away:
+        match.awayTeam.name,
+
+      score: {
+        home:
+          match.homeScore,
+
+        away:
+          match.awayScore,
+      },
+    },
+
     goalPlayers:
       goal.home.players.length +
       goal.away.players.length,
 
     starters: {
-      home: goal.home.players.filter(
-        (player) =>
-          player.role ===
-          "starter",
-      ).length,
+      home:
+        goal.home.players.filter(
+          (player) =>
+            player.role ===
+            "starter",
+        ).length,
 
-      away: goal.away.players.filter(
-        (player) =>
-          player.role ===
-          "starter",
-      ).length,
+      away:
+        goal.away.players.filter(
+          (player) =>
+            player.role ===
+            "starter",
+        ).length,
     },
 
     bench: {
-      home: goal.home.players.filter(
-        (player) =>
-          player.role ===
-          "substitute",
-      ).length,
+      home:
+        goal.home.players.filter(
+          (player) =>
+            player.role ===
+            "substitute",
+        ).length,
 
-      away: goal.away.players.filter(
-        (player) =>
-          player.role ===
-          "substitute",
-      ).length,
+      away:
+        goal.away.players.filter(
+          (player) =>
+            player.role ===
+            "substitute",
+        ).length,
+    },
+
+    formations: {
+      home:
+        goal.home.formation,
+
+      away:
+        goal.away.formation,
     },
 
     scoringEvents:
@@ -864,11 +1197,13 @@ export async function syncRichMatch(
         (player) => ({
           playerId:
             player.providerId,
+
           teamId:
             match.homeTeamId,
+
           providerTeamId:
-            goal.home
-              .providerTeamId,
+            goal.home.providerTeamId,
+
           player,
         }),
       ),
@@ -877,11 +1212,13 @@ export async function syncRichMatch(
         (player) => ({
           playerId:
             player.providerId,
+
           teamId:
             match.awayTeamId,
+
           providerTeamId:
-            goal.away
-              .providerTeamId,
+            goal.away.providerTeamId,
+
           player,
         }),
       ),
@@ -890,14 +1227,12 @@ export async function syncRichMatch(
   const previewBigBallsTeams =
     new Map([
       [
-        bigBalls
-          .homeTeamProviderId,
+        bigBalls.homeTeamProviderId,
         match.homeTeamId,
       ],
 
       [
-        bigBalls
-          .awayTeamProviderId,
+        bigBalls.awayTeamProviderId,
         match.awayTeamId,
       ],
     ]);
@@ -905,41 +1240,58 @@ export async function syncRichMatch(
   const previewUnresolved: UnresolvedIdentity[] =
     [];
 
-  let previewResolved = 0;
+  let previewResolved =
+    0;
 
-  for (const statistic of bigBalls.players) {
+  for (
+    const statistic
+    of bigBalls.players
+  ) {
     const teamId =
       previewBigBallsTeams.get(
         statistic.teamProviderId,
       );
 
-    const identity = teamId
-      ? matchBigBallsPlayer(
-          statistic,
-          teamId,
-          previewGoalPlayers,
-        )
-      : {
-          resolved: null,
-          method: null,
-        };
+    const identity =
+      teamId
+        ? matchBigBallsPlayer(
+            statistic,
+            teamId,
+            previewGoalPlayers,
+          )
+        : {
+            resolved:
+              null,
+            method:
+              null,
+          };
 
-    if (identity.resolved) {
-      previewResolved += 1;
+    if (
+      identity.resolved
+    ) {
+      previewResolved +=
+        1;
     } else {
       previewUnresolved.push({
         providerId:
           statistic.providerId,
-        name: statistic.name,
+
+        name:
+          statistic.name,
+
         teamProviderId:
           statistic.teamProviderId,
+
         shirtNumber:
           statistic.shirtNumber,
+
         position:
           statistic.position,
-        reason: teamId
-          ? "no_unique_safe_player_match"
-          : "team_identity_not_resolved",
+
+        reason:
+          teamId
+            ? "no_unique_safe_player_match"
+            : "team_identity_not_resolved",
       });
     }
   }
@@ -951,15 +1303,21 @@ export async function syncRichMatch(
       ),
   );
 
-  if (input.dryRun) {
+  if (
+    input.dryRun
+  ) {
     return {
-      dryRun: true,
-      matchId: match.id,
+      dryRun:
+        true,
+
+      matchId:
+        match.id,
 
       providers: {
         goal: {
           matchId:
             goal.providerMatchId,
+
           requests:
             goal.requestCount,
         },
@@ -967,6 +1325,7 @@ export async function syncRichMatch(
         bigBalls: {
           matchId:
             bigBalls.providerMatchId,
+
           requests:
             bigBalls.requestCount,
         },
@@ -985,14 +1344,16 @@ export async function syncRichMatch(
           previewUnresolved,
       },
 
-      persisted: false,
+      persisted:
+        false,
     };
   }
 
   const result =
     await db.transaction(
       async (tx) => {
-        const orm = tx.orm;
+        const orm =
+          tx.orm;
 
         const counts =
           emptySyncCounts();
@@ -1017,19 +1378,24 @@ export async function syncRichMatch(
           counts,
         );
 
-        const goalSides = [
-          {
-            side: goal.home,
-            teamId:
-              match.homeTeamId,
-          },
+        const goalSides =
+          [
+            {
+              side:
+                goal.home,
 
-          {
-            side: goal.away,
-            teamId:
-              match.awayTeamId,
-          },
-        ];
+              teamId:
+                match.homeTeamId,
+            },
+
+            {
+              side:
+                goal.away,
+
+              teamId:
+                match.awayTeamId,
+            },
+          ];
 
         await ensureMapping(
           orm,
@@ -1037,10 +1403,16 @@ export async function syncRichMatch(
           {
             dataSourceId:
               goalSource.id,
-            entityType: "match",
-            internalId: match.id,
+
+            entityType:
+              "match",
+
+            internalId:
+              match.id,
+
             providerId:
               goal.providerMatchId,
+
             metadata: {
               ownership: [
                 "lineups",
@@ -1051,19 +1423,25 @@ export async function syncRichMatch(
           },
         );
 
-        for (const side of goalSides) {
+        for (
+          const side
+          of goalSides
+        ) {
           await ensureMapping(
             orm,
             counts,
             {
               dataSourceId:
                 goalSource.id,
-              entityType: "team",
+
+              entityType:
+                "team",
+
               internalId:
                 side.teamId,
+
               providerId:
-                side.side
-                  .providerTeamId,
+                side.side.providerTeamId,
             },
           );
         }
@@ -1071,11 +1449,17 @@ export async function syncRichMatch(
         const resolvedGoalPlayers: GoalResolvedPlayer[] =
           [];
 
-        for (const {
-          side,
-          teamId,
-        } of goalSides) {
-          for (const player of side.players) {
+        for (
+          const {
+            side,
+            teamId,
+          }
+          of goalSides
+        ) {
+          for (
+            const player
+            of side.players
+          ) {
             resolvedGoalPlayers.push(
               await ensureGoalPlayer(
                 orm,
@@ -1092,76 +1476,75 @@ export async function syncRichMatch(
         }
 
         const barcelonaTeamId =
-          match.awayTeam
-            .isBarcelona
+          match.awayTeam.isBarcelona
             ? match.awayTeamId
             : match.homeTeamId;
 
-        for (const resolved of resolvedGoalPlayers.filter(
-          (player) =>
-            player.teamId ===
-            barcelonaTeamId,
-        )) {
+        for (
+          const resolved
+          of resolvedGoalPlayers.filter(
+            (player) =>
+              player.teamId ===
+              barcelonaTeamId,
+          )
+        ) {
           const existing =
             await orm.public.SquadMembership
               .where({
                 seasonId:
                   match.seasonId,
+
                 teamId:
                   resolved.teamId,
+
                 playerId:
                   resolved.playerId,
               })
               .first();
 
-          /*
-           * Preserve profile/squad facts we already know.
-           *
-           * Most importantly: a match lineup must never
-           * reset a manually or externally verified captain
-           * flag to false.
-           */
-          const membershipData = {
-            shirtNumber:
-              resolved.player
-                .shirtNumber ??
-              existing?.shirtNumber ??
-              null,
+          const membershipData =
+            {
+              shirtNumber:
+                resolved.player.shirtNumber ??
+                existing?.shirtNumber ??
+                null,
 
-            position:
-              resolved.player
-                .primaryPosition !==
-              "unknown"
-                ? resolved.player
-                    .primaryPosition
-                : existing?.position ??
-                  "unknown",
+              position:
+                resolved.player.primaryPosition !==
+                "unknown"
+                  ? resolved.player.primaryPosition
+                  : existing?.position ??
+                    "unknown",
 
-            isCaptain:
-              existing?.isCaptain ??
-              false,
-          };
+              isCaptain:
+                existing?.isCaptain ??
+                false,
+            };
 
           await ensureSimpleRow(
             counts.squadMemberships,
             existing,
             membershipData,
+
             () =>
-              orm.public.SquadMembership.create(
-                {
-                  seasonId:
-                    match.seasonId,
-                  teamId:
-                    resolved.teamId,
-                  playerId:
-                    resolved.playerId,
-                  ...membershipData,
-                },
-              ),
+              orm.public.SquadMembership.create({
+                seasonId:
+                  match.seasonId,
+
+                teamId:
+                  resolved.teamId,
+
+                playerId:
+                  resolved.playerId,
+
+                ...membershipData,
+              }),
+
             () =>
               orm.public.SquadMembership
                 .where({
-                  id: existing!.id,
+                  id:
+                    existing!.id,
                 })
                 .update(
                   membershipData,
@@ -1193,31 +1576,35 @@ export async function syncRichMatch(
             GoalResolvedPlayer
           >();
 
-        for (const resolved of resolvedGoalPlayers) {
+        for (
+          const resolved
+          of resolvedGoalPlayers
+        ) {
           goalPlayerByProviderKey.set(
-            resolved.player
-              .providerId,
+            resolved.player.providerId,
             resolved,
           );
 
           if (
-            resolved.player
-              .legacyEventKey
+            resolved.player.legacyEventKey
           ) {
             goalPlayerByProviderKey.set(
-              resolved.player
-                .legacyEventKey,
+              resolved.player.legacyEventKey,
               resolved,
             );
           }
         }
 
-        for (const [
-          index,
-          event,
-        ] of goal.events.entries()) {
+        for (
+          const [
+            index,
+            event,
+          ]
+          of goal.events.entries()
+        ) {
           const teamId =
-            event.side === "home"
+            event.side ===
+            "home"
               ? match.homeTeamId
               : match.awayTeamId;
 
@@ -1232,8 +1619,7 @@ export async function syncRichMatch(
                       teamId &&
                     event.scorerName &&
                     normalizedPersonName(
-                      candidate.player
-                        .name,
+                      candidate.player.name,
                     ) ===
                       normalizedPersonName(
                         event.scorerName,
@@ -1251,8 +1637,7 @@ export async function syncRichMatch(
                       teamId &&
                     event.assistName &&
                     normalizedPersonName(
-                      candidate.player
-                        .name,
+                      candidate.player.name,
                     ) ===
                       normalizedPersonName(
                         event.assistName,
@@ -1270,8 +1655,10 @@ export async function syncRichMatch(
               .where({
                 dataSourceId:
                   goalSource.id,
+
                 entityType:
                   "event",
+
                 providerId:
                   event.providerId,
               })
@@ -1281,92 +1668,104 @@ export async function syncRichMatch(
             mapping
               ? await orm.public.MatchEvent
                   .where({
-                    id: mapping.internalId,
+                    id:
+                      mapping.internalId,
                   })
                   .first()
               : null;
 
-          const eventData = {
-            matchId: match.id,
-            teamId,
+          const eventData =
+            {
+              matchId:
+                match.id,
 
-            primaryPlayerId:
-              scorer.playerId,
+              teamId,
 
-            relatedPlayerId:
-              assist?.playerId ??
-              null,
+              primaryPlayerId:
+                scorer.playerId,
 
-            dataSourceId:
-              goalSource.id,
+              relatedPlayerId:
+                assist?.playerId ??
+                null,
 
-            type: event.type,
+              dataSourceId:
+                goalSource.id,
 
-            period:
-              event.minute !==
-                null &&
-              event.minute > 45
-                ? 2
-                : 1,
+              type:
+                event.type,
 
-            minute:
-              event.minute,
+              period:
+                event.minute !==
+                  null &&
+                event.minute >
+                  45
+                  ? 2
+                  : 1,
 
-            second: null,
+              minute:
+                event.minute,
 
-            eventOrder:
-              index + 1,
+              second:
+                null,
 
-            xG: null,
+              eventOrder:
+                index + 1,
 
-            outcome: "goal",
+              xG:
+                null,
 
-            sequenceId:
-              `goal-api:${event.providerId}`,
+              outcome:
+                "goal",
 
-            coordinateSystem:
-              null,
+              sequenceId:
+                `goal-api:${event.providerId}`,
 
-            confidence:
-              "exact_provider" as const,
+              coordinateSystem:
+                null,
 
-            rawData: {
-              providerEventId:
-                event.providerId,
+              confidence:
+                "exact_provider" as const,
 
-              scorerName:
-                event.scorerName,
+              rawData: {
+                providerEventId:
+                  event.providerId,
 
-              scorerProviderKey:
-                event.scorerProviderKey,
+                scorerName:
+                  event.scorerName,
 
-              assistName:
-                event.assistName,
+                scorerProviderKey:
+                  event.scorerProviderKey,
 
-              assistProviderKey:
-                event.assistProviderKey,
+                assistName:
+                  event.assistName,
 
-              homeScore:
-                event.homeScore,
+                assistProviderKey:
+                  event.assistProviderKey,
 
-              awayScore:
-                event.awayScore,
-            },
-          };
+                homeScore:
+                  event.homeScore,
+
+                awayScore:
+                  event.awayScore,
+              },
+            };
 
           const stored =
             await ensureSimpleRow(
               counts.events,
               existing,
               eventData,
+
               () =>
                 orm.public.MatchEvent.create(
                   eventData,
                 ),
+
               () =>
                 orm.public.MatchEvent
                   .where({
-                    id: existing!.id,
+                    id:
+                      existing!.id,
                   })
                   .update(
                     eventData,
@@ -1392,24 +1791,29 @@ export async function syncRichMatch(
           );
         }
 
-        for (const [
-          teamId,
-          statistic,
-        ] of [
-          [
-            match.homeTeamId,
-            goal.statistics.home,
-          ],
-          [
-            match.awayTeamId,
-            goal.statistics.away,
-          ],
-        ] as const) {
+        for (
+          const [
+            teamId,
+            statistic,
+          ]
+          of [
+            [
+              match.homeTeamId,
+              goal.statistics.home,
+            ],
+
+            [
+              match.awayTeamId,
+              goal.statistics.away,
+            ],
+          ] as const
+        ) {
           const existing =
             await orm.public.MatchStatistic
               .where({
                 matchId:
                   match.id,
+
                 teamId,
               })
               .first();
@@ -1449,7 +1853,8 @@ export async function syncRichMatch(
             shotsOutsideBox:
               statistic.shotsOutsideBox,
 
-            xG: null,
+            xG:
+              null,
 
             passes:
               statistic.passes,
@@ -1499,6 +1904,7 @@ export async function syncRichMatch(
             rawData: {
               provider:
                 "goal-api",
+
               fullTime:
                 statistic.raw,
             },
@@ -1508,51 +1914,62 @@ export async function syncRichMatch(
             counts.teamStatistics,
             existing,
             data,
+
             () =>
-              orm.public.MatchStatistic.create(
-                {
-                  matchId:
-                    match.id,
-                  teamId,
-                  ...data,
-                },
-              ),
+              orm.public.MatchStatistic.create({
+                matchId:
+                  match.id,
+
+                teamId,
+
+                ...data,
+              }),
+
             () =>
               orm.public.MatchStatistic
                 .where({
-                  id: existing!.id,
+                  id:
+                    existing!.id,
                 })
-                .update(data),
+                .update(
+                  data,
+                ),
           );
         }
 
         const bigBallsTeams =
           new Map([
             [
-              bigBalls
-                .homeTeamProviderId,
+              bigBalls.homeTeamProviderId,
               match.homeTeamId,
             ],
+
             [
-              bigBalls
-                .awayTeamProviderId,
+              bigBalls.awayTeamProviderId,
               match.awayTeamId,
             ],
           ]);
 
-        for (const [
-          providerId,
-          teamId,
-        ] of bigBallsTeams) {
+        for (
+          const [
+            providerId,
+            teamId,
+          ]
+          of bigBallsTeams
+        ) {
           await ensureMapping(
             orm,
             counts,
             {
               dataSourceId:
                 bigBallsSource.id,
-              entityType: "team",
+
+              entityType:
+                "team",
+
               internalId:
                 teamId,
+
               providerId,
             },
           );
@@ -1561,7 +1978,10 @@ export async function syncRichMatch(
         const unresolved: UnresolvedIdentity[] =
           [];
 
-        for (const statistic of bigBalls.players) {
+        for (
+          const statistic
+          of bigBalls.players
+        ) {
           const teamId =
             bigBallsTeams.get(
               statistic.teamProviderId,
@@ -1638,15 +2058,14 @@ export async function syncRichMatch(
                 "player",
 
               internalId:
-                identity.resolved
-                  .playerId,
+                identity.resolved.playerId,
 
               providerId:
                 statistic.providerId,
 
               metadata: {
                 identityMethod:
-                  "verified_match_identity",
+                  identity.method,
               },
             },
           );
@@ -1658,8 +2077,7 @@ export async function syncRichMatch(
                   match.id,
 
                 playerId:
-                  identity.resolved
-                    .playerId,
+                  identity.resolved.playerId,
               })
               .first();
 
@@ -1694,8 +2112,11 @@ export async function syncRichMatch(
             shotsOnTarget:
               statistic.shotsOnTarget,
 
-            xG: null,
-            xA: null,
+            xG:
+              null,
+
+            xA:
+              null,
 
             passes:
               statistic.passes,
@@ -1758,6 +2179,9 @@ export async function syncRichMatch(
               providerPlayerId:
                 statistic.providerId,
 
+              identityMethod:
+                identity.method,
+
               rawStatistics:
                 statistic.raw,
             },
@@ -1767,31 +2191,35 @@ export async function syncRichMatch(
             counts.playerStatistics,
             existing,
             data,
+
             () =>
-              orm.public.PlayerMatchStatistic.create(
-                {
-                  matchId:
-                    match.id,
+              orm.public.PlayerMatchStatistic.create({
+                matchId:
+                  match.id,
 
-                  playerId:
-                    identity
-                      .resolved!
-                      .playerId,
+                playerId:
+                  identity.resolved!.playerId,
 
-                  ...data,
-                },
-              ),
+                ...data,
+              }),
+
             () =>
               orm.public.PlayerMatchStatistic
                 .where({
-                  id: existing!.id,
+                  id:
+                    existing!.id,
                 })
-                .update(data),
+                .update(
+                  data,
+                ),
           );
         }
 
         unresolved.sort(
-          (left, right) =>
+          (
+            left,
+            right,
+          ) =>
             left.providerId.localeCompare(
               right.providerId,
             ),
@@ -1836,8 +2264,11 @@ export async function syncRichMatch(
     );
 
   return {
-    dryRun: false,
-    matchId: match.id,
+    dryRun:
+      false,
+
+    matchId:
+      match.id,
 
     providers: {
       goal: {
@@ -1859,7 +2290,8 @@ export async function syncRichMatch(
 
     preview,
 
-    persisted: true,
+    persisted:
+      true,
 
     counts:
       result.counts,
