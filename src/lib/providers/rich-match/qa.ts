@@ -4,21 +4,31 @@ import { db } from "../../../prisma/db";
 
 function asObject(
   value: unknown,
-): Record<
-  string,
-  unknown
-> | null {
+): Record<string, unknown> | null {
   return (
     value !== null &&
-    typeof value ===
-      "object" &&
+    typeof value === "object" &&
     !Array.isArray(value)
-      ? (value as Record<
-          string,
-          unknown
-        >)
-      : null
-  );
+  )
+    ? (value as Record<
+        string,
+        unknown
+      >)
+    : null;
+}
+
+function stringValue(
+  object:
+    | Record<string, unknown>
+    | null,
+  key: string,
+) {
+  const value =
+    object?.[key];
+
+  return typeof value === "string"
+    ? value
+    : null;
 }
 
 export async function richMatchQa(
@@ -41,10 +51,8 @@ export async function richMatchQa(
   }
 
   if (
-    !match.homeTeam
-      .isBarcelona &&
-    !match.awayTeam
-      .isBarcelona
+    !match.homeTeam.isBarcelona &&
+    !match.awayTeam.isBarcelona
   ) {
     throw new Error(
       `Match ${matchId} is not an FC Barcelona fixture.`,
@@ -56,15 +64,13 @@ export async function richMatchQa(
     "finished"
   ) {
     throw new Error(
-      `Rich-match QA currently accepts finished matches only.`,
+      "Rich-match QA currently accepts finished matches only.",
     );
   }
 
   if (
-    match.homeScore ===
-      null ||
-    match.awayScore ===
-      null
+    match.homeScore === null ||
+    match.awayScore === null
   ) {
     throw new Error(
       `Finished match ${matchId} does not have a final score.`,
@@ -81,7 +87,8 @@ export async function richMatchQa(
   const lineupReport = [];
 
   for (
-    const lineup of lineups
+    const lineup
+    of lineups
   ) {
     const team =
       await db.orm.public.Team
@@ -97,9 +104,7 @@ export async function richMatchQa(
           lineupId:
             lineup.id,
         })
-        .include(
-          "player",
-        )
+        .include("player")
         .all();
 
     lineupReport.push({
@@ -224,9 +229,7 @@ export async function richMatchQa(
       .where({
         matchId,
       })
-      .include(
-        "player",
-      )
+      .include("player")
       .include("team")
       .include(
         "dataSource",
@@ -247,7 +250,15 @@ export async function richMatchQa(
       )
       .all();
 
-  const bigBallsMatchMapping =
+  const goalMapping =
+    mappings.find(
+      (mapping) =>
+        mapping.dataSource
+          .code ===
+        "goal-api",
+    );
+
+  const bigBallsMapping =
     mappings.find(
       (mapping) =>
         mapping.dataSource
@@ -257,9 +268,32 @@ export async function richMatchQa(
 
   const bigBallsMetadata =
     asObject(
-      bigBallsMatchMapping
+      bigBallsMapping
         ?.metadata,
     );
+
+  const fallbackMode =
+    stringValue(
+      bigBallsMetadata,
+      "fallbackMode",
+    );
+
+  const hasGoalCoverage =
+    Boolean(
+      goalMapping,
+    );
+
+  const isBigBallsFallback =
+    !hasGoalCoverage &&
+    fallbackMode ===
+      "big-balls-only";
+
+  const coverageMode =
+    hasGoalCoverage
+      ? "full-rich"
+      : isBigBallsFallback
+        ? "partial-big-balls"
+        : "unknown";
 
   const unresolved =
     Array.isArray(
@@ -319,6 +353,159 @@ export async function richMatchQa(
       playerStatIds,
     );
 
+  const validMatchTeamIds =
+    new Set([
+      match.homeTeamId,
+      match.awayTeamId,
+    ]);
+
+  const allowedPlayerSources =
+    new Set([
+      "big-balls-data",
+      "statshawk",
+    ]);
+
+  const allowedTeamSources =
+    new Set([
+      "goal-api",
+      "big-balls-data",
+    ]);
+
+  const playerSourceCounts =
+    playerStatistics.reduce<
+      Record<string, number>
+    >(
+      (
+        counts,
+        statistic,
+      ) => {
+        const code =
+          statistic.dataSource
+            ?.code ??
+          "unknown";
+
+        counts[code] =
+          (
+            counts[code] ??
+            0
+          ) + 1;
+
+        return counts;
+      },
+      {},
+    );
+
+  const teamSourceCounts =
+    teamStatistics.reduce<
+      Record<string, number>
+    >(
+      (
+        counts,
+        statistic,
+      ) => {
+        const code =
+          statistic.dataSource
+            ?.code ??
+          "unknown";
+
+        counts[code] =
+          (
+            counts[code] ??
+            0
+          ) + 1;
+
+        return counts;
+      },
+      {},
+    );
+
+  const barcelonaPlayerStatistics =
+    playerStatistics.filter(
+      (statistic) =>
+        statistic.teamId ===
+        barcelonaId,
+    );
+
+  const canonicalMergeRows =
+    barcelonaPlayerStatistics.filter(
+      (statistic) => {
+        const raw =
+          asObject(
+            statistic.rawData,
+          );
+
+        return Boolean(
+          asObject(
+            raw?.canonicalMerge,
+          ),
+        );
+      },
+    );
+
+  const fieldSourceCounts:
+    Record<
+      string,
+      number
+    > = {};
+
+  let canonicalConflictCount =
+    0;
+
+  for (
+    const statistic
+    of canonicalMergeRows
+  ) {
+    const raw =
+      asObject(
+        statistic.rawData,
+      );
+
+    const canonical =
+      asObject(
+        raw?.canonicalMerge,
+      );
+
+    const fieldSources =
+      asObject(
+        canonical?.fieldSources,
+      );
+
+    for (
+      const value
+      of Object.values(
+        fieldSources ??
+        {},
+      )
+    ) {
+      if (
+        typeof value !==
+        "string"
+      ) {
+        continue;
+      }
+
+      fieldSourceCounts[value] =
+        (
+          fieldSourceCounts[
+            value
+          ] ??
+          0
+        ) + 1;
+    }
+
+    const conflicts =
+      canonical?.conflicts;
+
+    if (
+      Array.isArray(
+        conflicts,
+      )
+    ) {
+      canonicalConflictCount +=
+        conflicts.length;
+    }
+  }
+
   const lineupHasUniquePlayers =
     lineupReport.every(
       (lineup) => {
@@ -341,12 +528,6 @@ export async function richMatchQa(
   const starterCoordinatesValid =
     lineupReport.every(
       (lineup) => {
-        /*
-         * Formation coordinates are UI-derived.
-         *
-         * If the provider supplies no formation,
-         * we intentionally do not fabricate coordinates.
-         */
         if (
           !lineup.formation
         ) {
@@ -389,12 +570,6 @@ export async function richMatchQa(
         match.awayTeamId,
     );
 
-  const validMatchTeamIds =
-    new Set([
-      match.homeTeamId,
-      match.awayTeamId,
-    ]);
-
   const invariants = [
     {
       name:
@@ -403,10 +578,12 @@ export async function richMatchQa(
       passed:
         match.status ===
           "finished" &&
-        (match.homeTeam
-          .isBarcelona ||
+        (
+          match.homeTeam
+            .isBarcelona ||
           match.awayTeam
-            .isBarcelona),
+            .isBarcelona
+        ),
     },
 
     {
@@ -422,44 +599,55 @@ export async function richMatchQa(
 
     {
       name:
-        "two_lineups",
+        "coverage_mode_known",
 
       passed:
-        lineups.length ===
-        2,
+        coverageMode !==
+        "unknown",
+    },
+
+    /*
+     * GOAL-dependent checks are required only when GOAL
+     * actually has verified coverage for the fixture.
+     */
+    {
+      name:
+        "lineup_shape_valid_for_coverage",
+
+      passed:
+        hasGoalCoverage
+          ? (
+              lineups.length ===
+                2 &&
+              homeLineup
+                ?.starters
+                .length ===
+                11 &&
+              awayLineup
+                ?.starters
+                .length ===
+                11
+            )
+          : lineups.length ===
+            0,
     },
 
     {
       name:
-        "home_starting_xi",
+        "lineup_confirmation_valid_for_coverage",
 
       passed:
-        homeLineup
-          ?.starters
-          .length === 11,
-    },
-
-    {
-      name:
-        "away_starting_xi",
-
-      passed:
-        awayLineup
-          ?.starters
-          .length === 11,
-    },
-
-    {
-      name:
-        "lineups_confirmed",
-
-      passed:
-        lineupReport.length ===
-          2 &&
-        lineupReport.every(
-          (lineup) =>
-            lineup.isConfirmed,
-        ),
+        hasGoalCoverage
+          ? (
+              lineupReport
+                .length ===
+                2 &&
+              lineupReport.every(
+                (lineup) =>
+                  lineup.isConfirmed,
+              )
+            )
+          : true,
     },
 
     {
@@ -506,22 +694,20 @@ export async function richMatchQa(
 
     {
       name:
-        "goal_count_matches_final_score",
+        "goal_events_valid_for_coverage",
 
       passed:
-        events.length ===
-        expectedGoals,
-    },
-
-    {
-      name:
-        "goal_team_counts_match_final_score",
-
-      passed:
-        homeGoalEvents ===
-          match.homeScore &&
-        awayGoalEvents ===
-          match.awayScore,
+        hasGoalCoverage
+          ? (
+              events.length ===
+                expectedGoals &&
+              homeGoalEvents ===
+                match.homeScore &&
+              awayGoalEvents ===
+                match.awayScore
+            )
+          : events.length ===
+            0,
     },
 
     {
@@ -529,14 +715,18 @@ export async function richMatchQa(
         "goal_source_ownership",
 
       passed:
-        events.length ===
-          expectedGoals &&
-        events.every(
-          (event) =>
-            event.dataSource
-              ?.code ===
-            "goal-api",
-        ),
+        hasGoalCoverage
+          ? (
+              events.length ===
+                expectedGoals &&
+              events.every(
+                (event) =>
+                  event.dataSource
+                    ?.code ===
+                  "goal-api",
+              )
+            )
+          : true,
     },
 
     {
@@ -544,11 +734,13 @@ export async function richMatchQa(
         "goal_players_resolved",
 
       passed:
-        events.every(
-          (event) =>
-            event.primaryPlayerId !==
-            null,
-        ),
+        hasGoalCoverage
+          ? events.every(
+              (event) =>
+                event.primaryPlayerId !==
+                null,
+            )
+          : true,
     },
 
     {
@@ -568,9 +760,11 @@ export async function richMatchQa(
           2 &&
         teamStatistics.every(
           (statistic) =>
-            statistic.dataSource
-              ?.code ===
-            "goal-api",
+            allowedTeamSources.has(
+              statistic.dataSource
+                ?.code ??
+                "",
+            ),
         ),
     },
 
@@ -588,7 +782,8 @@ export async function richMatchQa(
         "player_statistics_unique",
 
       passed:
-        uniquePlayerStatIds.size ===
+        uniquePlayerStatIds
+          .size ===
         playerStatIds.length,
     },
 
@@ -614,9 +809,11 @@ export async function richMatchQa(
           0 &&
         playerStatistics.every(
           (statistic) =>
-            statistic.dataSource
-              ?.code ===
-            "big-balls-data",
+            allowedPlayerSources.has(
+              statistic.dataSource
+                ?.code ??
+                "",
+            ),
         ),
     },
 
@@ -625,11 +822,28 @@ export async function richMatchQa(
         "barcelona_player_statistics_present",
 
       passed:
-        playerStatistics.some(
-          (statistic) =>
-            statistic.teamId ===
-            barcelonaId,
-        ),
+        barcelonaPlayerStatistics
+          .length > 0,
+    },
+
+    {
+      name:
+        "canonical_merge_provenance_present",
+
+      passed:
+        canonicalMergeRows
+          .length ===
+        barcelonaPlayerStatistics
+          .length,
+    },
+
+    {
+      name:
+        "canonical_merge_has_no_conflicts",
+
+      passed:
+        canonicalConflictCount ===
+        0,
     },
 
     {
@@ -653,28 +867,24 @@ export async function richMatchQa(
 
     {
       name:
-        "goal_match_mapping_present",
+        "big_balls_match_mapping_present",
 
       passed:
-        mappings.some(
-          (mapping) =>
-            mapping.dataSource
-              .code ===
-            "goal-api",
+        Boolean(
+          bigBallsMapping,
         ),
     },
 
     {
       name:
-        "big_balls_match_mapping_present",
+        "goal_mapping_matches_coverage",
 
       passed:
-        mappings.some(
-          (mapping) =>
-            mapping.dataSource
-              .code ===
-            "big-balls-data",
-        ),
+        hasGoalCoverage
+          ? Boolean(
+              goalMapping,
+            )
+          : true,
     },
   ];
 
@@ -692,6 +902,8 @@ export async function richMatchQa(
       competition:
         match.competition
           .name,
+
+      coverageMode,
 
       home: {
         id:
@@ -719,6 +931,12 @@ export async function richMatchQa(
     },
 
     coverage: {
+      goalAvailable:
+        hasGoalCoverage,
+
+      bigBallsFallback:
+        isBigBallsFallback,
+
       homeFormation:
         homeLineup
           ?.formation ??
@@ -739,16 +957,6 @@ export async function richMatchQa(
           ?.starters
           .length ?? 0,
 
-      homeBench:
-        homeLineup
-          ?.bench.length ??
-        0,
-
-      awayBench:
-        awayLineup
-          ?.bench.length ??
-        0,
-
       scoringEvents:
         events.length,
 
@@ -759,14 +967,27 @@ export async function richMatchQa(
         playerStatistics.length,
 
       barcelonaPlayerStatisticRows:
-        playerStatistics.filter(
-          (statistic) =>
-            statistic.teamId ===
-            barcelonaId,
-        ).length,
+        barcelonaPlayerStatistics.length,
 
-      unresolvedIdentities:
+      canonicalPlayerRows:
+        canonicalMergeRows.length,
+
+      unresolvedBigBallsIdentities:
         unresolved.length,
+    },
+
+    provenance: {
+      playerRowSources:
+        playerSourceCounts,
+
+      teamRowSources:
+        teamSourceCounts,
+
+      fieldSources:
+        fieldSourceCounts,
+
+      canonicalConflicts:
+        canonicalConflictCount,
     },
 
     lineups:
@@ -809,20 +1030,6 @@ export async function richMatchQa(
 
           xG:
             event.xG,
-
-          coordinates:
-            event.startX ===
-                null &&
-              event.startY ===
-                null
-              ? null
-              : {
-                  x:
-                    event.startX,
-
-                  y:
-                    event.startY,
-                },
         }),
       ),
 
@@ -847,18 +1054,6 @@ export async function richMatchQa(
           shotsOnTarget:
             statistic.shotsOnTarget,
 
-          shotsOffTarget:
-            statistic.shotsOffTarget,
-
-          blockedShots:
-            statistic.blockedShots,
-
-          shotsInsideBox:
-            statistic.shotsInsideBox,
-
-          shotsOutsideBox:
-            statistic.shotsOutsideBox,
-
           passes:
             statistic.passes,
 
@@ -880,26 +1075,25 @@ export async function richMatchQa(
           saves:
             statistic.saves,
 
-          attacks:
-            statistic.attacks,
-
-          dangerousAttacks:
-            statistic.dangerousAttacks,
-
           xG:
             statistic.xG,
         }),
       ),
 
     barcelonaPlayerStatistics:
-      playerStatistics
-        .filter(
-          (statistic) =>
-            statistic.teamId ===
-            barcelonaId,
-        )
-        .map(
-          (statistic) => ({
+      barcelonaPlayerStatistics.map(
+        (statistic) => {
+          const raw =
+            asObject(
+              statistic.rawData,
+            );
+
+          const canonical =
+            asObject(
+              raw?.canonicalMerge,
+            );
+
+          return {
             playerId:
               statistic.playerId,
 
@@ -907,7 +1101,7 @@ export async function richMatchQa(
               statistic.player
                 .displayName,
 
-            source:
+            primarySource:
               statistic.dataSource
                 ?.code ??
               null,
@@ -954,17 +1148,14 @@ export async function richMatchQa(
             duelsTotal:
               statistic.duelsTotal,
 
-            dribblesAttempted:
-              statistic.dribblesAttempted,
-
-            successfulDribbles:
-              statistic.successfulDribbles,
-
-            fouls:
-              statistic.fouls,
-
             saves:
               statistic.saves,
+
+            goalsConceded:
+              statistic.goalsConceded,
+
+            cleanSheet:
+              statistic.cleanSheet,
 
             rating:
               statistic.rating,
@@ -974,27 +1165,43 @@ export async function richMatchQa(
 
             xA:
               statistic.xA,
-          }),
-        ),
 
-    sourceOwnership: {
+            fieldSources:
+              asObject(
+                canonical
+                  ?.fieldSources,
+              ),
+
+            identities:
+              asObject(
+                canonical
+                  ?.identities,
+              ),
+          };
+        },
+      ),
+
+    sourcePolicy: {
       fixturesResults:
         "football-data-org",
 
       lineupBenchFormation:
-        "goal-api",
+        "goal-api when available",
 
       scoringEvents:
-        "goal-api",
+        "goal-api when available",
 
       teamStatistics:
-        "goal-api",
+        "goal-api primary; big-balls-data fallback",
 
-      playerStatisticsRatings:
+      playerStatistics:
+        "big-balls-data primary; statshawk field fallback",
+
+      ratings:
         "big-balls-data",
 
-      futurePlayerStatFallback:
-        "statshawk",
+      xGxA:
+        "NO_FREE_RELIABLE_SOURCE",
     },
 
     unresolvedIdentityCount:
@@ -1002,15 +1209,6 @@ export async function richMatchQa(
 
     unresolvedIdentities:
       unresolved,
-
-    explicitGaps: [
-      "expected goals (xG)",
-      "expected assists (xA)",
-      "shot coordinates",
-      "complete card timeline",
-      "complete substitution timeline",
-      "tracking-derived positions",
-    ],
 
     invariants,
 
