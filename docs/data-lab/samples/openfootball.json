@@ -1,0 +1,18 @@
+{
+  "capturedAt": "2026-09-25",
+  "source": "openfootball/football.json CC0 dataset",
+  "season": "Spain Primera División 2026/27",
+  "match": {
+    "round": "Matchday 7",
+    "date": "2026-09-19",
+    "time": "21:00",
+    "team1": "Sevilla FC",
+    "team2": "FC Barcelona",
+    "score": {
+      "ht": [1, 1],
+      "ft": [1, 3]
+    }
+  },
+  "sourceUrl": "https://raw.githubusercontent.com/openfootball/football.json/master/2026-27/es.1.json",
+  "note": "This is a fixture/result cross-check only; the dataset has no rich match detail."
+}

@@ -1,0 +1,27 @@
+{
+  "capturedAt": "2026-09-25",
+  "source": "football-data.org v4 free tier",
+  "match": {
+    "id": 564690,
+    "utcDate": "2026-09-19T19:00:00Z",
+    "status": "FINISHED",
+    "competition": "Primera Division",
+    "matchday": 7,
+    "venue": null,
+    "homeTeam": "Sevilla FC",
+    "awayTeam": "FC Barcelona",
+    "score": {
+      "fullTime": { "home": 1, "away": 3 },
+      "halfTime": { "home": 1, "away": 1 }
+    },
+    "counts": {
+      "lineups": 0,
+      "benches": 0,
+      "goals": 0,
+      "bookings": 0,
+      "substitutions": 0
+    },
+    "referee": "Juan Martínez Munuera"
+  },
+  "note": "Sanitized representative fields only. The API token is never stored."
+}

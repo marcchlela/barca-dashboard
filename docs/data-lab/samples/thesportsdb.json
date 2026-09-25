@@ -1,0 +1,61 @@
+{
+  "capturedAt": "2026-09-25",
+  "source": "TheSportsDB v1 free API",
+  "event": {
+    "idEvent": "2506233",
+    "dateEvent": "2026-09-19",
+    "strTime": "19:00:00",
+    "strHomeTeam": "Sevilla",
+    "strAwayTeam": "Barcelona",
+    "intHomeScore": "1",
+    "intAwayScore": "3",
+    "strVenue": "Estadio Ramón Sánchez Pizjuán",
+    "strHomeFormation": null,
+    "strAwayFormation": null
+  },
+  "representativeRows": {
+    "lineup": {
+      "strPlayer": "Andreas Christensen",
+      "strTeam": "Barcelona",
+      "strPosition": "Centre-Back",
+      "strSubstitute": "No",
+      "intSquadNumber": "15"
+    },
+    "timeline": {
+      "strTimeline": "Goal",
+      "strPlayer": "Raphinha",
+      "strAssist": "Andreas Christensen",
+      "intTime": "22",
+      "strTeam": "Barcelona"
+    },
+    "statistic": {
+      "strStat": "Passes accurate",
+      "intHome": "205",
+      "intAway": "581"
+    }
+  },
+  "returnedCounts": {
+    "lineup": 5,
+    "timeline": 5,
+    "eventstats": 5
+  },
+  "teamProfile": {
+    "idTeam": "133739",
+    "strTeam": "Barcelona",
+    "strLeague": "Spanish La Liga",
+    "strStadium": "Spotify Camp Nou",
+    "strLocation": "Barcelona",
+    "strCountry": "Spain",
+    "strWebsite": "www.fcbarcelona.com"
+  },
+  "playerProfile": {
+    "idPlayer": "34145493",
+    "strPlayer": "Andreas Christensen",
+    "strPosition": "Centre-Back",
+    "strNumber": "15",
+    "dateBorn": "1996-04-10",
+    "strNationality": "Denmark",
+    "strTeam": "Barcelona"
+  },
+  "note": "Each rich endpoint hit the documented five-row free-plan limit, so these collections are partial. Media URLs and unrelated raw fields were removed."
+}
