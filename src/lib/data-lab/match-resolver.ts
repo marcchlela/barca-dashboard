@@ -25,6 +25,9 @@ const TEAM_ALIAS_GROUPS = [
   ["real betis", "real betis balompie", "betis"],
   ["real sociedad", "real sociedad de futbol"],
   ["deportivo alaves", "alaves"],
+  ["racing santander", "real racing santander", "real racing club de santander"],
+  ["rayo vallecano", "rayo vallecano madrid", "rayo vallecano de madrid"],
+  ["feyenoord", "feyenoord rotterdam"],
 ] as const;
 
 const COMPETITION_ALIAS_GROUPS = [
@@ -39,6 +42,7 @@ const COMPETITION_ALIAS_GROUPS = [
     "uefa champions league",
     "champions league",
     "ucl",
+    "cl",
   ],
 ] as const;
 

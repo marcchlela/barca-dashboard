@@ -1,0 +1,96 @@
+{
+  "provider": "Big Balls Sports Data",
+  "researchedAt": "2026-09-25",
+  "baseUrl": "https://api.bigballsdata.com",
+  "authentication": "Bearer server-side environment key; secret omitted",
+  "authenticatedAccount": {
+    "plan": "free",
+    "perMinute": 100,
+    "perDay": 250
+  },
+  "auditQuota": {
+    "hardLimit": 100,
+    "finalRunRequests": 27,
+    "finalRunRemainingBefore": 100,
+    "finalRunRemainingAfter": 73,
+    "cumulativeAuthenticatedAuditRequests": 79,
+    "rejectedUnauthenticatedInspectionAttempts": 2,
+    "totalOutboundAttempts": 81
+  },
+  "resolution": {
+    "selected": 4,
+    "resolved": 4,
+    "footballDataOrgAgreement": 4,
+    "immutableFactDisagreements": 0
+  },
+  "matches": [
+    {
+      "label": "LL1",
+      "providerMatchId": "d7993bd5-307d-44cf-9468-56b15ab0cb09",
+      "barcelonaLineup": { "starters": 11, "unclassifiedNonStarters": 12, "formation": null, "shirtNumbers": 23, "positions": 23, "playerIds": 22 },
+      "events": { "status": "partial_scoring_only", "rows": 4, "goals": 4, "assists": 4, "goalCountMatchesScore": true, "rowsWithCoordinates": 0, "rowsWithXG": 0, "rowsWithXGOT": 0 },
+      "statistics": { "teamRows": 2, "playerRows": 43, "rating": "present_nonzero", "xG": "documentation_only", "xA": "documentation_only" }
+    },
+    {
+      "label": "LL2",
+      "providerMatchId": "37fa6524-847e-462d-a449-683608b7b125",
+      "barcelonaLineup": { "starters": 11, "unclassifiedNonStarters": 12, "formation": null, "shirtNumbers": 23, "positions": 23, "playerIds": 23 },
+      "events": { "status": "partial_scoring_only", "rows": 9, "goals": 9, "assists": 5, "goalCountMatchesScore": true, "rowsWithCoordinates": 0, "rowsWithXG": 0, "rowsWithXGOT": 0 },
+      "statistics": { "teamRows": 2, "playerRows": 44, "rating": "present_nonzero", "xG": "documentation_only", "xA": "documentation_only" }
+    },
+    {
+      "label": "LL3",
+      "providerMatchId": "98490532-2df1-4ac0-bcbb-84fafabd471a",
+      "barcelonaLineup": { "starters": 11, "unclassifiedNonStarters": 11, "formation": null, "shirtNumbers": 22, "positions": 22, "playerIds": 22 },
+      "events": { "status": "partial_scoring_only", "rows": 7, "goals": 7, "assists": 6, "goalCountMatchesScore": true, "rowsWithCoordinates": 0, "rowsWithXG": 0, "rowsWithXGOT": 0 },
+      "statistics": { "teamRows": 58, "playerRows": 44, "rating": "present_nonzero", "xG": "documentation_only", "xA": "documentation_only" }
+    },
+    {
+      "label": "UCL1",
+      "providerMatchId": "0b189094-b523-4878-8d9f-ccc81c8e117b",
+      "barcelonaLineup": { "starters": 0, "unclassifiedNonStarters": 0, "formation": null, "shirtNumbers": 0, "positions": 0, "playerIds": 0 },
+      "events": { "status": "not_available", "rows": 0, "goals": 0, "assists": 0, "goalCountMatchesScore": null, "rowsWithCoordinates": 0, "rowsWithXG": 0, "rowsWithXGOT": 0 },
+      "statistics": { "teamRows": 0, "playerRows": 0, "rating": "documentation_only", "xG": "documentation_only", "xA": "documentation_only" }
+    }
+  ],
+  "actualLaLigaTeamFields": [
+    "accurate_passes",
+    "ball_possession",
+    "blocked_shots",
+    "corner_kicks",
+    "fouls",
+    "goalkeeper_saves",
+    "offsides",
+    "pass_percentage",
+    "red_cards",
+    "shots_inside_box",
+    "shots_off_target",
+    "shots_on_target",
+    "shots_outside_box",
+    "total_passes",
+    "total_shots",
+    "yellow_cards"
+  ],
+  "actualLaLigaPlayerFieldGroups": [
+    "minutes",
+    "goals",
+    "assists",
+    "shots",
+    "passes and pass accuracy",
+    "key passes",
+    "tackles",
+    "interceptions",
+    "duels",
+    "dribbles",
+    "saves",
+    "rating"
+  ],
+  "seasonPlayerProbe": {
+    "playerName": "Lamine Yamal",
+    "status": "available",
+    "rating": "present_nonzero",
+    "xG": "documentation_only",
+    "xA": "documentation_only"
+  },
+  "secretIncluded": false
+}

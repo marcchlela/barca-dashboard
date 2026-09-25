@@ -204,7 +204,7 @@ async function toInternalMatch(row: FinishedMatchRow): Promise<InternalMatch> {
   };
 }
 
-async function selectReliabilityMatches() {
+export async function selectReliabilityMatches() {
   const barcelona = await db.orm.public.Team
     .where({ isBarcelona: true })
     .first();
