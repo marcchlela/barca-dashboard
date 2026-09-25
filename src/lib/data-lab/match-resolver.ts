@@ -35,6 +35,11 @@ const COMPETITION_ALIAS_GROUPS = [
     "spain primera division",
     "primera division",
   ],
+  [
+    "uefa champions league",
+    "champions league",
+    "ucl",
+  ],
 ] as const;
 
 const DISTINCT_TEAM_MARKERS = new Set([

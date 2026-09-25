@@ -4,6 +4,21 @@ Run date: **2026-09-25**
 Branch: **`data-backbone-v2`**  
 Endpoint: **`GET /api/dev/data-lab/barcelona-match`**
 
+## Final StatsHawk reliability phase
+
+The broader reliability sweep is documented in [the dedicated report](data-lab/statshawk-reliability.md), with sanitized evidence in [its compact JSON sample](data-lab/samples/statshawk-reliability.json).
+
+The result changes the earlier single-match interpretation: StatsHawk remains a useful player-stat enrichment source, but is **not yet approved as the primary source**. It resolved the original Sevilla league match and one Champions League match with the same useful box-score shape, but only 1 of 3 selected La Liga fixtures resolved. football-data.org and openfootball both confirmed the two unresolved league fixtures.
+
+The reliability run consumed 25 weighted units (4,951 to 4,926), audited all 35 roster rows, tested four player roles plus one UCL overview split, and preserved absent/zero/non-zero field states. No xG or xA appeared in any actual box score or overview. The new development-only endpoint is:
+
+```text
+GET /api/dev/data-lab/statshawk-reliability
+GET /api/dev/data-lab/statshawk-reliability?refresh=1
+```
+
+It uses a six-hour in-memory cache and a hard 120-unit guard. Production returns 404. No schema, migration, database record, production sync path, or UI was changed.
+
 ## Outcome
 
 The repository contains an isolated, read-only, development-only provider lab. It resolves one real Barcelona match from the existing database, probes only approved sources, normalizes field coverage, and reports every provider failure independently.

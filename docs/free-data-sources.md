@@ -2,6 +2,12 @@
 
 Research date: **2026-09-25**. Scope: current FC Barcelona/La Liga data that can legally and safely support a server-side dashboard at zero cost. This is an engineering risk assessment, not legal advice.
 
+## Reliability update
+
+A final multi-match StatsHawk audit downgraded its role from proposed primary player-stat source to **promising enrichment source pending broader availability**. Of three varied local La Liga matches, only Sevilla 1-3 Barcelona resolved; Barcelona 7-2 Racing Santander and Barcelona 5-2 Rayo Vallecano did not return a safely resolvable StatsHawk candidate. One Barcelona 5-1 Feyenoord Champions League match resolved through the documented `ucl` competition and matched the league box-score shape.
+
+Where available, StatsHawk's player measures and immutable match identity were coherent. Availability is the blocker: football-data.org and openfootball independently agreed on both missing league fixtures. Across actual box scores and five player overviews, xG/xA remained absent despite being advertised in capabilities. See [the full reliability report](data-lab/statshawk-reliability.md).
+
 ## Decision
 
 There is still no single verified, stable, legally reusable, zero-cost source for every desired field. The defensible free stack is:
