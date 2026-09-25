@@ -1,0 +1,758 @@
+[
+  {
+    "id": "column.public.match_statistic.attacks",
+    "label": "Add column \"attacks\" to \"match_statistic\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "attacks",
+        "table": "match_statistic"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"attacks\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "match_statistic",
+          "attacks"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"attacks\"",
+        "sql": "ALTER TABLE \"public\".\"match_statistic\" ADD COLUMN \"attacks\" int4"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"attacks\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "match_statistic",
+          "attacks"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.match_statistic.blockedShots",
+    "label": "Add column \"blockedShots\" to \"match_statistic\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "blockedShots",
+        "table": "match_statistic"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"blockedShots\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "match_statistic",
+          "blockedShots"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"blockedShots\"",
+        "sql": "ALTER TABLE \"public\".\"match_statistic\" ADD COLUMN \"blockedShots\" int4"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"blockedShots\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "match_statistic",
+          "blockedShots"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.match_statistic.dangerousAttacks",
+    "label": "Add column \"dangerousAttacks\" to \"match_statistic\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "dangerousAttacks",
+        "table": "match_statistic"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"dangerousAttacks\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "match_statistic",
+          "dangerousAttacks"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"dangerousAttacks\"",
+        "sql": "ALTER TABLE \"public\".\"match_statistic\" ADD COLUMN \"dangerousAttacks\" int4"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"dangerousAttacks\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "match_statistic",
+          "dangerousAttacks"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.match_statistic.freeKicks",
+    "label": "Add column \"freeKicks\" to \"match_statistic\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "freeKicks",
+        "table": "match_statistic"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"freeKicks\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "match_statistic",
+          "freeKicks"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"freeKicks\"",
+        "sql": "ALTER TABLE \"public\".\"match_statistic\" ADD COLUMN \"freeKicks\" int4"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"freeKicks\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "match_statistic",
+          "freeKicks"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.match_statistic.goalKicks",
+    "label": "Add column \"goalKicks\" to \"match_statistic\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "goalKicks",
+        "table": "match_statistic"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"goalKicks\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "match_statistic",
+          "goalKicks"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"goalKicks\"",
+        "sql": "ALTER TABLE \"public\".\"match_statistic\" ADD COLUMN \"goalKicks\" int4"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"goalKicks\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "match_statistic",
+          "goalKicks"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.match_statistic.saves",
+    "label": "Add column \"saves\" to \"match_statistic\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "saves",
+        "table": "match_statistic"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"saves\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "match_statistic",
+          "saves"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"saves\"",
+        "sql": "ALTER TABLE \"public\".\"match_statistic\" ADD COLUMN \"saves\" int4"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"saves\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "match_statistic",
+          "saves"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.match_statistic.shotsInsideBox",
+    "label": "Add column \"shotsInsideBox\" to \"match_statistic\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "shotsInsideBox",
+        "table": "match_statistic"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"shotsInsideBox\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "match_statistic",
+          "shotsInsideBox"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"shotsInsideBox\"",
+        "sql": "ALTER TABLE \"public\".\"match_statistic\" ADD COLUMN \"shotsInsideBox\" int4"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"shotsInsideBox\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "match_statistic",
+          "shotsInsideBox"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.match_statistic.shotsOffTarget",
+    "label": "Add column \"shotsOffTarget\" to \"match_statistic\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "shotsOffTarget",
+        "table": "match_statistic"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"shotsOffTarget\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "match_statistic",
+          "shotsOffTarget"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"shotsOffTarget\"",
+        "sql": "ALTER TABLE \"public\".\"match_statistic\" ADD COLUMN \"shotsOffTarget\" int4"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"shotsOffTarget\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "match_statistic",
+          "shotsOffTarget"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.match_statistic.shotsOutsideBox",
+    "label": "Add column \"shotsOutsideBox\" to \"match_statistic\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "shotsOutsideBox",
+        "table": "match_statistic"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"shotsOutsideBox\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "match_statistic",
+          "shotsOutsideBox"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"shotsOutsideBox\"",
+        "sql": "ALTER TABLE \"public\".\"match_statistic\" ADD COLUMN \"shotsOutsideBox\" int4"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"shotsOutsideBox\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "match_statistic",
+          "shotsOutsideBox"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.match_statistic.substitutions",
+    "label": "Add column \"substitutions\" to \"match_statistic\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "substitutions",
+        "table": "match_statistic"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"substitutions\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "match_statistic",
+          "substitutions"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"substitutions\"",
+        "sql": "ALTER TABLE \"public\".\"match_statistic\" ADD COLUMN \"substitutions\" int4"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"substitutions\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "match_statistic",
+          "substitutions"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.match_statistic.throwIns",
+    "label": "Add column \"throwIns\" to \"match_statistic\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "throwIns",
+        "table": "match_statistic"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"throwIns\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "match_statistic",
+          "throwIns"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"throwIns\"",
+        "sql": "ALTER TABLE \"public\".\"match_statistic\" ADD COLUMN \"throwIns\" int4"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"throwIns\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "match_statistic",
+          "throwIns"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.player_match_statistic.blocks",
+    "label": "Add column \"blocks\" to \"player_match_statistic\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "blocks",
+        "table": "player_match_statistic"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"blocks\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "player_match_statistic",
+          "blocks"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"blocks\"",
+        "sql": "ALTER TABLE \"public\".\"player_match_statistic\" ADD COLUMN \"blocks\" int4"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"blocks\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "player_match_statistic",
+          "blocks"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.player_match_statistic.cleanSheet",
+    "label": "Add column \"cleanSheet\" to \"player_match_statistic\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "cleanSheet",
+        "table": "player_match_statistic"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"cleanSheet\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "player_match_statistic",
+          "cleanSheet"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"cleanSheet\"",
+        "sql": "ALTER TABLE \"public\".\"player_match_statistic\" ADD COLUMN \"cleanSheet\" bool"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"cleanSheet\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "player_match_statistic",
+          "cleanSheet"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.player_match_statistic.dribblesAttempted",
+    "label": "Add column \"dribblesAttempted\" to \"player_match_statistic\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "dribblesAttempted",
+        "table": "player_match_statistic"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"dribblesAttempted\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "player_match_statistic",
+          "dribblesAttempted"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"dribblesAttempted\"",
+        "sql": "ALTER TABLE \"public\".\"player_match_statistic\" ADD COLUMN \"dribblesAttempted\" int4"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"dribblesAttempted\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "player_match_statistic",
+          "dribblesAttempted"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.player_match_statistic.fouls",
+    "label": "Add column \"fouls\" to \"player_match_statistic\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "fouls",
+        "table": "player_match_statistic"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"fouls\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "player_match_statistic",
+          "fouls"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"fouls\"",
+        "sql": "ALTER TABLE \"public\".\"player_match_statistic\" ADD COLUMN \"fouls\" int4"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"fouls\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "player_match_statistic",
+          "fouls"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.player_match_statistic.goalsConceded",
+    "label": "Add column \"goalsConceded\" to \"player_match_statistic\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "goalsConceded",
+        "table": "player_match_statistic"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"goalsConceded\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "player_match_statistic",
+          "goalsConceded"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"goalsConceded\"",
+        "sql": "ALTER TABLE \"public\".\"player_match_statistic\" ADD COLUMN \"goalsConceded\" int4"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"goalsConceded\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "player_match_statistic",
+          "goalsConceded"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.player_match_statistic.saves",
+    "label": "Add column \"saves\" to \"player_match_statistic\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "saves",
+        "table": "player_match_statistic"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"saves\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "player_match_statistic",
+          "saves"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"saves\"",
+        "sql": "ALTER TABLE \"public\".\"player_match_statistic\" ADD COLUMN \"saves\" int4"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"saves\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "player_match_statistic",
+          "saves"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.player_match_statistic.successfulDribbles",
+    "label": "Add column \"successfulDribbles\" to \"player_match_statistic\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "successfulDribbles",
+        "table": "player_match_statistic"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"successfulDribbles\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "player_match_statistic",
+          "successfulDribbles"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"successfulDribbles\"",
+        "sql": "ALTER TABLE \"public\".\"player_match_statistic\" ADD COLUMN \"successfulDribbles\" int4"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"successfulDribbles\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "player_match_statistic",
+          "successfulDribbles"
+        ]
+      }
+    ]
+  }
+]

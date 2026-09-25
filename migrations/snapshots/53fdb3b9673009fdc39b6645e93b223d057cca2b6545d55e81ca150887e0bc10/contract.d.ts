@@ -34,7 +34,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'ab80e523f0f42c7647e39a2c23ef6b102102f5b0f68a5f04b61bbce06c2326a4'>;
+  StorageHashBase<'53fdb3b9673009fdc39b6645e93b223d057cca2b6545d55e81ca150887e0bc10'>;
 export type ExecutionHash =
   ExecutionHashBase<'c52f5cea5ddccedf784326ed70031eddf18d45ebab8569b47ae3ad552aa9518f'>;
 export type ProfileHash =
@@ -305,7 +305,6 @@ export type FieldOutputTypes = {
       readonly role: 'starter' | 'substitute';
       readonly shirtNumber: CodecTypes['pg/int4@1']['output'] | null;
       readonly position: CodecTypes['pg/text@1']['output'] | null;
-      readonly lineupOrdinal: CodecTypes['pg/int4@1']['output'] | null;
       readonly positionX: CodecTypes['pg/float8@1']['output'] | null;
       readonly positionY: CodecTypes['pg/float8@1']['output'] | null;
       readonly enteredMinute: CodecTypes['pg/int4@1']['output'] | null;
@@ -763,7 +762,6 @@ export type FieldInputTypes = {
       readonly role: 'starter' | 'substitute';
       readonly shirtNumber: CodecTypes['pg/int4@1']['input'] | null;
       readonly position: CodecTypes['pg/text@1']['input'] | null;
-      readonly lineupOrdinal: CodecTypes['pg/int4@1']['input'] | null;
       readonly positionX: CodecTypes['pg/float8@1']['input'] | null;
       readonly positionY: CodecTypes['pg/float8@1']['input'] | null;
       readonly enteredMinute: CodecTypes['pg/int4@1']['input'] | null;
@@ -1253,7 +1251,6 @@ export type StorageColumnTypes = {
       readonly id: CodecTypes['pg/uuid@1']['output'];
       readonly leftMinute: CodecTypes['pg/int4@1']['output'] | null;
       readonly lineupId: CodecTypes['pg/uuid@1']['output'];
-      readonly lineupOrdinal: CodecTypes['pg/int4@1']['output'] | null;
       readonly playerId: CodecTypes['pg/uuid@1']['output'];
       readonly position: CodecTypes['pg/text@1']['output'] | null;
       readonly positionX: CodecTypes['pg/float8@1']['output'] | null;
@@ -1711,7 +1708,6 @@ export type StorageColumnInputTypes = {
       readonly id: CodecTypes['pg/uuid@1']['input'];
       readonly leftMinute: CodecTypes['pg/int4@1']['input'] | null;
       readonly lineupId: CodecTypes['pg/uuid@1']['input'];
-      readonly lineupOrdinal: CodecTypes['pg/int4@1']['input'] | null;
       readonly playerId: CodecTypes['pg/uuid@1']['input'];
       readonly position: CodecTypes['pg/text@1']['input'] | null;
       readonly positionX: CodecTypes['pg/float8@1']['input'] | null;
@@ -2278,7 +2274,6 @@ export namespace Models {
     role: 'starter' | 'substitute';
     shirtNumber: CodecTypes['pg/int4@1']['output'] | null;
     position: CodecTypes['pg/text@1']['output'] | null;
-    lineupOrdinal: CodecTypes['pg/int4@1']['output'] | null;
     positionX: CodecTypes['pg/float8@1']['output'] | null;
     positionY: CodecTypes['pg/float8@1']['output'] | null;
     enteredMinute: CodecTypes['pg/int4@1']['output'] | null;
@@ -3356,11 +3351,6 @@ type ContractBase = Omit<
                 readonly position: {
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                };
-                readonly lineupOrdinal: {
-                  readonly nativeType: 'int4';
-                  readonly codecId: 'pg/int4@1';
                   readonly nullable: true;
                 };
                 readonly positionX: {
@@ -6533,10 +6523,6 @@ type ContractBase = Omit<
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
-              readonly lineupOrdinal: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
-              };
               readonly positionX: {
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/float8@1' };
@@ -6604,7 +6590,6 @@ type ContractBase = Omit<
                 readonly role: { readonly column: 'role' };
                 readonly shirtNumber: { readonly column: 'shirtNumber' };
                 readonly position: { readonly column: 'position' };
-                readonly lineupOrdinal: { readonly column: 'lineupOrdinal' };
                 readonly positionX: { readonly column: 'positionX' };
                 readonly positionY: { readonly column: 'positionY' };
                 readonly enteredMinute: { readonly column: 'enteredMinute' };
