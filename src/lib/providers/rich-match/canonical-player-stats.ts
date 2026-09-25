@@ -52,6 +52,14 @@ type Conflict = {
   statsHawk: number | boolean;
 };
 
+type StoredProviderIdentity = {
+  internalId: string;
+
+  identityMethod:
+    | string
+    | null;
+};
+
 function errorMessage(
   error: unknown,
 ) {
@@ -174,9 +182,43 @@ function namesShareUsefulToken(
   );
 }
 
+function storedIdentityMethod(
+  metadata: unknown,
+) {
+  if (
+    metadata === null ||
+    typeof metadata !==
+      "object" ||
+    Array.isArray(
+      metadata,
+    )
+  ) {
+    return null;
+  }
+
+  const value =
+    (
+      metadata as Record<
+        string,
+        unknown
+      >
+    ).identityMethod;
+
+  return (
+    typeof value ===
+      "string" &&
+    value.trim()
+  )
+    ? value
+    : null;
+}
+
 function resolveMappedPlayer(
   mappings:
-    Map<string, string>,
+    Map<
+      string,
+      StoredProviderIdentity
+    >,
   providerId: string,
   squadById:
     Map<
@@ -184,20 +226,36 @@ function resolveMappedPlayer(
       CanonicalSquadPlayer
     >,
 ) {
-  const internalId =
+  const mapping =
     mappings.get(
       providerId,
     );
 
-  if (!internalId) {
+  if (!mapping) {
     return null;
   }
 
-  return (
+  const canonical =
     squadById.get(
-      internalId,
-    ) ?? null
-  );
+      mapping.internalId,
+    );
+
+  if (!canonical) {
+    return null;
+  }
+
+  return {
+    canonical,
+
+    /*
+     * Preserve the original evidence that established this
+     * identity. Merely using an existing mapping on a later
+     * run must not rewrite provenance to "provider_mapping".
+     */
+    method:
+      mapping.identityMethod ??
+      "provider_mapping",
+  };
 }
 
 function resolveBigBallsPlayer(
@@ -209,7 +267,7 @@ function resolveBigBallsPlayer(
       CanonicalSquadPlayer
     >,
   mappings:
-    Map<string, string>,
+    Map<string, StoredProviderIdentity>,
 ): {
   canonical:
     CanonicalSquadPlayer | null;
@@ -223,13 +281,7 @@ function resolveBigBallsPlayer(
     );
 
   if (mapped) {
-    return {
-      canonical:
-        mapped,
-
-      method:
-        "provider_mapping",
-    };
+    return mapped;
   }
 
   const normalized =
@@ -306,7 +358,7 @@ function resolveStatsHawkPlayer(
       CanonicalSquadPlayer
     >,
   mappings:
-    Map<string, string>,
+    Map<string, StoredProviderIdentity>,
 ): {
   canonical:
     CanonicalSquadPlayer | null;
@@ -320,13 +372,7 @@ function resolveStatsHawkPlayer(
     );
 
   if (mapped) {
-    return {
-      canonical:
-        mapped,
-
-      method:
-        "provider_mapping",
-    };
+    return mapped;
   }
 
   const identityName =
@@ -688,25 +734,47 @@ export async function previewCanonicalPlayerStatistics(
           .all()
       : [];
 
-  const bigMappingMap =
-    new Map(
-      bigBallsMappings.map(
-        (mapping) => [
-          mapping.providerId,
-          mapping.internalId,
-        ],
-      ),
-    );
+const bigMappingMap =
+  new Map<
+    string,
+    StoredProviderIdentity
+  >(
+    bigBallsMappings.map(
+      (mapping) => [
+        mapping.providerId,
+        {
+          internalId:
+            mapping.internalId,
 
-  const statsHawkMappingMap =
-    new Map(
-      statsHawkMappings.map(
-        (mapping) => [
-          mapping.providerId,
-          mapping.internalId,
-        ],
-      ),
-    );
+          identityMethod:
+            storedIdentityMethod(
+              mapping.metadata,
+            ),
+        },
+      ],
+    ),
+  );
+
+const statsHawkMappingMap =
+  new Map<
+    string,
+    StoredProviderIdentity
+  >(
+    statsHawkMappings.map(
+      (mapping) => [
+        mapping.providerId,
+        {
+          internalId:
+            mapping.internalId,
+
+          identityMethod:
+            storedIdentityMethod(
+              mapping.metadata,
+            ),
+        },
+      ],
+    ),
+  );
 
   const resolvedBigBalls =
     new Map<
