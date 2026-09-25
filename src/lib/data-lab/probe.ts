@@ -6,9 +6,11 @@ import {
 import { getInternalBarcelonaMatch } from "./internal-match";
 import { probeFootballData } from "./providers/football-data";
 import { probeOpenFootball } from "./providers/openfootball";
+import { probeStatsHawk } from "./providers/statshawk";
 import { probeStatsBomb } from "./providers/statsbomb";
 import { probeTheSportsDb } from "./providers/the-sports-db";
 import { ALL_SOURCE_PROFILES } from "./source-status";
+import { runDataLabDeterministicValidation } from "./validation";
 import {
   emptyCoverage,
   type DataLabReport,
@@ -17,24 +19,17 @@ import {
 } from "./types";
 
 function skippedProbe(provider: SourceProfile): ProviderProbe {
-  const notConfigured =
-    provider.id === "statshawk" && !process.env.STATSHAWK_API_KEY;
-
   return {
     provider,
-    status: notConfigured ? "not_configured" : "skipped_by_policy",
+    status: "skipped_by_policy",
     testedAutomatically: false,
-    currentSeasonAvailable: notConfigured
-      ? null
-      : provider.currentSeasonExpected,
+    currentSeasonAvailable: provider.currentSeasonExpected,
     match: null,
     resolution: null,
     coverage: emptyCoverage(),
     completeness: {},
     evidence: [
-      notConfigured
-        ? "STATSHAWK_API_KEY is not configured; no request was made."
-        : provider.automationPolicy === "DENY"
+      provider.automationPolicy === "DENY"
         ? "No request was made: the source is legally restricted or permission/provenance is unclear."
         : "No adapter is enabled for this source.",
     ],
@@ -72,6 +67,7 @@ export async function runBarcelonaDataLab({
     probeTheSportsDb(internalMatch),
     probeStatsBomb(internalMatch),
     probeOpenFootball(internalMatch),
+    probeStatsHawk(internalMatch),
   ]);
   const automatedIds = new Set(automated.map((probe) => probe.provider.id));
   const providers = [
@@ -105,6 +101,7 @@ export async function runBarcelonaDataLab({
       writesAttempted: 0,
       schemaChanged: false,
     },
+    validation: runDataLabDeterministicValidation(),
     internalMatch,
     providers,
     comparison: {
@@ -115,17 +112,24 @@ export async function runBarcelonaDataLab({
     },
     recommendation: {
       primary: "football-data-org",
-      secondary: ["openfootball", "thesportsdb"],
+      secondary: ["statshawk", "openfootball", "thesportsdb"],
       fieldOwnership: {
         "fixtures, results, standings": "football-data-org",
-        "fixture/result cross-check": "openfootball",
-        venue: "thesportsdb (secondary enrichment; verify before persistence)",
+        "fixture/result cross-check": "statshawk + openfootball",
+        venue: "statshawk; thesportsdb as secondary enrichment",
+        "player profiles and roster positions": "statshawk (roster is not a match lineup)",
+        "player minutes, goals, assists": "statshawk",
+        "player shots and shots on target": "statshawk",
+        "player passing and pass accuracy": "statshawk",
+        "player tackles, interceptions, and fouls": "statshawk",
+        "goalkeeper saves and goalkeeper statistics": "statshawk",
+        "player card totals": "statshawk (not a timestamped event timeline)",
         "complete lineups and bench": "NO_FREE_RELIABLE_SOURCE",
         formation: "NO_FREE_RELIABLE_SOURCE",
         "complete goals, assists, cards, substitutions": "NO_FREE_RELIABLE_SOURCE",
         "complete team statistics": "NO_FREE_RELIABLE_SOURCE",
         "xG and shot coordinates": "NO_FREE_RELIABLE_SOURCE",
-        "player match statistics and ratings": "NO_FREE_RELIABLE_SOURCE",
+        "player ratings": "NO_FREE_RELIABLE_SOURCE",
         "injuries and suspensions": "NO_FREE_RELIABLE_SOURCE",
       },
       unresolvedGaps: [
@@ -133,7 +137,7 @@ export async function runBarcelonaDataLab({
         "Complete event timeline with assists, cards, and substitutions",
         "Possession, shots, passing, and other team statistics",
         "xG, shot coordinates, momentum, and heatmaps",
-        "Per-player match statistics and ratings",
+        "Player ratings",
         "Current injuries and suspensions with reuse permission",
       ],
     },

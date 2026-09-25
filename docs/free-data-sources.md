@@ -4,130 +4,111 @@ Research date: **2026-09-25**. Scope: current FC Barcelona/La Liga data that can
 
 ## Decision
 
-There is no verified, stable, legally reusable, zero-cost source that supplies the complete desired data set: current fixtures, standings, venue, full lineups and bench, formations, full events, team statistics, xG/shot coordinates, player match statistics/ratings, and injuries.
+There is still no single verified, stable, legally reusable, zero-cost source for every desired field. The defensible free stack is:
 
-The defensible free stack is:
+1. **football-data.org** for primary fixtures, results, and standings.
+2. **StatsHawk** for a current-match cross-check, venue, player box-score measures, roster associations, and player overview.
+3. **openfootball** as a CC0 fixture/result cross-check and outage fallback.
+4. **TheSportsDB** for best-effort venue/profile enrichment only; its five-row cap makes rich match collections partial.
+5. **StatsBomb Open Data** for historical research/schema experiments, not current matches.
 
-1. **football-data.org** for the primary current fixture/result/standings backbone.
-2. **openfootball** as a CC0 fixture/result cross-check and outage fallback, not as an authority.
-3. **TheSportsDB** for best-effort venue and small representative enrichment only. Its five-row free response cap makes lineups, timelines, and statistics incomplete.
-4. **StatsBomb Open Data** for historical research and schema/model experiments, not current matches.
-5. **StatsHawk** is the strongest untested follow-up candidate: it has documented terms, La Liga coverage, player match lines/injuries, and 5,000 free units. A user-created key is required before its real coverage can be validated.
-
-Do not build automated adapters for Understat, FotMob, SofaScore, ESPN, official LaLiga pages/apps, or official UEFA pages under their present policies. Do not adopt PitchAPI until its data provenance and reuse rights are clarified in writing.
+Do not automate Understat, FotMob, SofaScore, ESPN, official LaLiga pages/apps, or official UEFA pages under their current policies. Do not adopt PitchAPI until its provenance and reuse rights are clarified in writing.
 
 ## Classification vocabulary
 
-- `OFFICIAL_API`: documented API/open-data channel published by the provider itself. This does not mean the vendor is the official competition data rights-holder.
-- `PUBLIC_API_UNDOCUMENTED`: publicly reachable machine-readable source that is not a conventional supported API. Use only when an explicit open licence independently permits it.
-- `PUBLIC_WEB_MANUAL_ONLY`: page can be inspected by a person, but automation is not authorized.
-- `RESTRICTED_DO_NOT_AUTOMATE`: terms, robots policy, or other first-party restriction blocks automation.
-- `UNKNOWN_DO_NOT_AUTOMATE`: permission or upstream provenance is not clear enough to automate safely.
+- `OFFICIAL_API`: documented API/open-data channel published by the provider itself; this does not imply official competition-data rights.
+- `PUBLIC_API_UNDOCUMENTED`: public machine-readable source that is not a conventional API, used only with an explicit open licence.
+- `PUBLIC_WEB_MANUAL_ONLY`: human inspection only.
+- `RESTRICTED_DO_NOT_AUTOMATE`: terms or robots policy blocks automation.
+- `UNKNOWN_DO_NOT_AUTOMATE`: permission/provenance is not clear enough for safe automation.
 
-## Comparison matrix
+## Provider comparison
 
-| Source | Class | Automation | Current La Liga | Free constraints | Test-match result | Decision |
-|---|---|---:|---:|---|---|---|
-| [football-data.org](https://www.football-data.org/pricing) | `OFFICIAL_API` | Allow | Yes | 10 requests/minute; basic tier omits deep data | Exact match `564690`; score + referee, no venue/rich arrays | Primary |
-| [TheSportsDB](https://www.thesportsdb.com/documentation) | `OFFICIAL_API` | Allow | Yes | 30 requests/minute; rich endpoints return only five rows on free API | Exact event `2506233`; venue plus partial lineups/events/stats | Secondary only |
-| [StatsBomb Open Data](https://github.com/statsbomb/open-data) | `OFFICIAL_API` | Allow | No | Open research dataset; attribution rules apply | Current season absent; newest La Liga is 2020/21 | Historical only |
-| [openfootball/football.json](https://github.com/openfootball/football.json) | `PUBLIC_API_UNDOCUMENTED`* | Allow | Yes | CC0, daily generated JSON; community maintained | Exact date/teams/HT/FT match | Cross-check |
-| [StatsHawk](https://www.statshawk.ai/api) | `OFFICIAL_API` | Allow with key | Claimed yes | 5,000 units/month; hourly soccer refresh; test key | Not tested: no project key | Next trial |
-| [Understat](https://understat.com/) | `RESTRICTED_DO_NOT_AUTOMATE` | Deny | Visible manually | `robots.txt` disallows `/` for all agents; no official API/licence found | No automated request | Manual reference only |
-| [FotMob](https://www.fotmob.com/) | `RESTRICTED_DO_NOT_AUTOMATE` | Deny | Yes | Terms prohibit robots/crawlers and systematic use | No automated request | Do not automate |
-| [SofaScore](https://www.sofascore.com/de/terms-and-conditions) | `RESTRICTED_DO_NOT_AUTOMATE` | Deny | Yes | Terms prohibit scraping/aggregation and server burden from automated requests | No automated request | Do not automate |
-| [ESPN](https://www.disneyplus.com/welcome/subscriber-agreement) | `RESTRICTED_DO_NOT_AUTOMATE` | Deny | Yes | No supported public soccer API; service terms prohibit automated extraction/data mining | No automated request | Do not automate |
-| [official LaLiga](https://www.laliga.com/en-GB/legal/legal-oficial) | `RESTRICTED_DO_NOT_AUTOMATE` | Deny | Yes | Content limited to personal/private use; reuse requires authorization | No automated request | Do not automate |
-| [official UEFA](https://www.uefa.com/news-media/news/0256-0dc91ad71f32-ce04913814f0-1000--general-terms-and-conditions/) | `RESTRICTED_DO_NOT_AUTOMATE` | Deny | Yes for UEFA competitions | General terms prohibit systematic/automated collection | No automated request | Do not automate |
-| [PitchAPI](https://pitchapi.dev/) | `UNKNOWN_DO_NOT_AUTOMATE` | Deny pending proof | Claimed yes | Free/unlimited claim, but no public terms or upstream licence found | No automated request | Seek written clarification |
-| [football-data.co.uk](https://www.football-data.co.uk/data.php) | `RESTRICTED_DO_NOT_AUTOMATE` | Deny | Yes | Owner limits data to private individuals and excludes bots/scrapers/AI | No automated request | Do not automate |
-| [API-Football](https://www.api-football.com/documentation-v3) | `OFFICIAL_API` | Allow with key | Not on this project's free plan | Current season is outside the available free seasons | Not tested | Historical benchmark only |
+| Source | Class | Automation | Current La Liga | Test-match result | Decision |
+|---|---|---:|---:|---|---|
+| [football-data.org](https://www.football-data.org/pricing) | `OFFICIAL_API` | Allow | Yes | Exact mapped match `564690`; basic score/referee, no free rich arrays | Primary basic backbone |
+| [StatsHawk](https://www.statshawk.ai/api) | `OFFICIAL_API` | Allow with key | Yes, verified | Exact contest, venue, finalized player box score, roster, capabilities, player overview | Player-match enrichment |
+| [TheSportsDB](https://www.thesportsdb.com/documentation) | `OFFICIAL_API` | Allow | Yes | Exact event `2506233`; venue plus five-row partial collections | Secondary only |
+| [StatsBomb Open Data](https://github.com/statsbomb/open-data) | `OFFICIAL_API` | Allow | No | Current season absent; newest La Liga is 2020/21 | Historical only |
+| [openfootball/football.json](https://github.com/openfootball/football.json) | `PUBLIC_API_UNDOCUMENTED`* | Allow | Yes | Exact date/teams/HT/FT match | Cross-check |
+| [Understat](https://understat.com/) | `RESTRICTED_DO_NOT_AUTOMATE` | Deny | Visible manually | No request | Manual reference only |
+| [FotMob](https://www.fotmob.com/) | `RESTRICTED_DO_NOT_AUTOMATE` | Deny | Visible manually | No request | Do not automate |
+| [SofaScore](https://www.sofascore.com/de/terms-and-conditions) | `RESTRICTED_DO_NOT_AUTOMATE` | Deny | Visible manually | No request | Do not automate |
+| ESPN | `RESTRICTED_DO_NOT_AUTOMATE` | Deny | Visible manually | No supported public soccer API | Do not automate |
+| [official LaLiga](https://www.laliga.com/en-GB/legal/legal-oficial) | `RESTRICTED_DO_NOT_AUTOMATE` | Deny | Yes | No public developer API/automation permission | Do not automate |
+| [official UEFA](https://www.uefa.com/news-media/news/0256-0dc91ad71f32-ce04913814f0-1000--general-terms-and-conditions/) | `RESTRICTED_DO_NOT_AUTOMATE` | Deny | UEFA only | Systematic collection prohibited | Do not automate |
+| [PitchAPI](https://pitchapi.dev/) | `UNKNOWN_DO_NOT_AUTOMATE` | Deny pending proof | Claimed | No public terms/upstream licence found | Seek written clarification |
+| [football-data.co.uk](https://www.football-data.co.uk/data.php) | `RESTRICTED_DO_NOT_AUTOMATE` | Deny | Yes | Private-use terms exclude automated bot/scraper/AI use | Do not automate |
+| [API-Football](https://www.api-football.com/documentation-v3) | `OFFICIAL_API` | Allow with key | Not on this free plan | Current season unavailable | Historical benchmark only |
 
-\* The requested taxonomy has no `OPEN_DATASET` value. openfootball is a documented CC0 static dataset rather than an undocumented API; `PUBLIC_API_UNDOCUMENTED` is the closest available label.
+\* The requested taxonomy has no `OPEN_DATASET` value. Openfootball is a documented CC0 static dataset; `PUBLIC_API_UNDOCUMENTED` is the closest available classification.
 
-## Requested capability matrix
+## Verified current-match capability
 
-`Yes` means verified for the selected current match unless marked otherwise. `Partial` means the provider returned data but a known cap made it incomplete. `Visible` means it appears on the consumer site but cannot be automated under the current policy. `Claimed` means first-party API documentation advertises it, but this lab could not test it without a user-created key.
+`Yes` means the field actually appeared for Sevilla 1–3 Barcelona. `Partial` means a known provider cap prevents completeness. Capability-only fields do not count as actual coverage.
 
-| Source | Classification | Current 2026/27 Barça? | Free? | Automation allowed? | Fixtures | Lineups | Formation | Events | Team stats | Player stats | Ratings | xG | Shot map | Injuries | Limitations | Recommendation |
-|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|
-| football-data.org | `OFFICIAL_API` | Yes | Yes | Yes | Yes | No | No | No | No | No | No | No | No | No | Deep match data is paid | Primary basic backbone |
-| TheSportsDB | `OFFICIAL_API` | Yes | Yes | Yes | Yes | Partial (5) | No | Partial (5) | Partial (5) | No match stats | No | No | No | No | Five-row free cap; community data | Venue/profile enrichment only |
-| StatsBomb Open Data | `OFFICIAL_API` | No | Yes | Yes | Historical | Historical | Historical | Historical | Historical | Historical | No consumer rating | Historical | Historical | No | La Liga ends at 2020/21 | Historical modelling only |
-| openfootball | `PUBLIC_API_UNDOCUMENTED`* | Yes | Yes | Yes | Yes | No | No | No | No | No | No | No | No | No | Community fixture/result data only | Result cross-check |
-| StatsHawk | `OFFICIAL_API` | Claimed | Yes | Yes with key | Claimed | Unknown | Unknown | Unknown | Claimed | Claimed | Unknown | Claimed | Unknown | Claimed | No project key; new provider | Next controlled trial |
-| Understat | `RESTRICTED_DO_NOT_AUTOMATE` | Visible | Yes to view | No | Visible | No | No | Visible shots | Visible | Visible | No | Visible | Visible | No | robots.txt disallows all automation | Manual reference only |
-| FotMob | `RESTRICTED_DO_NOT_AUTOMATE` | Visible | Yes to view | No | Visible | Visible | Visible | Visible | Visible | Visible | Visible | Visible | Visible | Visible | Terms forbid systematic/automated extraction | Do not automate |
-| SofaScore | `RESTRICTED_DO_NOT_AUTOMATE` | Visible | Yes to view | No | Visible | Visible | Visible | Visible | Visible | Visible | Visible | Visible | Visible | Visible | Terms forbid scraping/aggregation | Do not automate |
-| ESPN | `RESTRICTED_DO_NOT_AUTOMATE` | Visible | Yes to view | No | Visible | Some | Some | Visible | Visible | Visible | No | Limited | No | Limited | Undocumented endpoints; automation prohibited | Do not automate |
-| official LaLiga | `RESTRICTED_DO_NOT_AUTOMATE` | Visible | Yes to view | No | Visible | Visible | Visible | Visible | Visible | Visible | No | Unknown | Unknown | Visible | Personal/private content terms; no developer API | Do not automate |
-| official UEFA | `RESTRICTED_DO_NOT_AUTOMATE` | UEFA only | Yes to view | No | Visible | Visible | Visible | Visible | Visible | Visible | No | Visible | Visible | Visible | Systematic collection prohibited | Do not automate |
-| PitchAPI | `UNKNOWN_DO_NOT_AUTOMATE` | Claimed | Claimed free | Not yet | Claimed | Claimed | Claimed | Claimed | Claimed | Claimed | Unknown | Claimed | Claimed | Unknown | No public terms/upstream licence | Seek written permission/provenance |
-| football-data.co.uk | `RESTRICTED_DO_NOT_AUTOMATE` | Yes | Private use | No | Yes | No | No | No | Yes | No | No | No | No | No | Explicit bot/scraper/AI exclusion | Do not automate |
-| API-Football | `OFFICIAL_API` | No on free plan | Historical only | Yes with key | Historical | Historical | Historical | Historical | Historical | Historical | Historical | Varies | Varies | Historical | Free access stops at 2024 for this key | Optional historical benchmark |
+| Source | Fixtures | Lineups | Formation | Events | Team stats | Player stats | Ratings | xG | Injuries | Notes |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|
+| football-data.org | Yes | No | No | No | No | No | No | No | No | Basic free response |
+| StatsHawk | Yes | No | No | No | No | Yes | No | No | No | Finalized player box score; roster is not a lineup |
+| TheSportsDB | Yes | Partial (5) | No | Partial (5) | Partial (5) | No | No | No | No | Community data and five-row cap |
+| StatsBomb Open Data | Historical | Historical | Historical | Historical | Historical | Historical | No | Historical | No | La Liga ends at 2020/21 |
+| openfootball | Yes | No | No | No | No | No | No | No | No | Fixture/result data only |
+
+StatsHawk's capabilities response advertised `xg` and `xa`, but neither appeared in the selected match. The lab therefore reports actual xG coverage as false.
 
 ## API keys and zero-cost access
 
-| Provider | Environment variable | $0 access | Situation in this repository |
+| Provider | Environment variable | $0 access | Repository status |
 |---|---|---|---|
-| football-data.org | `FOOTBALL_DATA_API_KEY` | Yes; 10 requests/minute and basic current La Liga coverage | Already configured and verified; never returned or committed |
-| TheSportsDB | None for v1 development access | Yes; public development key `123`, 30 requests/minute, five-row rich endpoint cap | Verified without a private secret |
-| StatsHawk | `STATSHAWK_API_KEY` | Yes; 5,000 weighted units/month, no card, test API key | Not configured; user must create the free key before a real probe |
-| API-Football | Provider-specific key already tested outside this lab | Yes only for older seasons available to the plan | Do not use for current 2026/27 data |
-| PitchAPI | `PITCHAPI_API_KEY` if ever approved | Advertises free/unlimited access | Intentionally not requested or used until terms and provenance are clarified |
+| football-data.org | `FOOTBALL_DATA_API_KEY` | 10 requests/minute; basic current La Liga | Configured and verified |
+| TheSportsDB | None for v1 development access | Public development key `123`; rich endpoint cap of five | Verified |
+| StatsHawk | `STATSHAWK_API_KEY` | 5,000 weighted units/month | Configured and verified |
+| StatsHawk base URL | `STATSHAWK_BASE_URL` (optional) | Defaults to `https://api.statshawk.ai/v1` | Default verified |
+| API-Football | Provider key | Older seasons on this plan | Not suitable for current season |
+| PitchAPI | `PITCHAPI_API_KEY` if ever approved | Advertised free/unlimited | Intentionally not used |
 
-The lab does not create accounts. Keys must be obtained by the user from the provider and placed only in the local ignored `.env`. A missing optional key is reported as `not_configured`, not treated as a provider failure.
+Keys are server-only ignored environment values. None is printed, returned by the endpoint, stored in samples, or committed.
 
-## Verified source notes
+## StatsHawk experiment
+
+The exact contest is `cst_06g95vb5bhv131tnctf3ykgy60`, kickoff `2026-09-19T19:00:00Z`, Sevilla 1–3 Barcelona. The final adapter path used:
+
+| Endpoint | Weight |
+|---|---:|
+| `GET /v1/competitions` | 1 |
+| `GET /v1/competitions/laliga/editions/2026/games?date=2026-09-19` | 2 |
+| `GET /v1/contests/{id}` | 1 |
+| `GET /v1/contests/{id}/boxscore` | 2 |
+| `GET /v1/competitions/laliga/capabilities` | 1 |
+| `GET /v1/teams/{barcelona_id}/roster` | 3 |
+| `GET /v1/persons/{person_id}/overview?competition=laliga&season=2026` | 1 |
+
+That is 7 requests and 11 weighted units per uncached refresh. The in-memory Data Lab cache lasts 15 minutes.
+
+Actual Barcelona player fields were minutes, goals, assists, shots, shots on target, shot accuracy, passes, completed passes, pass percentage, tackles, interceptions, fouls, yellow/red totals, and keeper measures. Four compact rows are stored in [the sanitized sample](data-lab/samples/statshawk.json).
+
+The roster supplied 35 player associations with broad positions in the sampled rows, but no sampled shirt numbers. It does not establish confirmed starters, substitutes, formation, or match positions.
+
+StatsHawk's documentation describes current injury data for MLB, NFL, NBA, NHL, and WNBA, not soccer. An injury-history request was therefore not useful for this experiment, and injury coverage remains false.
+
+## Other verified source notes
 
 ### football-data.org
 
-The [pricing page](https://www.football-data.org/pricing) lists a €0 tier with 12 competitions, fixtures/tables, delayed schedules/scores, and 10 calls per minute. The same page places lineups, substitutes, goals, and cards in the paid Deep Data tier. [La Liga is in free coverage](https://www.football-data.org/coverage), and the [v4 policy documentation](https://docs.football-data.org/general/v4/policies.html) confirms the free rate limit.
-
-The actual free match request returned the correct current result, matchday, half-time score, and referee. `venue` was null and the lineup, bench, goals, bookings, and substitutions arrays were empty. It is reliable for the project's existing basic backbone, not for the requested detail expansion.
+The [pricing page](https://www.football-data.org/pricing) lists a €0 tier with 12 competitions, fixtures/tables, delayed schedules/scores, and 10 calls per minute. Deep lineups, substitutes, goals, and cards are paid. [La Liga is in free coverage](https://www.football-data.org/coverage).
 
 ### TheSportsDB
 
-The [official documentation](https://www.thesportsdb.com/documentation) exposes event, lineup, timeline, and event-stat endpoints and a public development key. It documents a 30-request/minute limit and five-result limit for each of those rich endpoints on v1 free access. The [terms](https://www.thesportsdb.com/docs_terms_of_use.php) distinguish API use from prohibited website scraping, require credit, and reserve app-store publication for paid subscribers.
-
-For Sevilla–Barcelona, lookup returned the stadium plus exactly five lineup rows, five timeline rows, and five statistic rows. Separate official endpoints also returned a Barcelona team profile and an Andreas Christensen player profile (position, shirt number, birth date, nationality, height, and weight). Those profiles are useful reference data, but the capped match collections are incomplete and must not be represented as complete.
+The [official documentation](https://www.thesportsdb.com/documentation) exposes event, lineup, timeline, event-stat, team, and player endpoints. For Sevilla–Barcelona, it returned venue plus exactly five lineup, five timeline, and five statistic rows. Those rich collections are incomplete. The adapter now selects the team/player profile from Barcelona's actual home/away side rather than assuming Barcelona is away.
 
 ### StatsBomb Open Data
 
-The official [open-data repository](https://github.com/statsbomb/open-data) publishes competition, match, lineup, event, and selected 360 data with attribution requirements. Its live catalogue contained 80 competition-season entries during this audit; La Liga ended at 2020/21. This is excellent for historical event-model development but cannot enrich the 2026/27 test match.
+The official [open-data repository](https://github.com/statsbomb/open-data) provides rich historical data with attribution requirements. Its current catalogue does not cover the 2026/27 test match.
 
 ### openfootball
 
-The [España source repository](https://github.com/openfootball/espana) and generated [football.json repository](https://github.com/openfootball/football.json) are CC0/public domain. The generated JSON is documented as rebuilding daily from Football.TXT. The 2026/27 La Liga file contained the exact selected match with date, local time, teams, half-time score, and full-time score.
-
-This is the cleanest no-key fallback found, but its community-maintained nature and narrow fields make it a cross-check rather than the canonical feed.
-
-### StatsHawk
-
-StatsHawk's [API page](https://www.statshawk.ai/api) claims La Liga support and 5,000 free lookups. [Pricing](https://www.statshawk.ai/pricing) says standard stats are available on the free plan. Most importantly, its [terms](https://www.statshawk.ai/terms) explicitly allow caching, history, and derived statistics in public applications while forbidding raw-data resale. Its [freshness contract](https://www.statshawk.ai/docs/getting-started/freshness) says soccer refreshes hourly.
-
-This is materially safer than reverse-engineered consumer endpoints, but it is a new service and was discovered late in the audit. No account was created and no key was present, so field completeness for the selected match remains unverified. Trial it next with a user-created test key.
-
-### Restricted consumer and official sites
-
-- Understat served a current 2026/27 La Liga page during manual review, but `https://understat.com/robots.txt` returned `User-agent: *` and `Disallow: /`. No adapter was created.
-- FotMob's own site states that automatic services and systematic/regular use are not permitted.
-- [SofaScore terms](https://www.sofascore.com/de/terms-and-conditions) prohibit extraction, aggregation, scraping, and burdening its servers with automated requests.
-- Current ESPN JSON URLs are undocumented. The Disney agreement covering ESPN services prohibits robots/scripts, data mining, and database compilation.
-- [LaLiga's official app terms](https://www.laliga.com/en-GB/legal/legal-oficial) restrict content to personal/private use and prohibit reproduction or public communication without authorization.
-- [UEFA's general terms](https://www.uefa.com/news-media/news/0256-0dc91ad71f32-ce04913814f0-1000--general-terms-and-conditions/) prohibit systematic collection via robots, spiders, scripts, or other automated means.
-
-### Unclear or unsuitable alternatives
-
-- PitchAPI has unusually rich documentation and a free/unlimited claim. A [recent community launch post](https://www.reddit.com/r/sportsanalytics/comments/1vp4s09/free_advanced_analytics_football_api/) says the data is aggregated from multiple sources including WhoScored. No public terms or upstream licensing statement was found. That combination is not sufficient for an automated integration.
-- football-data.co.uk publishes useful current CSVs, but its [data page](https://www.football-data.co.uk/data.php) explicitly limits free data to private individuals and excludes commercial/data-training uses involving automated bots, scrapers, or AI.
-- Libraries such as soccerdata/worldfootballR and public GitHub wrappers are implementation tools, not data licences. If their upstream site is restricted, the wrapper does not make the data safe.
-
-## GitHub and community lead review
-
-Current [Reddit discussions](https://www.reddit.com/r/sportsanalytics/comments/1v8rk3h/looking_for_football_data_sources_and_apis/) correctly surfaced the practical pattern: football-data.org is reliable but thin, API-Football excludes current seasons on free access, and recommendations often drift toward scraping SofaScore/ESPN. Those posts were used only to discover leads; every decision above was checked against first-party documentation, terms, robots policy, or an explicit open licence.
-
-The legitimate GitHub findings were StatsBomb's official open-data repository and openfootball's CC0 repositories. Scraper projects were intentionally not treated as evidence of permission.
+The generated [football.json repository](https://github.com/openfootball/football.json) is CC0/public domain. Its local match time has no timezone, so the lab retains it as `local_time_unknown_zone` instead of creating a fake UTC instant.
 
 ## Field-by-field conclusion
 
@@ -135,14 +116,17 @@ The legitimate GitHub findings were StatsBomb's official open-data repository an
 |---|---|---|
 | Fixtures/results | football-data.org | High |
 | Standings | football-data.org | High |
-| Fixture/result backup | openfootball | Medium |
-| Venue | TheSportsDB, verify independently | Medium/low |
+| Fixture/result cross-check | StatsHawk + openfootball | High/medium |
+| Venue | StatsHawk; TheSportsDB secondary | Medium/high |
 | Referee | football-data.org when present | Medium/high |
+| Player match minutes/goals/assists | StatsHawk | Medium/high |
+| Player shots/passing/defensive totals | StatsHawk | Medium/high |
+| Goalkeeper match statistics | StatsHawk | Medium/high |
 | Complete lineups/bench/formations | None | Gap |
-| Complete goals/assists/cards/substitutions | None | Gap |
-| Complete team stats | None | Gap |
-| xG and shot coordinates | StatsBomb historical only | Current gap |
-| Player match statistics/ratings | StatsHawk may help; untested | Gap pending trial |
-| Injuries/suspensions | StatsHawk may help; untested | Gap pending trial |
+| Timestamped events/substitutions | None | Gap |
+| Complete team stats/possession | None | Gap |
+| Actual xG and shot coordinates | None current | Gap |
+| Player ratings | None current | Gap |
+| Soccer injuries/suspensions | None verified | Gap |
 
-The engineering recommendation is to preserve missing values as missing. Do not infer completeness from a non-empty five-row response, do not synthesize unavailable formations or ratings, and do not silently replace legal data gaps with scraped feeds.
+Preserve missing values as missing. Do not infer lineup status from a roster, infer xG from advertised capabilities, infer completeness from a five-row response, or replace legal data gaps with scraped feeds.

@@ -81,7 +81,9 @@ export const SOURCE_PROFILES = {
     termsUrl: "https://www.statshawk.ai/terms",
     summary: "New documented API with La Liga, a 5,000-unit free tier, and explicit app caching rights.",
     limitations: [
-      "No key was configured, so current-match coverage was not independently verified in this lab.",
+      "Verified against the current La Liga schedule, contest detail, box score, roster, capabilities, and one player overview.",
+      "Its roster is not a confirmed match lineup; no formation, bench role, match position, or shirt number should be inferred from it.",
+      "Soccer injury history is not currently covered by the documented injury surface.",
       "Soccer refreshes hourly and is not presented as a licensed enterprise feed.",
       "Free keys are test keys; production requirements should be confirmed before adoption.",
     ],

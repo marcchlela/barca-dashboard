@@ -32,9 +32,12 @@ function toCandidate(match: OpenFootballMatch): MatchCandidate {
   const score = fullTimeScore(match.score);
   return {
     providerMatchId: null,
-    // Times are local and the dataset supplies no timezone. Noon UTC preserves
-    // date matching without pretending to have an exact instant.
-    kickoff: `${match.date}T12:00:00Z`,
+    kickoff: null,
+    calendarDate: match.date,
+    localTime: match.time ?? null,
+    temporalPrecision: match.time
+      ? "local_time_unknown_zone"
+      : "date_only",
     homeTeam: match.team1,
     awayTeam: match.team2,
     homeScore: score?.[0] ?? null,

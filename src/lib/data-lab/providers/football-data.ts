@@ -34,6 +34,9 @@ function toCandidate(match: DetailedMatch): MatchCandidate {
   return {
     providerMatchId: String(match.id),
     kickoff: match.utcDate,
+    calendarDate: match.utcDate.slice(0, 10),
+    localTime: null,
+    temporalPrecision: "exact",
     homeTeam: match.homeTeam.name,
     awayTeam: match.awayTeam.name,
     homeScore: match.score.fullTime.home,

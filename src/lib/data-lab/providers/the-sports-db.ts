@@ -1,5 +1,5 @@
 import { fetchJson, safeErrorMessage } from "../http";
-import { resolveMatchCandidate } from "../match-resolver";
+import { matchTeamIdentity, resolveMatchCandidate } from "../match-resolver";
 import { SOURCE_PROFILES } from "../source-status";
 import {
   emptyCoverage,
@@ -24,9 +24,22 @@ type SportsDbEvent = Record<string, string | null> & {
   strVenue: string | null;
   strHomeFormation: string | null;
   strAwayFormation: string | null;
+  idHomeTeam: string | null;
+  idAwayTeam: string | null;
 };
 
 type SportsDbRow = Record<string, string | null>;
+
+export type SportsDbTeamIdentity = Pick<
+  SportsDbEvent,
+  "strHomeTeam" | "strAwayTeam" | "idHomeTeam" | "idAwayTeam"
+>;
+
+export type SportsDbLineupIdentity = {
+  idTeam?: string | null;
+  strTeam?: string | null;
+  idPlayer?: string | null;
+};
 
 function numeric(value: string | null | undefined) {
   if (value === null || value === undefined || value === "") return null;
@@ -35,18 +48,53 @@ function numeric(value: string | null | undefined) {
 }
 
 function toCandidate(event: SportsDbEvent): MatchCandidate {
-  const timestamp = event.strTimestamp ??
-    (event.strTime ? `${event.dateEvent}T${event.strTime}Z` : `${event.dateEvent}T12:00:00Z`);
-
   return {
     providerMatchId: event.idEvent,
-    kickoff: timestamp,
+    // The public payload's match clock has produced a three-hour offset in
+    // this fixture and does not establish a reliable UTC instant.
+    kickoff: null,
+    calendarDate: event.dateEvent || null,
+    localTime: event.strTime ?? event.strTimestamp?.slice(11, 19) ?? null,
+    temporalPrecision: event.strTime || event.strTimestamp
+      ? "local_time_unknown_zone"
+      : event.dateEvent
+        ? "date_only"
+        : "unknown",
     homeTeam: event.strHomeTeam,
     awayTeam: event.strAwayTeam,
     homeScore: numeric(event.intHomeScore),
     awayScore: numeric(event.intAwayScore),
     competition: event.strLeague,
   };
+}
+
+export function selectBarcelonaSportsDbRows(
+  detail: SportsDbTeamIdentity,
+  lineup: readonly SportsDbLineupIdentity[],
+) {
+  const homeIsBarcelona = matchTeamIdentity(
+    "FC Barcelona",
+    detail.strHomeTeam,
+  ).matched;
+  const awayIsBarcelona = matchTeamIdentity(
+    "FC Barcelona",
+    detail.strAwayTeam,
+  ).matched;
+
+  if (homeIsBarcelona === awayIsBarcelona) {
+    return { side: null, teamId: null, player: null } as const;
+  }
+
+  const side = homeIsBarcelona ? "home" : "away";
+  const teamId = side === "home" ? detail.idHomeTeam : detail.idAwayTeam;
+  const player = lineup.find((row) => {
+    if (teamId && row.idTeam) return row.idTeam === teamId;
+    return Boolean(
+      row.strTeam && matchTeamIdentity("FC Barcelona", row.strTeam).matched,
+    );
+  }) ?? null;
+
+  return { side, teamId: teamId ?? player?.idTeam ?? null, player } as const;
 }
 
 function searchName(value: string) {
@@ -178,10 +226,9 @@ export async function probeTheSportsDb(
     const lineup = lineupResponse.lineup ?? [];
     const timeline = timelineResponse.timeline ?? [];
     const stats = statsResponse.eventstats ?? [];
-    const teamId = detail.idAwayTeam ??
-      lineup.find((row) => row.strTeam === "Barcelona")?.idTeam ??
-      null;
-    const playerId = lineup[0]?.idPlayer ?? null;
+    const barcelona = selectBarcelonaSportsDbRows(detail, lineup);
+    const teamId = barcelona.teamId;
+    const playerId = barcelona.player?.idPlayer ?? null;
     const [teamResponse, playerResponse] = await Promise.all([
       teamId
         ? fetchJson<{ teams?: SportsDbRow[] | null }>(
@@ -250,6 +297,7 @@ export async function probeTheSportsDb(
         `Resolved TheSportsDB event ${found.idEvent}.`,
         `Free responses returned ${lineup.length} lineup, ${timeline.length} timeline, and ${stats.length} statistic rows.`,
         `Team and player profile lookups returned ${team ? "one team" : "no team"} and ${player ? "one player" : "no player"}.`,
+        `Barcelona was the ${barcelona.side ?? "unresolved"} side; profile IDs were selected only from that side.`,
         "The documented five-row free cap makes all three rich collections incomplete.",
       ],
       sanitizedSample: {

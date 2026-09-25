@@ -83,7 +83,17 @@ export type InternalMatch = {
 
 export type MatchCandidate = {
   providerMatchId: string | null;
+  /** A timezone-aware instant. Null unless temporalPrecision is `exact`. */
   kickoff: string | null;
+  /** Provider calendar date, kept separate from an exact instant. */
+  calendarDate: string | null;
+  /** Provider-local clock time whose timezone is unknown. */
+  localTime: string | null;
+  temporalPrecision:
+    | "exact"
+    | "local_time_unknown_zone"
+    | "date_only"
+    | "unknown";
   homeTeam: string;
   awayTeam: string;
   homeScore: number | null;
@@ -96,14 +106,26 @@ export type MatchResolution = {
   confidence: number;
   criteria: {
     providerId: boolean;
-    kickoff: boolean;
+    temporalPrecision: MatchCandidate["temporalPrecision"];
+    exactKickoff: boolean;
+    kickoffDeltaMinutes: number | null;
+    sameCalendarDate: boolean;
+    localTimeProvided: boolean;
     homeTeam: boolean;
+    homeTeamMethod: TeamIdentityMethod;
     awayTeam: boolean;
+    awayTeamMethod: TeamIdentityMethod;
     score: boolean;
     competition: boolean;
   };
   notes: string[];
 };
+
+export type TeamIdentityMethod =
+  | "exact_normalized"
+  | "known_alias"
+  | "conservative_tokens"
+  | "none";
 
 export type ProviderProbeStatus =
   | "ok"
@@ -138,6 +160,10 @@ export type DataLabReport = {
     mode: "read-only";
     writesAttempted: 0;
     schemaChanged: false;
+  };
+  validation: {
+    allPassed: boolean;
+    cases: Array<{ name: string; passed: boolean }>;
   };
   internalMatch: InternalMatch;
   providers: ProviderProbe[];
