@@ -1,6 +1,8 @@
 import "server-only";
 
-import { BigBallsClient } from "./client";
+import {
+  BigBallsClient,
+} from "./client";
 
 import {
   bigBallsCandidate,
@@ -21,18 +23,23 @@ import {
 } from "../shared/match-identity";
 
 type CachedMatchBundle = {
-  expiresAt: number;
+  expiresAt:
+    number;
 
   promise:
     Promise<BigBallsMatchBundle>;
 };
 
+type CompetitionConfig = {
+  league:
+    "laliga" | "cl";
+};
+
 /*
- * The base rich-match sync and the canonical player merger
- * both need the same Big Balls match bundle.
+ * The base rich-match sync and canonical merger can request
+ * the same Big Balls bundle during one workflow.
  *
- * Do not pay for the same provider requests twice during
- * one backfill / QA workflow.
+ * Cache it so we never spend quota twice for the same match.
  */
 const MATCH_BUNDLE_TTL_MS =
   15 * 60 * 1000;
@@ -43,28 +50,78 @@ const matchBundleCache =
     CachedMatchBundle
   >();
 
+function competitionConfig(
+  competitionName:
+    string,
+): CompetitionConfig {
+  const normalized =
+    competitionName
+      .toLowerCase()
+      .trim();
+
+  if (
+    normalized.includes(
+      "champions",
+    ) ||
+    normalized ===
+      "ucl" ||
+    normalized ===
+      "cl"
+  ) {
+    return {
+      league:
+        "cl",
+    };
+  }
+
+  if (
+    normalized.includes(
+      "primera",
+    ) ||
+    normalized.includes(
+      "la liga",
+    ) ||
+    normalized.includes(
+      "laliga",
+    )
+  ) {
+    return {
+      league:
+        "laliga",
+    };
+  }
+
+  throw new Error(
+    `Big Balls production provider does not support competition "${competitionName}".`,
+  );
+}
+
 function matchCacheKey(
-  internal: MatchIdentityInput,
+  internal:
+    MatchIdentityInput,
 ) {
   /*
-   * Deliberately ignore providerIds here.
+   * Deliberately ignore providerIds.
    *
-   * A base sync may persist a provider mapping before the
-   * canonical merge runs, which would otherwise change the
-   * cache key even though this is still the exact same match.
+   * A provider mapping can be persisted between the base
+   * provider stage and canonical merge. That must not turn
+   * the same football match into a different cache entry.
    */
   return JSON.stringify({
     kickoff:
       internal.kickoff,
 
     competition:
-      internal.competition.name,
+      internal.competition
+        .name,
 
     home:
-      internal.homeTeam.name,
+      internal.homeTeam
+        .name,
 
     away:
-      internal.awayTeam.name,
+      internal.awayTeam
+        .name,
 
     homeScore:
       internal.score.home,
@@ -74,11 +131,31 @@ function matchCacheKey(
   });
 }
 
-async function fetchBigBallsMatchBundleUncached(
-  internal: MatchIdentityInput,
-): Promise<BigBallsMatchBundle> {
-  const client =
-    new BigBallsClient();
+async function resolveProviderMatchId(
+  client:
+    BigBallsClient,
+
+  internal:
+    MatchIdentityInput,
+
+  league:
+    CompetitionConfig["league"],
+) {
+  /*
+   * Once we have an exact persisted mapping, prefer it over
+   * another list/search request.
+   *
+   * The detail endpoint is still revalidated below against
+   * immutable match facts before any data is trusted.
+   */
+  const mappedId =
+    internal.providerIds[
+      "big-balls-data"
+    ];
+
+  if (mappedId) {
+    return mappedId;
+  }
 
   const date =
     internal.kickoff.slice(
@@ -88,7 +165,11 @@ async function fetchBigBallsMatchBundleUncached(
 
   const listBody =
     await client.get(
-      `/v1/matches?sport=football&league=laliga&date=${date}&limit=200`,
+      `/v1/matches?sport=football&league=${encodeURIComponent(
+        league,
+      )}&date=${encodeURIComponent(
+        date,
+      )}&limit=200`,
     );
 
   const found =
@@ -122,9 +203,32 @@ async function fetchBigBallsMatchBundleUncached(
 
   if (!providerMatchId) {
     throw new Error(
-      "No Big Balls fixture passed the hardened target-match resolver.",
+      `No Big Balls ${league} fixture passed the hardened target-match resolver.`,
     );
   }
+
+  return providerMatchId;
+}
+
+async function fetchBigBallsMatchBundleUncached(
+  internal:
+    MatchIdentityInput,
+): Promise<BigBallsMatchBundle> {
+  const client =
+    new BigBallsClient();
+
+  const config =
+    competitionConfig(
+      internal.competition
+        .name,
+    );
+
+  const providerMatchId =
+    await resolveProviderMatchId(
+      client,
+      internal,
+      config.league,
+    );
 
   const encoded =
     encodeURIComponent(
@@ -150,6 +254,12 @@ async function fetchBigBallsMatchBundleUncached(
       ),
     ]);
 
+  /*
+   * Even an exact persisted provider mapping is never trusted
+   * blindly.
+   *
+   * Re-check date/kickoff, teams, score and competition.
+   */
   const detailCandidate =
     bigBallsCandidate(
       detailBody.data,
@@ -182,7 +292,8 @@ async function fetchBigBallsMatchBundleUncached(
 }
 
 export function fetchBigBallsMatchBundle(
-  internal: MatchIdentityInput,
+  internal:
+    MatchIdentityInput,
 ): Promise<BigBallsMatchBundle> {
   const key =
     matchCacheKey(
@@ -208,28 +319,28 @@ export function fetchBigBallsMatchBundle(
     );
   }
 
-const promise =
-  fetchBigBallsMatchBundleUncached(
-    internal,
-  ).catch(
-    (error) => {
-      const current =
-        matchBundleCache.get(
-          key,
-        );
+  const promise =
+    fetchBigBallsMatchBundleUncached(
+      internal,
+    ).catch(
+      (error) => {
+        const current =
+          matchBundleCache.get(
+            key,
+          );
 
-      if (
-        current?.promise ===
-        promise
-      ) {
-        matchBundleCache.delete(
-          key,
-        );
-      }
+        if (
+          current?.promise ===
+          promise
+        ) {
+          matchBundleCache.delete(
+            key,
+          );
+        }
 
-      throw error;
-    },
-  );
+        throw error;
+      },
+    );
 
   matchBundleCache.set(
     key,
