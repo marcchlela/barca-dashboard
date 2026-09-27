@@ -22,6 +22,12 @@ import {
   type RichSyncCounts,
   type UnresolvedIdentity,
 } from "./types";
+import {
+  dedupeGoalScoringEvents,
+} from "./goal-event-dedupe";
+import {
+  hasCanonicalPlayerMerge,
+} from "./canonical-row";
 
 type Orm = typeof db.orm;
 
@@ -1791,6 +1797,19 @@ export async function syncRichMatch(
           );
         }
 
+        const goalEventReconciliation =
+          await dedupeGoalScoringEvents(
+            orm,
+
+            {
+              matchId:
+                match.id,
+
+              dataSourceId:
+                goalSource.id,
+            },
+          );
+
         for (
           const [
             teamId,
@@ -2047,6 +2066,47 @@ export async function syncRichMatch(
             continue;
           }
 
+          const existing =
+            await orm.public.PlayerMatchStatistic
+              .where({
+                matchId:
+                  match.id,
+
+                playerId:
+                  identity.resolved.playerId,
+              })
+              .first();
+
+          /*
+          * Barça player rows that have already passed through the
+          * canonical Big Balls + StatsHawk merger are owned by the
+          * canonical layer.
+          *
+          * Do not:
+          *
+          * - replace their merged statistics with raw Big Balls values
+          * - replace StatsHawk ownership with Big Balls ownership
+          * - downgrade canonical provider-mapping provenance
+          *
+          * The canonical persistence phase later in this same rich
+          * backfill is responsible for refreshing them.
+          */
+          if (
+            teamId ===
+              barcelonaTeamId &&
+            existing &&
+            hasCanonicalPlayerMerge(
+              existing.rawData,
+            )
+          ) {
+            changed(
+              counts.playerStatistics,
+              "unchanged",
+            );
+
+            continue;
+          }
+
           await ensureMapping(
             orm,
             counts,
@@ -2069,17 +2129,6 @@ export async function syncRichMatch(
               },
             },
           );
-
-          const existing =
-            await orm.public.PlayerMatchStatistic
-              .where({
-                matchId:
-                  match.id,
-
-                playerId:
-                  identity.resolved.playerId,
-              })
-              .first();
 
           if (
             existing?.dataSourceId &&
@@ -2258,7 +2307,10 @@ export async function syncRichMatch(
 
         return {
           counts,
+
           unresolved,
+
+          goalEventReconciliation,
         };
       },
     );
@@ -2295,6 +2347,9 @@ export async function syncRichMatch(
 
     counts:
       result.counts,
+
+    goalEventReconciliation:
+      result.goalEventReconciliation,
 
     unresolvedIdentities:
       result.unresolved,

@@ -19,6 +19,9 @@ import {
   type RichSyncCounts,
   type UnresolvedIdentity,
 } from "./types";
+import {
+  hasCanonicalPlayerMerge,
+} from "./canonical-row";
 
 type Orm = typeof db.orm;
 
@@ -1216,6 +1219,39 @@ export async function syncBigBallsFallbackMatch(
             continue;
           }
 
+          const existing =
+            await orm.public.PlayerMatchStatistic
+              .where({
+                matchId:
+                  match.id,
+
+                playerId:
+                  identity.playerId,
+              })
+              .first();
+
+          /*
+          * Same ownership rule as the full rich path:
+          *
+          * once a Barça statistic row is canonical, this raw Big Balls
+          * fallback stage must not downgrade or overwrite it.
+          */
+          if (
+            teamId ===
+              barcelonaTeamId &&
+            existing &&
+            hasCanonicalPlayerMerge(
+              existing.rawData,
+            )
+          ) {
+            changed(
+              counts.playerStatistics,
+              "unchanged",
+            );
+
+            continue;
+          }
+
           await ensureMapping(
             orm,
             counts,
@@ -1241,17 +1277,6 @@ export async function syncBigBallsFallbackMatch(
               },
             },
           );
-
-          const existing =
-            await orm.public.PlayerMatchStatistic
-              .where({
-                matchId:
-                  match.id,
-
-                playerId:
-                  identity.playerId,
-              })
-              .first();
 
           if (
             existing?.dataSourceId &&
