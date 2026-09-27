@@ -20,8 +20,7 @@ import {
   jsonEqual,
 } from "../shared/normalization";
 
-type Orm =
-  typeof db.orm;
+type Orm = typeof db.orm;
 
 type JsonValue =
   | null
@@ -30,8 +29,7 @@ type JsonValue =
   | string
   | JsonValue[]
   | {
-      [key: string]:
-        JsonValue;
+      [key: string]: JsonValue;
     };
 
 type CanonicalPreview =
@@ -61,47 +59,32 @@ function changed(
 function asObject(
   value: unknown,
 ):
-  | Record<
-      string,
-      unknown
-    >
+  | Record<string, unknown>
   | null {
-  return (
-    value !== null &&
-    typeof value ===
-      "object" &&
-    !Array.isArray(
-      value,
-    )
-  )
-    ? (
-        value as Record<
-          string,
-          unknown
-        >
-      )
-    : null;
+  if (
+    value === null ||
+    typeof value !== "object" ||
+    Array.isArray(value)
+  ) {
+    return null;
+  }
+
+  return value as Record<
+    string,
+    unknown
+  >;
 }
 
 function recordMatches(
   existing:
-    Record<
-      string,
-      unknown
-    >,
+    Record<string, unknown>,
   data:
-    Record<
-      string,
-      unknown
-    >,
+    Record<string, unknown>,
 ) {
   return Object
     .entries(data)
     .every(
-      ([
-        key,
-        value,
-      ]) =>
+      ([key, value]) =>
         jsonEqual(
           existing[key],
           value,
@@ -182,9 +165,7 @@ async function ensureDataSource(
         id:
           existing.id,
       })
-      .update(
-        data,
-      );
+      .update(data);
 
   if (!updated) {
     throw new Error(
@@ -225,22 +206,23 @@ async function ensurePlayerMapping(
       "created",
     );
 
-    return orm.public.ProviderMapping.create({
-      dataSourceId:
-        input.dataSourceId,
+    return orm.public.ProviderMapping
+      .create({
+        dataSourceId:
+          input.dataSourceId,
 
-      entityType:
-        "player",
+        entityType:
+          "player",
 
-      internalId:
-        input.playerId,
+        internalId:
+          input.playerId,
 
-      providerId:
-        input.providerId,
+        providerId:
+          input.providerId,
 
-      metadata:
-        input.metadata,
-    });
+        metadata:
+          input.metadata,
+      });
   }
 
   if (
@@ -292,7 +274,8 @@ async function ensurePlayerMapping(
 }
 
 function primaryProvider(
-  player: CanonicalPlayer,
+  player:
+    CanonicalPlayer,
 ): ProviderCode {
   const sources =
     Object.values(
@@ -315,10 +298,6 @@ function primaryProvider(
     return "statshawk";
   }
 
-  /*
-   * A merged participant with no sourced values would not
-   * be useful as a PlayerMatchStatistic row.
-   */
   throw new Error(
     `Canonical player ${player.playerName} has no sourced statistic fields.`,
   );
@@ -327,8 +306,10 @@ function primaryProvider(
 function canonicalRawData(
   existingRawData:
     unknown,
+
   player:
     CanonicalPlayer,
+
   preview:
     CanonicalPreview,
 ) {
@@ -337,7 +318,7 @@ function canonicalRawData(
       existingRawData,
     ) ?? {};
 
-  const conflicts =
+  const blockingConflicts =
     preview.merge
       .conflictDetails
       .filter(
@@ -346,11 +327,29 @@ function canonicalRawData(
           player.playerId,
       );
 
+  const minorDiscrepancies =
+    preview.merge
+      .minorDiscrepancyDetails
+      .filter(
+        (discrepancy) =>
+          discrepancy.playerId ===
+          player.playerId,
+      );
+
+  const reviewDiscrepancies =
+    preview.merge
+      .reviewDiscrepancyDetails
+      .filter(
+        (discrepancy) =>
+          discrepancy.playerId ===
+          player.playerId,
+      );
+
   /*
-   * Preserve any provider evidence already stored by the
-   * earlier rich-match pipeline.
+   * Preserve provider evidence written by the earlier
+   * rich-match stage.
    *
-   * canonicalMerge is deterministic, so repeated syncs
+   * canonicalMerge is deterministic so repeated writes
    * remain idempotent.
    */
   return {
@@ -358,18 +357,10 @@ function canonicalRawData(
 
     canonicalMerge: {
       version:
-        1,
+        2,
 
-      policy: {
-        primary:
-          "big-balls-data",
-
-        fallback:
-          "statshawk",
-
-        rule:
-          "Fallback fills only null/missing Big Balls fields. Zero is real data.",
-      },
+      policy:
+        preview.merge.policy,
 
       fieldSources:
         player.fieldSources,
@@ -377,7 +368,18 @@ function canonicalRawData(
       identities:
         player.identities,
 
-      conflicts,
+      /*
+       * Keep the original key for existing QA code.
+       * It contains blocking conflicts only.
+       */
+      conflicts:
+        blockingConflicts,
+
+      blockingConflicts,
+
+      minorDiscrepancies,
+
+      reviewDiscrepancies,
     },
   };
 }
@@ -495,25 +497,21 @@ function statisticData(
 }
 
 async function previewWritePlan(
-  matchId: string,
-  teamId: string,
+  matchId:
+    string,
+
+  teamId:
+    string,
+
   preview:
     CanonicalPreview,
 ) {
-  let created =
-    0;
+  let created = 0;
+  let updated = 0;
+  let unchanged = 0;
 
-  let updated =
-    0;
-
-  let unchanged =
-    0;
-
-  let bigBallsOwned =
-    0;
-
-  let statsHawkOwned =
-    0;
+  let bigBallsOwned = 0;
+  let statsHawkOwned = 0;
 
   for (
     const player
@@ -528,15 +526,14 @@ async function previewWritePlan(
       provider ===
       "big-balls-data"
     ) {
-      bigBallsOwned +=
-        1;
+      bigBallsOwned += 1;
     } else {
-      statsHawkOwned +=
-        1;
+      statsHawkOwned += 1;
     }
 
     const existing =
-      await db.orm.public.PlayerMatchStatistic
+      await db.orm.public
+        .PlayerMatchStatistic
         .where({
           matchId,
 
@@ -545,11 +542,6 @@ async function previewWritePlan(
         })
         .first();
 
-    /*
-     * During dry-run we don't know the final DataSource UUID
-     * if it hasn't been created yet, so compare the actual
-     * statistical payload separately from ownership.
-     */
     const stats =
       player.statistics;
 
@@ -633,9 +625,7 @@ async function previewWritePlan(
     };
 
     if (!existing) {
-      created +=
-        1;
-
+      created += 1;
       continue;
     }
 
@@ -645,11 +635,9 @@ async function previewWritePlan(
         comparable,
       )
     ) {
-      unchanged +=
-        1;
+      unchanged += 1;
     } else {
-      updated +=
-        1;
+      updated += 1;
     }
   }
 
@@ -724,8 +712,8 @@ export async function persistCanonicalPlayerStatistics(
       : match.awayTeamId;
 
   /*
-   * This performs provider reads and canonical identity/field
-   * merging, but no writes.
+   * Provider reads + canonical merge.
+   * No database writes have happened yet.
    */
   const preview =
     await previewCanonicalPlayerStatistics(
@@ -738,6 +726,23 @@ export async function persistCanonicalPlayerStatistics(
   ) {
     throw new Error(
       `Canonical player-stat merge produced zero Barcelona participants for match ${match.id}.`,
+    );
+  }
+
+  /*
+   * HARD SAFETY GATE.
+   *
+   * Review/minor discrepancies are allowed because the primary
+   * provider remains authoritative.
+   *
+   * Blocking conflicts are not allowed to reach persistence.
+   */
+  if (
+    preview.merge.conflicts >
+    0
+  ) {
+    throw new Error(
+      `Canonical player-stat merge has ${preview.merge.conflicts} blocking conflict(s) for match ${match.id}. Persistence refused.`,
     );
   }
 
@@ -810,14 +815,16 @@ export async function persistCanonicalPlayerStatistics(
           await ensureDataSource(
             orm,
             counts,
-            RICH_DATA_SOURCES.bigBalls,
+            RICH_DATA_SOURCES
+              .bigBalls,
           );
 
         const statsHawkSource =
           await ensureDataSource(
             orm,
             counts,
-            RICH_DATA_SOURCES.statsHawk,
+            RICH_DATA_SOURCES
+              .statsHawk,
           );
 
         for (
@@ -836,9 +843,8 @@ export async function persistCanonicalPlayerStatistics(
               : statsHawkSource;
 
           /*
-           * Persist safe provider identities discovered by the
-           * canonical merge. These make later matches easier to
-           * resolve without loosening identity rules.
+           * Persist safe identities discovered by the canonical
+           * merger so later matches can resolve them directly.
            */
           if (
             player.identities
@@ -905,7 +911,8 @@ export async function persistCanonicalPlayerStatistics(
           }
 
           const existing =
-            await orm.public.PlayerMatchStatistic
+            await orm.public
+              .PlayerMatchStatistic
               .where({
                 matchId:
                   match.id,
@@ -937,7 +944,8 @@ export async function persistCanonicalPlayerStatistics(
               "created",
             );
 
-            await orm.public.PlayerMatchStatistic
+            await orm.public
+              .PlayerMatchStatistic
               .create({
                 matchId:
                   match.id,
@@ -971,7 +979,8 @@ export async function persistCanonicalPlayerStatistics(
           );
 
           const updated =
-            await orm.public.PlayerMatchStatistic
+            await orm.public
+              .PlayerMatchStatistic
               .where({
                 id:
                   existing.id,

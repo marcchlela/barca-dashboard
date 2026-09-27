@@ -2,16 +2,26 @@ import "server-only";
 
 import { db } from "../../../prisma/db";
 
-import { fetchBigBallsMatchBundle } from "../big-balls/fetch";
-import type { BigBallsPlayerStatistic } from "../big-balls/types";
+import {
+  fetchBigBallsMatchBundle,
+} from "../big-balls/fetch";
 
-import { fetchStatsHawkMatchBundle } from "../statshawk/fetch";
+import type {
+  BigBallsPlayerStatistic,
+} from "../big-balls/types";
+
+import {
+  fetchStatsHawkMatchBundle,
+} from "../statshawk/fetch";
+
 import type {
   StatsHawkPlayerStatistic,
   StatsHawkRosterPlayer,
 } from "../statshawk/types";
 
-import type { MatchIdentityInput } from "../shared/match-identity";
+import type {
+  MatchIdentityInput,
+} from "../shared/match-identity";
 
 import {
   normalizedPersonName,
@@ -20,6 +30,10 @@ import {
 type ProviderCode =
   | "big-balls-data"
   | "statshawk";
+
+type FieldSource =
+  | ProviderCode
+  | "derived";
 
 type CanonicalSquadPlayer = {
   playerId: string;
@@ -37,19 +51,63 @@ type ResolvedBigBalls = {
 
 type ResolvedStatsHawk = {
   canonical: CanonicalSquadPlayer;
-  statistic: StatsHawkPlayerStatistic;
+
+  statistic:
+    StatsHawkPlayerStatistic;
+
   roster:
     | StatsHawkRosterPlayer
     | null;
+
   method: string;
 };
 
-type Conflict = {
+type ComparisonValue =
+  | number
+  | boolean;
+
+type BlockingConflict = {
   playerId: string;
   playerName: string;
   field: string;
-  bigBalls: number | boolean;
-  statsHawk: number | boolean;
+
+  bigBalls:
+    ComparisonValue;
+
+  statsHawk:
+    ComparisonValue;
+};
+
+type MinorDiscrepancy = {
+  playerId: string;
+  playerName: string;
+  field: string;
+
+  bigBalls: number;
+  statsHawk: number;
+  delta: number;
+
+  reason:
+    | "small_pass_count_difference"
+    | "small_minutes_difference";
+};
+
+type ReviewDiscrepancy = {
+  playerId: string;
+  playerName: string;
+  field: string;
+
+  bigBalls:
+    ComparisonValue;
+
+  statsHawk:
+    ComparisonValue;
+
+  delta:
+    number | null;
+
+  reason:
+    "provider_methodology_difference";
 };
 
 type StoredProviderIdentity = {
@@ -59,6 +117,12 @@ type StoredProviderIdentity = {
     | string
     | null;
 };
+
+type DifferenceKind =
+  | "equal"
+  | "minor"
+  | "review"
+  | "blocking";
 
 function errorMessage(
   error: unknown,
@@ -91,11 +155,17 @@ function dateKey(
   ) {
     return parsed
       .toISOString()
-      .slice(0, 10);
+      .slice(
+        0,
+        10,
+      );
   }
 
   return text.length >= 10
-    ? text.slice(0, 10)
+    ? text.slice(
+        0,
+        10,
+      )
     : null;
 }
 
@@ -103,34 +173,50 @@ function normalizedPosition(
   value: string,
 ) {
   const normalized =
-    value.toLowerCase();
+    value
+      .toLowerCase()
+      .trim();
 
   if (
-    normalized.includes("goal")
+    normalized.includes(
+      "goal",
+    ) ||
+    normalized.includes(
+      "keeper",
+    )
   ) {
     return "goalkeeper";
   }
 
   if (
-    normalized.includes("def")
+    normalized.includes(
+      "def",
+    )
   ) {
     return "defender";
   }
 
   if (
-    normalized.includes("mid")
+    normalized.includes(
+      "mid",
+    )
   ) {
     return "midfielder";
   }
 
   if (
-    normalized.includes("for") ||
-    normalized.includes("attack")
+    normalized.includes(
+      "for",
+    ) ||
+    normalized.includes(
+      "attack",
+    )
   ) {
     return "forward";
   }
 
-  return normalized === "unknown"
+  return normalized ===
+    "unknown"
     ? "unknown"
     : normalized;
 }
@@ -140,10 +226,14 @@ function compatiblePosition(
   right: string,
 ) {
   const a =
-    normalizedPosition(left);
+    normalizedPosition(
+      left,
+    );
 
   const b =
-    normalizedPosition(right);
+    normalizedPosition(
+      right,
+    );
 
   return (
     a === "unknown" ||
@@ -171,14 +261,18 @@ function namesShareUsefulToken(
 ) {
   const leftTokens =
     new Set(
-      nameTokens(left),
+      nameTokens(
+        left,
+      ),
     );
 
   return nameTokens(
     right,
   ).some(
     (token) =>
-      leftTokens.has(token),
+      leftTokens.has(
+        token,
+      ),
   );
 }
 
@@ -219,7 +313,10 @@ function resolveMappedPlayer(
       string,
       StoredProviderIdentity
     >,
-  providerId: string,
+
+  providerId:
+    string,
+
   squadById:
     Map<
       string,
@@ -247,11 +344,6 @@ function resolveMappedPlayer(
   return {
     canonical,
 
-    /*
-     * Preserve the original evidence that established this
-     * identity. Merely using an existing mapping on a later
-     * run must not rewrite provenance to "provider_mapping".
-     */
     method:
       mapping.identityMethod ??
       "provider_mapping",
@@ -259,19 +351,29 @@ function resolveMappedPlayer(
 }
 
 function resolveBigBallsPlayer(
-  statistic: BigBallsPlayerStatistic,
-  squad: CanonicalSquadPlayer[],
+  statistic:
+    BigBallsPlayerStatistic,
+
+  squad:
+    CanonicalSquadPlayer[],
+
   squadById:
     Map<
       string,
       CanonicalSquadPlayer
     >,
+
   mappings:
-    Map<string, StoredProviderIdentity>,
+    Map<
+      string,
+      StoredProviderIdentity
+    >,
 ): {
   canonical:
     CanonicalSquadPlayer | null;
-  method: string | null;
+
+  method:
+    string | null;
 } {
   const mapped =
     resolveMappedPlayer(
@@ -294,11 +396,13 @@ function resolveBigBallsPlayer(
       (player) =>
         normalizedPersonName(
           player.displayName,
-        ) === normalized,
+        ) ===
+        normalized,
     );
 
   if (
-    exact.length === 1
+    exact.length ===
+    1
   ) {
     return {
       canonical:
@@ -313,7 +417,7 @@ function resolveBigBallsPlayer(
     statistic.shirtNumber !==
     null
   ) {
-    const shirtName =
+    const shirtMatches =
       squad.filter(
         (player) =>
           player.shirtNumber ===
@@ -325,12 +429,12 @@ function resolveBigBallsPlayer(
       );
 
     if (
-      shirtName.length ===
+      shirtMatches.length ===
       1
     ) {
       return {
         canonical:
-          shirtName[0],
+          shirtMatches[0],
 
         method:
           "unique_shirt_name_token",
@@ -348,21 +452,33 @@ function resolveBigBallsPlayer(
 }
 
 function resolveStatsHawkPlayer(
-  statistic: StatsHawkPlayerStatistic,
+  statistic:
+    StatsHawkPlayerStatistic,
+
   roster:
-    StatsHawkRosterPlayer | null,
-  squad: CanonicalSquadPlayer[],
+    | StatsHawkRosterPlayer
+    | null,
+
+  squad:
+    CanonicalSquadPlayer[],
+
   squadById:
     Map<
       string,
       CanonicalSquadPlayer
     >,
+
   mappings:
-    Map<string, StoredProviderIdentity>,
+    Map<
+      string,
+      StoredProviderIdentity
+    >,
 ): {
   canonical:
     CanonicalSquadPlayer | null;
-  method: string | null;
+
+  method:
+    string | null;
 } {
   const mapped =
     resolveMappedPlayer(
@@ -389,16 +505,19 @@ function resolveStatsHawkPlayer(
       (player) =>
         normalizedPersonName(
           player.displayName,
-        ) === normalized &&
+        ) ===
+          normalized &&
         compatiblePosition(
           roster?.position ??
             statistic.position,
+
           player.primaryPosition,
         ),
     );
 
   if (
-    exact.length === 1
+    exact.length ===
+    1
   ) {
     const providerDob =
       dateKey(
@@ -407,13 +526,10 @@ function resolveStatsHawkPlayer(
 
     const canonicalDob =
       dateKey(
-        exact[0].birthDate,
+        exact[0]
+          .birthDate,
       );
 
-    /*
-     * An explicit date conflict invalidates an otherwise
-     * tempting exact-name match.
-     */
     if (
       providerDob &&
       canonicalDob &&
@@ -441,10 +557,6 @@ function resolveStatsHawkPlayer(
     };
   }
 
-  /*
-   * A weaker name form is allowed only with exact DOB
-   * and compatible broad position.
-   */
   const providerDob =
     dateKey(
       roster?.birthDate,
@@ -470,6 +582,7 @@ function resolveStatsHawkPlayer(
         compatiblePosition(
           roster?.position ??
             statistic.position,
+
           player.primaryPosition,
         ) &&
         namesShareUsefulToken(
@@ -500,36 +613,137 @@ function resolveStatsHawkPlayer(
   };
 }
 
-function fieldEqual(
+function classifyDifference(
   field: string,
-  left: number | boolean,
-  right: number | boolean,
-) {
+
+  left:
+    ComparisonValue,
+
+  right:
+    ComparisonValue,
+): DifferenceKind {
   if (
     typeof left ===
       "boolean" ||
     typeof right ===
       "boolean"
   ) {
-    return left === right;
+    return left === right
+      ? "equal"
+      : "blocking";
   }
 
   if (
-    field ===
-    "passAccuracy"
+    left === right
   ) {
-    return (
-      Math.abs(
-        left - right,
-      ) <= 0.02
-    );
+    return "equal";
   }
 
-  return left === right;
+  const delta =
+    Math.abs(
+      left -
+      right,
+    );
+
+  /*
+   * Small passing differences are treated as provider
+   * counting noise, but still preserved in provenance.
+   */
+  if (
+    (
+      field ===
+        "passes" ||
+      field ===
+        "completedPasses"
+    ) &&
+    delta <= 2
+  ) {
+    return "minor";
+  }
+
+  /*
+   * Small substitute-minute differences are normally caused
+   * by provider timing / added-time conventions.
+   */
+  if (
+    field ===
+      "minutes" &&
+    delta <= 5
+  ) {
+    return "minor";
+  }
+
+  /*
+   * These are hard match facts.
+   *
+   * A disagreement here is unsafe enough to block automatic
+   * ingestion until manually investigated.
+   */
+  if (
+    field ===
+      "goals" ||
+    field ===
+      "assists" ||
+    field ===
+      "yellowCards" ||
+    field ===
+      "redCards"
+  ) {
+    return "blocking";
+  }
+
+  /*
+   * A large minutes discrepancy can mean wrong player
+   * identity or wrong appearance matching.
+   */
+  if (
+    field ===
+      "minutes" &&
+    delta > 10
+  ) {
+    return "blocking";
+  }
+
+  /*
+   * Shots, tackles, interceptions, fouls and similar event
+   * counts can legitimately differ by provider methodology.
+   *
+   * Big Balls stays canonical, while the disagreement is
+   * retained for QA.
+   */
+  return "review";
+}
+
+function derivePassAccuracy(
+  passes:
+    | number
+    | null,
+
+  completedPasses:
+    | number
+    | null,
+) {
+  if (
+    passes === null ||
+    passes <= 0 ||
+    completedPasses ===
+      null ||
+    completedPasses < 0 ||
+    completedPasses >
+      passes
+  ) {
+    return null;
+  }
+
+  return (
+    completedPasses /
+    passes
+  );
 }
 
 export async function previewCanonicalPlayerStatistics(
-  matchId: string,
+  matchId:
+    string,
 ) {
   const match =
     await db.orm.public.Match
@@ -537,9 +751,15 @@ export async function previewCanonicalPlayerStatistics(
         id:
           matchId,
       })
-      .include("homeTeam")
-      .include("awayTeam")
-      .include("competition")
+      .include(
+        "homeTeam",
+      )
+      .include(
+        "awayTeam",
+      )
+      .include(
+        "competition",
+      )
       .first();
 
   if (!match) {
@@ -549,8 +769,10 @@ export async function previewCanonicalPlayerStatistics(
   }
 
   if (
-    !match.homeTeam.isBarcelona &&
-    !match.awayTeam.isBarcelona
+    !match.homeTeam
+      .isBarcelona &&
+    !match.awayTeam
+      .isBarcelona
   ) {
     throw new Error(
       "Match is not an FC Barcelona fixture.",
@@ -583,21 +805,25 @@ export async function previewCanonicalPlayerStatistics(
   const internal:
     MatchIdentityInput = {
       kickoff:
-        match.kickoff.toString(),
+        match.kickoff
+          .toString(),
 
       competition: {
         name:
-          match.competition.name,
+          match.competition
+            .name,
       },
 
       homeTeam: {
         name:
-          match.homeTeam.name,
+          match.homeTeam
+            .name,
       },
 
       awayTeam: {
         name:
-          match.awayTeam.name,
+          match.awayTeam
+            .name,
       },
 
       score: {
@@ -622,7 +848,8 @@ export async function previewCanonicalPlayerStatistics(
     };
 
   const barcelonaTeamId =
-    match.homeTeam.isBarcelona
+    match.homeTeam
+      .isBarcelona
       ? match.homeTeamId
       : match.awayTeamId;
 
@@ -635,7 +862,9 @@ export async function previewCanonicalPlayerStatistics(
         teamId:
           barcelonaTeamId,
       })
-      .include("player")
+      .include(
+        "player",
+      )
       .all();
 
   const squad:
@@ -734,47 +963,49 @@ export async function previewCanonicalPlayerStatistics(
           .all()
       : [];
 
-const bigMappingMap =
-  new Map<
-    string,
-    StoredProviderIdentity
-  >(
-    bigBallsMappings.map(
-      (mapping) => [
-        mapping.providerId,
-        {
-          internalId:
-            mapping.internalId,
+  const bigMappingMap =
+    new Map<
+      string,
+      StoredProviderIdentity
+    >(
+      bigBallsMappings.map(
+        (mapping) => [
+          mapping.providerId,
 
-          identityMethod:
-            storedIdentityMethod(
-              mapping.metadata,
-            ),
-        },
-      ],
-    ),
-  );
+          {
+            internalId:
+              mapping.internalId,
 
-const statsHawkMappingMap =
-  new Map<
-    string,
-    StoredProviderIdentity
-  >(
-    statsHawkMappings.map(
-      (mapping) => [
-        mapping.providerId,
-        {
-          internalId:
-            mapping.internalId,
+            identityMethod:
+              storedIdentityMethod(
+                mapping.metadata,
+              ),
+          },
+        ],
+      ),
+    );
 
-          identityMethod:
-            storedIdentityMethod(
-              mapping.metadata,
-            ),
-        },
-      ],
-    ),
-  );
+  const statsHawkMappingMap =
+    new Map<
+      string,
+      StoredProviderIdentity
+    >(
+      statsHawkMappings.map(
+        (mapping) => [
+          mapping.providerId,
+
+          {
+            internalId:
+              mapping.internalId,
+
+            identityMethod:
+              storedIdentityMethod(
+                mapping.metadata,
+              ),
+          },
+        ],
+      ),
+    );
 
   const resolvedBigBalls =
     new Map<
@@ -790,16 +1021,26 @@ const statsHawkMappingMap =
 
   const unresolvedBigBalls:
     Array<{
-      providerId: string;
-      name: string;
-      reason: string;
+      providerId:
+        string;
+
+      name:
+        string;
+
+      reason:
+        string;
     }> = [];
 
   const unresolvedStatsHawk:
     Array<{
-      providerId: string;
-      name: string;
-      reason: string;
+      providerId:
+        string;
+
+      name:
+        string;
+
+      reason:
+        string;
     }> = [];
 
   if (
@@ -810,7 +1051,8 @@ const statsHawkMappingMap =
       bigBallsResult.value;
 
     const barcelonaProviderTeamId =
-      match.homeTeam.isBarcelona
+      match.homeTeam
+        .isBarcelona
         ? bundle.homeTeamProviderId
         : bundle.awayTeamProviderId;
 
@@ -851,6 +1093,7 @@ const statsHawkMappingMap =
       resolvedBigBalls.set(
         identity.canonical
           .playerId,
+
         {
           canonical:
             identity.canonical,
@@ -882,7 +1125,8 @@ const statsHawkMappingMap =
       );
 
     const barcelonaProviderTeamId =
-      match.homeTeam.isBarcelona
+      match.homeTeam
+        .isBarcelona
         ? bundle.homeTeamProviderId
         : bundle.awayTeamProviderId;
 
@@ -929,6 +1173,7 @@ const statsHawkMappingMap =
       resolvedStatsHawk.set(
         identity.canonical
           .playerId,
+
         {
           canonical:
             identity.canonical,
@@ -946,21 +1191,36 @@ const statsHawkMappingMap =
 
   const playerIds =
     new Set([
-      ...resolvedBigBalls.keys(),
-      ...resolvedStatsHawk.keys(),
+      ...resolvedBigBalls
+        .keys(),
+
+      ...resolvedStatsHawk
+        .keys(),
     ]);
 
   const conflicts:
-    Conflict[] =
+    BlockingConflict[] =
+    [];
+
+  const minorDiscrepancies:
+    MinorDiscrepancy[] =
+    [];
+
+  const reviewDiscrepancies:
+    ReviewDiscrepancy[] =
     [];
 
   let fieldsFilledByStatsHawk =
     0;
 
   const merged =
-    [...playerIds]
+    [
+      ...playerIds,
+    ]
       .map(
-        (playerId) => {
+        (
+          playerId,
+        ) => {
           const big =
             resolvedBigBalls.get(
               playerId,
@@ -975,85 +1235,164 @@ const statsHawkMappingMap =
             big?.canonical ??
             hawk?.canonical;
 
-            if (!canonical) {
+          if (!canonical) {
             return null;
-            }
+          }
 
-            /*
-            * Keep the narrowed value in a dedicated constant.
-            *
-            * TypeScript does not preserve the `canonical !== undefined`
-            * narrowing reliably inside the nested choose() function.
-            */
-            const canonicalPlayer =
+          const canonicalPlayer =
             canonical;
 
-            const fieldSources:
+          const fieldSources:
             Record<
-                string,
-                ProviderCode
+              string,
+              FieldSource
             > = {};
 
           function choose<
             T extends
-              number |
-              boolean
+              ComparisonValue
           >(
-            field: string,
+            field:
+              string,
+
             primary:
               | T
               | null
               | undefined,
+
             fallback:
               | T
               | null
               | undefined,
+
+            compareProviders =
+              true,
           ):
             | T
             | null {
             if (
-              primary !==
-                null &&
-              primary !==
-                undefined
+              primary !== null &&
+              primary !== undefined
             ) {
               fieldSources[field] =
                 "big-balls-data";
 
               if (
+                compareProviders &&
                 fallback !==
                   null &&
                 fallback !==
-                  undefined &&
-                !fieldEqual(
-                  field,
-                  primary,
-                  fallback,
-                )
+                  undefined
               ) {
-                conflicts.push({
-                  playerId,
-                  playerName:
-                    canonicalPlayer.displayName,
-
-                  field,
-
-                  bigBalls:
+                const kind =
+                  classifyDifference(
+                    field,
                     primary,
-
-                  statsHawk:
                     fallback,
-                });
+                  );
+
+                if (
+                  kind ===
+                    "minor" &&
+                  typeof primary ===
+                    "number" &&
+                  typeof fallback ===
+                    "number"
+                ) {
+                  const delta =
+                    Math.abs(
+                      primary -
+                      fallback,
+                    );
+
+                  minorDiscrepancies.push({
+                    playerId,
+
+                    playerName:
+                      canonicalPlayer
+                        .displayName,
+
+                    field,
+
+                    bigBalls:
+                      primary,
+
+                    statsHawk:
+                      fallback,
+
+                    delta,
+
+                    reason:
+                      field ===
+                        "minutes"
+                        ? "small_minutes_difference"
+                        : "small_pass_count_difference",
+                  });
+                }
+
+                if (
+                  kind ===
+                  "review"
+                ) {
+                  reviewDiscrepancies.push({
+                    playerId,
+
+                    playerName:
+                      canonicalPlayer
+                        .displayName,
+
+                    field,
+
+                    bigBalls:
+                      primary,
+
+                    statsHawk:
+                      fallback,
+
+                    delta:
+                      typeof primary ===
+                        "number" &&
+                      typeof fallback ===
+                        "number"
+                        ? Math.abs(
+                            primary -
+                            fallback,
+                          )
+                        : null,
+
+                    reason:
+                      "provider_methodology_difference",
+                  });
+                }
+
+                if (
+                  kind ===
+                  "blocking"
+                ) {
+                  conflicts.push({
+                    playerId,
+
+                    playerName:
+                      canonicalPlayer
+                        .displayName,
+
+                    field,
+
+                    bigBalls:
+                      primary,
+
+                    statsHawk:
+                      fallback,
+                  });
+                }
               }
 
               return primary;
             }
 
             if (
-              fallback !==
-                null &&
-              fallback !==
-                undefined
+              fallback !== null &&
+              fallback !== undefined
             ) {
               fieldSources[field] =
                 "statshawk";
@@ -1067,216 +1406,316 @@ const statsHawkMappingMap =
             return null;
           }
 
-          /*
-           * Big Balls remains primary.
-           *
-           * StatsHawk is used ONLY when the Big Balls field
-           * is actually null/missing. Zero is real data and
-           * is never treated as missing.
-           */
+          const minutes =
+            choose(
+              "minutes",
+
+              big?.statistic
+                .minutes,
+
+              hawk?.statistic
+                .minutes,
+            );
+
+          const goals =
+            choose(
+              "goals",
+
+              big?.statistic
+                .goals,
+
+              hawk?.statistic
+                .goals,
+            );
+
+          const assists =
+            choose(
+              "assists",
+
+              big?.statistic
+                .assists,
+
+              hawk?.statistic
+                .assists,
+            );
+
+          const shots =
+            choose(
+              "shots",
+
+              big?.statistic
+                .shots,
+
+              hawk?.statistic
+                .shots,
+            );
+
+          const shotsOnTarget =
+            choose(
+              "shotsOnTarget",
+
+              big?.statistic
+                .shotsOnTarget,
+
+              hawk?.statistic
+                .shotsOnTarget,
+            );
+
+          const passes =
+            choose(
+              "passes",
+
+              big?.statistic
+                .passes,
+
+              hawk?.statistic
+                .passes,
+            );
+
+          const completedPasses =
+            choose(
+              "completedPasses",
+
+              big?.statistic
+                .completedPasses,
+
+              hawk?.statistic
+                .completedPasses,
+            );
+
+          const derivedPassAccuracy =
+            derivePassAccuracy(
+              passes,
+              completedPasses,
+            );
+
+          const passAccuracy =
+            derivedPassAccuracy !==
+            null
+              ? derivedPassAccuracy
+              : choose(
+                  "passAccuracy",
+
+                  big?.statistic
+                    .passAccuracy,
+
+                  hawk?.statistic
+                    .passAccuracy,
+
+                  false,
+                );
+
+          if (
+            derivedPassAccuracy !==
+            null
+          ) {
+            fieldSources.passAccuracy =
+              "derived";
+          }
+
+          const keyPasses =
+            choose(
+              "keyPasses",
+
+              big?.statistic
+                .keyPasses,
+
+              null,
+            );
+
+          const tackles =
+            choose(
+              "tackles",
+
+              big?.statistic
+                .tackles,
+
+              hawk?.statistic
+                .tackles,
+            );
+
+          const blocks =
+            choose(
+              "blocks",
+
+              big?.statistic
+                .blocks,
+
+              null,
+            );
+
+          const interceptions =
+            choose(
+              "interceptions",
+
+              big?.statistic
+                .interceptions,
+
+              hawk?.statistic
+                .interceptions,
+            );
+
+          const duelsWon =
+            choose(
+              "duelsWon",
+
+              big?.statistic
+                .duelsWon,
+
+              null,
+            );
+
+          const duelsTotal =
+            choose(
+              "duelsTotal",
+
+              big?.statistic
+                .duelsTotal,
+
+              null,
+            );
+
+          const dribblesAttempted =
+            choose(
+              "dribblesAttempted",
+
+              big?.statistic
+                .dribblesAttempted,
+
+              null,
+            );
+
+          const successfulDribbles =
+            choose(
+              "successfulDribbles",
+
+              big?.statistic
+                .successfulDribbles,
+
+              null,
+            );
+
+          const fouls =
+            choose(
+              "fouls",
+
+              big?.statistic
+                .fouls,
+
+              hawk?.statistic
+                .fouls,
+            );
+
+          const yellowCards =
+            choose(
+              "yellowCards",
+
+              big?.statistic
+                .yellowCards,
+
+              hawk?.statistic
+                .yellowCards,
+            );
+
+          const redCards =
+            choose(
+              "redCards",
+
+              big?.statistic
+                .redCards,
+
+              hawk?.statistic
+                .redCards,
+            );
+
+          const saves =
+            choose(
+              "saves",
+
+              big?.statistic
+                .saves,
+
+              hawk?.statistic
+                .saves,
+            );
+
+          const goalsConceded =
+            choose(
+              "goalsConceded",
+
+              null,
+
+              hawk?.statistic
+                .goalsConceded,
+            );
+
+          const cleanSheet =
+            choose(
+              "cleanSheet",
+
+              null,
+
+              hawk?.statistic
+                .cleanSheet,
+            );
+
+          const rating =
+            choose(
+              "rating",
+
+              big?.statistic
+                .rating,
+
+              null,
+            );
+
           const statistics = {
-            minutes:
-              choose(
-                "minutes",
-                big?.statistic
-                  .minutes,
-                hawk?.statistic
-                  .minutes,
-              ),
+            minutes,
 
-            goals:
-              choose(
-                "goals",
-                big?.statistic
-                  .goals,
-                hawk?.statistic
-                  .goals,
-              ),
+            goals,
 
-            assists:
-              choose(
-                "assists",
-                big?.statistic
-                  .assists,
-                hawk?.statistic
-                  .assists,
-              ),
+            assists,
 
-            shots:
-              choose(
-                "shots",
-                big?.statistic
-                  .shots,
-                hawk?.statistic
-                  .shots,
-              ),
+            shots,
 
-            shotsOnTarget:
-              choose(
-                "shotsOnTarget",
-                big?.statistic
-                  .shotsOnTarget,
-                hawk?.statistic
-                  .shotsOnTarget,
-              ),
+            shotsOnTarget,
 
-            passes:
-              choose(
-                "passes",
-                big?.statistic
-                  .passes,
-                hawk?.statistic
-                  .passes,
-              ),
+            passes,
 
-            completedPasses:
-              choose(
-                "completedPasses",
-                big?.statistic
-                  .completedPasses,
-                hawk?.statistic
-                  .completedPasses,
-              ),
+            completedPasses,
 
-            passAccuracy:
-              choose(
-                "passAccuracy",
-                big?.statistic
-                  .passAccuracy,
-                hawk?.statistic
-                  .passAccuracy,
-              ),
+            passAccuracy,
 
-            keyPasses:
-              choose(
-                "keyPasses",
-                big?.statistic
-                  .keyPasses,
-                null,
-              ),
+            keyPasses,
 
-            tackles:
-              choose(
-                "tackles",
-                big?.statistic
-                  .tackles,
-                hawk?.statistic
-                  .tackles,
-              ),
+            tackles,
 
-            blocks:
-              choose(
-                "blocks",
-                big?.statistic
-                  .blocks,
-                null,
-              ),
+            blocks,
 
-            interceptions:
-              choose(
-                "interceptions",
-                big?.statistic
-                  .interceptions,
-                hawk?.statistic
-                  .interceptions,
-              ),
+            interceptions,
 
-            duelsWon:
-              choose(
-                "duelsWon",
-                big?.statistic
-                  .duelsWon,
-                null,
-              ),
+            duelsWon,
 
-            duelsTotal:
-              choose(
-                "duelsTotal",
-                big?.statistic
-                  .duelsTotal,
-                null,
-              ),
+            duelsTotal,
 
-            dribblesAttempted:
-              choose(
-                "dribblesAttempted",
-                big?.statistic
-                  .dribblesAttempted,
-                null,
-              ),
+            dribblesAttempted,
 
-            successfulDribbles:
-              choose(
-                "successfulDribbles",
-                big?.statistic
-                  .successfulDribbles,
-                null,
-              ),
+            successfulDribbles,
 
-            fouls:
-              choose(
-                "fouls",
-                big?.statistic
-                  .fouls,
-                hawk?.statistic
-                  .fouls,
-              ),
+            fouls,
 
-            yellowCards:
-              choose(
-                "yellowCards",
-                big?.statistic
-                  .yellowCards,
-                hawk?.statistic
-                  .yellowCards,
-              ),
+            yellowCards,
 
-            redCards:
-              choose(
-                "redCards",
-                big?.statistic
-                  .redCards,
-                hawk?.statistic
-                  .redCards,
-              ),
+            redCards,
 
-            saves:
-              choose(
-                "saves",
-                big?.statistic
-                  .saves,
-                hawk?.statistic
-                  .saves,
-              ),
+            saves,
 
-            goalsConceded:
-              choose(
-                "goalsConceded",
-                null,
-                hawk?.statistic
-                  .goalsConceded,
-              ),
+            goalsConceded,
 
-            cleanSheet:
-              choose(
-                "cleanSheet",
-                null,
-                hawk?.statistic
-                  .cleanSheet,
-              ),
+            cleanSheet,
 
-            rating:
-              choose(
-                "rating",
-                big?.statistic
-                  .rating,
-                null,
-              ),
+            rating,
 
-            /*
-             * Neither verified source supplies actual xG/xA
-             * for these current matches.
-             */
             xG:
               null,
 
@@ -1288,7 +1727,8 @@ const statsHawkMappingMap =
             playerId,
 
             playerName:
-              canonicalPlayer.displayName,
+              canonicalPlayer
+                .displayName,
 
             identities: {
               bigBalls:
@@ -1339,7 +1779,10 @@ const statsHawkMappingMap =
           value !== null,
       )
       .sort(
-        (left, right) =>
+        (
+          left,
+          right,
+        ) =>
           (
             right.statistics
               .minutes ??
@@ -1370,10 +1813,12 @@ const statsHawkMappingMap =
           .name,
 
       home:
-        match.homeTeam.name,
+        match.homeTeam
+          .name,
 
       away:
-        match.awayTeam.name,
+        match.awayTeam
+          .name,
 
       score: {
         home:
@@ -1453,6 +1898,18 @@ const statsHawkMappingMap =
       conflictDetails:
         conflicts,
 
+      minorDiscrepancies:
+        minorDiscrepancies.length,
+
+      minorDiscrepancyDetails:
+        minorDiscrepancies,
+
+      reviewDiscrepancies:
+        reviewDiscrepancies.length,
+
+      reviewDiscrepancyDetails:
+        reviewDiscrepancies,
+
       policy: {
         primary:
           "big-balls-data",
@@ -1461,7 +1918,24 @@ const statsHawkMappingMap =
           "statshawk",
 
         rule:
-          "Fallback fills only null/missing primary fields. Zero is preserved as real data.",
+          "StatsHawk fills only null/missing Big Balls fields. Zero is preserved as real data.",
+
+        passAccuracy:
+          "Derived from canonical completedPasses / passes whenever both counts are available.",
+
+        minorRules: {
+          passing:
+            "Passes or completed passes differing by at most 2 are recorded as minor provider-counting differences.",
+
+          minutes:
+            "Minutes differing by at most 5 are recorded as minor timing differences.",
+        },
+
+        reviewRule:
+          "Non-hard-fact provider disagreements are retained for QA but do not block ingestion; Big Balls remains canonical.",
+
+        blockingRule:
+          "Goals, assists, yellow cards, red cards, boolean hard facts, or a minutes difference greater than 10 block ingestion.",
       },
     },
 
