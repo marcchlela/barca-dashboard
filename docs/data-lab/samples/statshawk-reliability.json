@@ -1,0 +1,139 @@
+{
+  "reportVersion": "statshawk-reliability-v1",
+  "generatedAt": "2026-09-25T14:08:21.221Z",
+  "database": {
+    "mode": "read-only",
+    "writesAttempted": 0,
+    "schemaChanged": false
+  },
+  "budget": {
+    "hardLimitWeightedUnits": 120,
+    "actualWeightedUnitsConsumed": 25,
+    "quotaBefore": 4951,
+    "quotaAfter": 4926,
+    "requestCount": 17
+  },
+  "competitions": {
+    "laLiga": {
+      "slug": "laliga",
+      "id": "comp_06fhmv124hzf52b300gyb739nr",
+      "selected": 3,
+      "resolved": 1
+    },
+    "championsLeague": {
+      "slug": "ucl",
+      "id": "comp_06fhmzyt8hw83db2s0vbpr9h04",
+      "selected": 1,
+      "resolved": 1
+    }
+  },
+  "matches": [
+    {
+      "label": "LL1",
+      "internalMatchId": "dc0f3ba4-90ae-439d-b839-f15e15854fd4",
+      "fixture": "Sevilla FC 1-3 FC Barcelona",
+      "kickoff": "2026-09-19T19:00:00Z",
+      "status": "ok",
+      "contestId": "cst_06g95vb5bhv131tnctf3ykgy60",
+      "identityProviders": ["statshawk", "football-data-org", "openfootball"],
+      "barcelonaRows": 23,
+      "activeRows": 16,
+      "zeroMinuteRows": 7
+    },
+    {
+      "label": "LL2",
+      "internalMatchId": "38a5737e-f3a4-4d9b-99a3-017fbb89e967",
+      "fixture": "FC Barcelona 7-2 Real Racing Club de Santander",
+      "kickoff": "2026-09-16T19:30:00Z",
+      "status": "not_available",
+      "contestId": null,
+      "identityProviders": ["football-data-org", "openfootball"]
+    },
+    {
+      "label": "LL3",
+      "internalMatchId": "710cd44d-7ae8-4214-b11a-41524948bfef",
+      "fixture": "FC Barcelona 5-2 Rayo Vallecano de Madrid",
+      "kickoff": "2026-08-31T19:30:00Z",
+      "status": "not_available",
+      "contestId": null,
+      "identityProviders": ["football-data-org", "openfootball"]
+    },
+    {
+      "label": "UCL1",
+      "internalMatchId": "8c40e8f4-84c2-4da7-a04c-88280c29753b",
+      "fixture": "FC Barcelona 5-1 Feyenoord Rotterdam",
+      "kickoff": "2026-09-09T16:45:00Z",
+      "status": "ok",
+      "contestId": "cst_06g5yv40pnwr536hjre53e225r",
+      "identityProviders": ["statshawk", "football-data-org"],
+      "barcelonaRows": 23,
+      "activeRows": 16,
+      "zeroMinuteRows": 7
+    }
+  ],
+  "fieldStateLegend": {
+    "present_nonzero": "field appeared and at least one observed value was non-zero",
+    "present_zero_only": "field appeared but every observed value was zero",
+    "absent": "field did not appear in the actual payload",
+    "unknown": "the match did not resolve"
+  },
+  "consistencyMatrix": {
+    "minutes": { "LL1": "present_nonzero", "LL2": "unknown", "LL3": "unknown", "UCL1": "present_nonzero" },
+    "goals": { "LL1": "present_nonzero", "LL2": "unknown", "LL3": "unknown", "UCL1": "present_nonzero" },
+    "assists": { "LL1": "present_nonzero", "LL2": "unknown", "LL3": "unknown", "UCL1": "present_nonzero" },
+    "shots": { "LL1": "present_nonzero", "LL2": "unknown", "LL3": "unknown", "UCL1": "present_nonzero" },
+    "shotsOnTarget": { "LL1": "present_nonzero", "LL2": "unknown", "LL3": "unknown", "UCL1": "present_nonzero" },
+    "shotAccuracy": { "LL1": "present_nonzero", "LL2": "unknown", "LL3": "unknown", "UCL1": "present_nonzero" },
+    "passes": { "LL1": "present_nonzero", "LL2": "unknown", "LL3": "unknown", "UCL1": "present_nonzero" },
+    "completedPasses": { "LL1": "present_nonzero", "LL2": "unknown", "LL3": "unknown", "UCL1": "present_nonzero" },
+    "passAccuracy": { "LL1": "present_nonzero", "LL2": "unknown", "LL3": "unknown", "UCL1": "present_nonzero" },
+    "tackles": { "LL1": "present_nonzero", "LL2": "unknown", "LL3": "unknown", "UCL1": "present_nonzero" },
+    "interceptions": { "LL1": "present_nonzero", "LL2": "unknown", "LL3": "unknown", "UCL1": "present_nonzero" },
+    "fouls": { "LL1": "present_nonzero", "LL2": "unknown", "LL3": "unknown", "UCL1": "present_nonzero" },
+    "yellowCards": { "LL1": "present_zero_only", "LL2": "unknown", "LL3": "unknown", "UCL1": "present_nonzero" },
+    "redCards": { "LL1": "present_zero_only", "LL2": "unknown", "LL3": "unknown", "UCL1": "present_zero_only" },
+    "saves": { "LL1": "present_nonzero", "LL2": "unknown", "LL3": "unknown", "UCL1": "present_nonzero" },
+    "savePercentage": { "LL1": "present_nonzero", "LL2": "unknown", "LL3": "unknown", "UCL1": "present_nonzero" },
+    "goalsConceded": { "LL1": "present_nonzero", "LL2": "unknown", "LL3": "unknown", "UCL1": "present_nonzero" },
+    "cleanSheet": { "LL1": "present_zero_only", "LL2": "unknown", "LL3": "unknown", "UCL1": "present_zero_only" },
+    "xG": { "LL1": "absent", "LL2": "unknown", "LL3": "unknown", "UCL1": "absent" },
+    "xA": { "LL1": "absent", "LL2": "unknown", "LL3": "unknown", "UCL1": "absent" }
+  },
+  "roster": {
+    "totalRows": 35,
+    "uniqueProviderPersonIds": 35,
+    "coverage": {
+      "providerPersonId": 35,
+      "displayName": 35,
+      "position": 35,
+      "shirtNumber": 0,
+      "nationality": 0,
+      "birthCountry": 0,
+      "birthDate": 35,
+      "preferredFoot": 0,
+      "height": 34,
+      "weight": 30,
+      "portraitOrPhoto": 0,
+      "membershipStatus": 0
+    },
+    "representativeRows": [
+      { "personId": "per_06fhmv2055wv7f3jkpprqaqa2c", "displayName": "Joan García", "position": "G", "birthDate": "2001-05-04", "heightInches": 76, "weightPounds": 185 },
+      { "personId": "per_06fhmv20wszj36zcb8v72kzbng", "displayName": "João Cancelo", "position": "D", "birthDate": "1994-05-27", "heightInches": 72, "weightPounds": 161 },
+      { "personId": "per_06fhmsy8sxyr127w7hy7se6tbr", "displayName": "Rodri", "position": "M", "birthDate": "1996-06-22", "heightInches": 75, "weightPounds": 196 },
+      { "personId": "per_06fhmsvw7dv57dg800ztsnvny8", "displayName": "Gabriel Jesus", "position": "F", "birthDate": "1997-04-03", "heightInches": 69, "weightPounds": 161 }
+    ]
+  },
+  "playerOverviews": [
+    { "personId": "per_06fhmv2055wv7f3jkpprqaqa2c", "displayName": "Joan García", "role": "goalkeeper", "competition": "laliga", "gameLogRows": 6, "totals": { "minutes": 495, "saves": 11, "goalsConceded": 5, "cleanSheets": 3, "savePercentage": 0.6875 } },
+    { "personId": "per_06fhmv20wszj36zcb8v72kzbng", "displayName": "João Cancelo", "role": "defender", "competition": "laliga", "gameLogRows": 7, "totals": { "minutes": 206, "goals": 1, "passes": 160, "completedPasses": 143, "tackles": 3, "interceptions": 4 } },
+    { "personId": "per_06fhmsy8sxyr127w7hy7se6tbr", "displayName": "Rodri", "role": "midfielder", "competition": "laliga", "gameLogRows": 6, "totals": { "minutes": 356, "passes": 391, "completedPasses": 365, "tackles": 12, "interceptions": 8 } },
+    { "personId": "per_06fhmv25hdve7dznpracg8pejm", "displayName": "Lamine Yamal", "role": "forward", "competition": "laliga", "gameLogRows": 7, "totals": { "minutes": 581, "goals": 7, "assists": 4, "shots": 38, "shotsOnTarget": 14 } },
+    { "personId": "per_06fhmsy8sxyr127w7hy7se6tbr", "displayName": "Rodri", "role": "midfielder", "competition": "ucl", "gameLogRows": 1, "totals": { "minutes": 83, "passes": 85, "completedPasses": 82, "tackles": 2 } }
+  ],
+  "xGxA": {
+    "advertisedByCapabilities": true,
+    "observedInMatches": false,
+    "observedInPlayerOverviews": false
+  },
+  "verdict": "promising_but_not_yet_primary"
+}

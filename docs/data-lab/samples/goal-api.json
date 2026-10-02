@@ -1,0 +1,137 @@
+{
+  "provider": "GOAL API",
+  "researchedAt": "2026-09-25",
+  "baseUrl": "https://api.goal-api.com/v1",
+  "authentication": "Bearer server-side environment key; secret omitted",
+  "freePlanAdvertisedDailyLimit": 1000,
+  "auditQuota": {
+    "hardLimit": 100,
+    "finalRunRequests": 21,
+    "finalRunRemainingBefore": 958,
+    "finalRunRemainingAfter": 937,
+    "cumulativeAuditRequests": 63
+  },
+  "resolution": {
+    "selected": 4,
+    "resolved": 4,
+    "footballDataOrgAgreement": 4,
+    "immutableFactDisagreements": 0
+  },
+  "matches": [
+    {
+      "label": "LL1",
+      "providerMatchId": "cmt71rjrbswybt107w88f7u9s",
+      "barcelona": {
+        "side": "away",
+        "formation": "4-3-3",
+        "starters": 11,
+        "bench": 12,
+        "names": 23,
+        "playerIds": 23,
+        "shirtNumbers": 23,
+        "positions": 23,
+        "lineupOrdinals": 23,
+        "playerImages": 21,
+        "coaches": 1
+      },
+      "events": { "rows": 4, "goals": 4, "assists": 4, "cards": 0, "substitutions": 0, "goalCountMatchesScore": true },
+      "teamStatisticRows": 25,
+      "playerStatisticRows": 0
+    },
+    {
+      "label": "LL2",
+      "providerMatchId": "cmt71qvr5sqn6t107du29tccv",
+      "barcelona": {
+        "side": "home",
+        "formation": "4-3-3",
+        "starters": 11,
+        "bench": 12,
+        "names": 23,
+        "playerIds": 23,
+        "shirtNumbers": 23,
+        "positions": 23,
+        "lineupOrdinals": 23,
+        "playerImages": 22,
+        "coaches": 1
+      },
+      "events": { "rows": 9, "goals": 9, "assists": 5, "cards": 0, "substitutions": 0, "penalties": 2, "goalCountMatchesScore": true },
+      "teamStatisticRows": 25,
+      "playerStatisticRows": 0
+    },
+    {
+      "label": "LL3",
+      "providerMatchId": "cmt1fhu8s771epd07piptzx39",
+      "barcelona": {
+        "side": "home",
+        "formation": "4-2-3-1",
+        "starters": 11,
+        "bench": 11,
+        "names": 22,
+        "playerIds": 22,
+        "shirtNumbers": 22,
+        "positions": 22,
+        "lineupOrdinals": 22,
+        "playerImages": 21,
+        "coaches": 1
+      },
+      "events": { "rows": 7, "goals": 7, "assists": 6, "cards": 0, "substitutions": 0, "goalCountMatchesScore": true },
+      "teamStatisticRows": 24,
+      "playerStatisticRows": 0
+    },
+    {
+      "label": "UCL1",
+      "providerMatchId": "cmthypp7xe1sfnx07x4yn8s81",
+      "barcelona": {
+        "side": "home",
+        "formation": "4-3-3",
+        "starters": 11,
+        "bench": 12,
+        "names": 23,
+        "playerIds": 23,
+        "shirtNumbers": 23,
+        "positions": 23,
+        "lineupOrdinals": 23,
+        "playerImages": 22,
+        "coaches": 1
+      },
+      "events": { "rows": 6, "goals": 6, "assists": 5, "cards": 0, "substitutions": 0, "goalCountMatchesScore": true },
+      "teamStatisticRows": 25,
+      "playerStatisticRows": 0
+    }
+  ],
+  "actualTeamStatisticFields": [
+    "Attacks",
+    "Ball Possession",
+    "Corners",
+    "Dangerous Attacks",
+    "Fouls",
+    "Free Kick",
+    "Goal Kick",
+    "Off Target",
+    "Offsides",
+    "On Target",
+    "Passes Accurate",
+    "Passes Total",
+    "Penalty",
+    "Saves",
+    "Shots Blocked",
+    "Shots Inside Box",
+    "Shots Off Goal",
+    "Shots On Goal",
+    "Shots Outside Box",
+    "Shots Total",
+    "Substitution",
+    "Throw In",
+    "Yellow Cards"
+  ],
+  "notActuallyReturned": [
+    "player match statistics",
+    "player ratings",
+    "xG",
+    "xA",
+    "shot coordinates",
+    "cards/substitutions as event rows",
+    "confirmed-versus-predicted lineup status"
+  ],
+  "secretIncluded": false
+}

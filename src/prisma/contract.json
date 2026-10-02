@@ -1343,6 +1343,13 @@
                   "kind": "scalar"
                 }
               },
+              "lineupOrdinal": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
               "playerId": {
                 "nullable": false,
                 "type": {
@@ -1449,6 +1456,9 @@
                 },
                 "lineupId": {
                   "column": "lineupId"
+                },
+                "lineupOrdinal": {
+                  "column": "lineupOrdinal"
                 },
                 "playerId": {
                   "column": "playerId"
@@ -2563,6 +2573,20 @@
           },
           "MatchStatistic": {
             "fields": {
+              "attacks": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "blockedShots": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
               "clearances": {
                 "nullable": true,
                 "type": {
@@ -2591,6 +2615,13 @@
                   "kind": "scalar"
                 }
               },
+              "dangerousAttacks": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
               "dataSourceId": {
                 "nullable": true,
                 "type": {
@@ -2599,6 +2630,20 @@
                 }
               },
               "fouls": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "freeKicks": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "goalKicks": {
                 "nullable": true,
                 "type": {
                   "codecId": "pg/int4@1",
@@ -2668,6 +2713,13 @@
                   "kind": "scalar"
                 }
               },
+              "saves": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
               "shots": {
                 "nullable": true,
                 "type": {
@@ -2675,7 +2727,35 @@
                   "kind": "scalar"
                 }
               },
+              "shotsInsideBox": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "shotsOffTarget": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
               "shotsOnTarget": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "shotsOutsideBox": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "substitutions": {
                 "nullable": true,
                 "type": {
                   "codecId": "pg/int4@1",
@@ -2693,6 +2773,13 @@
                 "nullable": false,
                 "type": {
                   "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "throwIns": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
                   "kind": "scalar"
                 }
               },
@@ -2770,6 +2857,12 @@
             },
             "storage": {
               "fields": {
+                "attacks": {
+                  "column": "attacks"
+                },
+                "blockedShots": {
+                  "column": "blockedShots"
+                },
                 "clearances": {
                   "column": "clearances"
                 },
@@ -2782,11 +2875,20 @@
                 "createdAt": {
                   "column": "createdAt"
                 },
+                "dangerousAttacks": {
+                  "column": "dangerousAttacks"
+                },
                 "dataSourceId": {
                   "column": "dataSourceId"
                 },
                 "fouls": {
                   "column": "fouls"
+                },
+                "freeKicks": {
+                  "column": "freeKicks"
+                },
+                "goalKicks": {
+                  "column": "goalKicks"
                 },
                 "id": {
                   "column": "id"
@@ -2815,17 +2917,35 @@
                 "redCards": {
                   "column": "redCards"
                 },
+                "saves": {
+                  "column": "saves"
+                },
                 "shots": {
                   "column": "shots"
                 },
+                "shotsInsideBox": {
+                  "column": "shotsInsideBox"
+                },
+                "shotsOffTarget": {
+                  "column": "shotsOffTarget"
+                },
                 "shotsOnTarget": {
                   "column": "shotsOnTarget"
+                },
+                "shotsOutsideBox": {
+                  "column": "shotsOutsideBox"
+                },
+                "substitutions": {
+                  "column": "substitutions"
                 },
                 "tackles": {
                   "column": "tackles"
                 },
                 "teamId": {
                   "column": "teamId"
+                },
+                "throwIns": {
+                  "column": "throwIns"
                 },
                 "updatedAt": {
                   "column": "updatedAt"
@@ -3680,10 +3800,24 @@
                   "kind": "scalar"
                 }
               },
+              "blocks": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
               "carries": {
                 "nullable": true,
                 "type": {
                   "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "cleanSheet": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/bool@1",
                   "kind": "scalar"
                 }
               },
@@ -3708,6 +3842,13 @@
                   "kind": "scalar"
                 }
               },
+              "dribblesAttempted": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
               "duelsTotal": {
                 "nullable": true,
                 "type": {
@@ -3722,7 +3863,21 @@
                   "kind": "scalar"
                 }
               },
+              "fouls": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
               "goals": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "goalsConceded": {
                 "nullable": true,
                 "type": {
                   "codecId": "pg/int4@1",
@@ -3827,6 +3982,13 @@
                   "kind": "scalar"
                 }
               },
+              "saves": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
               "shots": {
                 "nullable": true,
                 "type": {
@@ -3835,6 +3997,13 @@
                 }
               },
               "shotsOnTarget": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "successfulDribbles": {
                 "nullable": true,
                 "type": {
                   "codecId": "pg/int4@1",
@@ -3962,8 +4131,14 @@
                 "assists": {
                   "column": "assists"
                 },
+                "blocks": {
+                  "column": "blocks"
+                },
                 "carries": {
                   "column": "carries"
+                },
+                "cleanSheet": {
+                  "column": "cleanSheet"
                 },
                 "completedPasses": {
                   "column": "completedPasses"
@@ -3974,14 +4149,23 @@
                 "dataSourceId": {
                   "column": "dataSourceId"
                 },
+                "dribblesAttempted": {
+                  "column": "dribblesAttempted"
+                },
                 "duelsTotal": {
                   "column": "duelsTotal"
                 },
                 "duelsWon": {
                   "column": "duelsWon"
                 },
+                "fouls": {
+                  "column": "fouls"
+                },
                 "goals": {
                   "column": "goals"
+                },
+                "goalsConceded": {
+                  "column": "goalsConceded"
                 },
                 "id": {
                   "column": "id"
@@ -4025,11 +4209,17 @@
                 "redCards": {
                   "column": "redCards"
                 },
+                "saves": {
+                  "column": "saves"
+                },
                 "shots": {
                   "column": "shots"
                 },
                 "shotsOnTarget": {
                   "column": "shotsOnTarget"
+                },
+                "successfulDribbles": {
+                  "column": "successfulDribbles"
                 },
                 "tackles": {
                   "column": "tackles"
@@ -6495,6 +6685,11 @@
                   "nativeType": "uuid",
                   "nullable": false
                 },
+                "lineupOrdinal": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
                 "playerId": {
                   "codecId": "pg/uuid@1",
                   "nativeType": "uuid",
@@ -7183,6 +7378,16 @@
             },
             "match_statistic": {
               "columns": {
+                "attacks": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "blockedShots": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
                 "clearances": {
                   "codecId": "pg/int4@1",
                   "nativeType": "int4",
@@ -7207,12 +7412,27 @@
                   "nativeType": "timestamptz",
                   "nullable": false
                 },
+                "dangerousAttacks": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
                 "dataSourceId": {
                   "codecId": "pg/uuid@1",
                   "nativeType": "uuid",
                   "nullable": true
                 },
                 "fouls": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "freeKicks": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "goalKicks": {
                   "codecId": "pg/int4@1",
                   "nativeType": "int4",
                   "nullable": true
@@ -7262,12 +7482,37 @@
                   "nativeType": "int4",
                   "nullable": true
                 },
+                "saves": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
                 "shots": {
                   "codecId": "pg/int4@1",
                   "nativeType": "int4",
                   "nullable": true
                 },
+                "shotsInsideBox": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "shotsOffTarget": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
                 "shotsOnTarget": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "shotsOutsideBox": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "substitutions": {
                   "codecId": "pg/int4@1",
                   "nativeType": "int4",
                   "nullable": true
@@ -7281,6 +7526,11 @@
                   "codecId": "pg/uuid@1",
                   "nativeType": "uuid",
                   "nullable": false
+                },
+                "throwIns": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
                 },
                 "updatedAt": {
                   "codecId": "pg/timestamptz-temporal@1",
@@ -7968,9 +8218,19 @@
                   "nativeType": "int4",
                   "nullable": true
                 },
+                "blocks": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
                 "carries": {
                   "codecId": "pg/int4@1",
                   "nativeType": "int4",
+                  "nullable": true
+                },
+                "cleanSheet": {
+                  "codecId": "pg/bool@1",
+                  "nativeType": "bool",
                   "nullable": true
                 },
                 "completedPasses": {
@@ -7992,6 +8252,11 @@
                   "nativeType": "uuid",
                   "nullable": true
                 },
+                "dribblesAttempted": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
                 "duelsTotal": {
                   "codecId": "pg/int4@1",
                   "nativeType": "int4",
@@ -8002,7 +8267,17 @@
                   "nativeType": "int4",
                   "nullable": true
                 },
+                "fouls": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
                 "goals": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "goalsConceded": {
                   "codecId": "pg/int4@1",
                   "nativeType": "int4",
                   "nullable": true
@@ -8077,12 +8352,22 @@
                   "nativeType": "int4",
                   "nullable": true
                 },
+                "saves": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
                 "shots": {
                   "codecId": "pg/int4@1",
                   "nativeType": "int4",
                   "nullable": true
                 },
                 "shotsOnTarget": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "successfulDribbles": {
                   "codecId": "pg/int4@1",
                   "nativeType": "int4",
                   "nullable": true
@@ -9644,7 +9929,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "0de287499e5db7dce522a0af929d26415d9950d56b8d62d532a6c24307404f32"
+    "storageHash": "ab80e523f0f42c7647e39a2c23ef6b102102f5b0f68a5f04b61bbce06c2326a4"
   },
   "execution": {
     "executionHash": "c52f5cea5ddccedf784326ed70031eddf18d45ebab8569b47ae3ad552aa9518f",

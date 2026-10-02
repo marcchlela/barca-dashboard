@@ -3,6 +3,23 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /*
+  |--------------------------------------------------------------------------
+  | Global scrollbar defaults
+  |--------------------------------------------------------------------------
+  |
+  | These are deliberately neutral fallbacks.
+  |
+  | The active dashboard kit replaces them at runtime through
+  | ThemeScrollbarSync.
+  |--------------------------------------------------------------------------
+  */
+
+  --scrollbar-thumb: #8a96a6;
+  --scrollbar-thumb-hover: #d9b35a;
+  --scrollbar-track: #07111f;
+  --scrollbar-border: #0d1b2d;
 }
 
 @theme inline {
@@ -27,6 +44,107 @@ body {
 
 html {
   scrollbar-gutter: stable;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Global themed scrollbars
+|--------------------------------------------------------------------------
+|
+| Applies to:
+|
+| - the main browser/page scrollbar
+| - centered modals
+| - horizontal data tables
+| - internal panels
+| - future dashboard surfaces
+|
+| Firefox uses scrollbar-width / scrollbar-color.
+| Chromium/Safari use the ::-webkit-scrollbar rules.
+|--------------------------------------------------------------------------
+*/
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color:
+    var(--scrollbar-thumb)
+    var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 7px;
+}
+
+*::-webkit-scrollbar-track {
+  background:
+    var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar-thumb {
+  min-height: 36px;
+
+  border:
+    2px solid
+    var(--scrollbar-track);
+
+  border-radius:
+    999px;
+
+  background:
+    var(--scrollbar-thumb);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background:
+    var(--scrollbar-thumb-hover);
+}
+
+*::-webkit-scrollbar-corner {
+  background:
+    var(--scrollbar-track);
+}
+
+/*
+|--------------------------------------------------------------------------
+| Optional ultra-subtle scrolling surface
+|--------------------------------------------------------------------------
+|
+| Add className="scrollbar-subtle" to a specific component if we want
+| its scrollbar to almost disappear until hover.
+|--------------------------------------------------------------------------
+*/
+
+.scrollbar-subtle {
+  scrollbar-color:
+    color-mix(
+      in srgb,
+      var(--scrollbar-thumb) 55%,
+      transparent
+    )
+    transparent;
+}
+
+.scrollbar-subtle::-webkit-scrollbar-track {
+  background:
+    transparent;
+}
+
+.scrollbar-subtle::-webkit-scrollbar-thumb {
+  border-color:
+    transparent;
+
+  background:
+    color-mix(
+      in srgb,
+      var(--scrollbar-thumb) 55%,
+      transparent
+    );
+}
+
+.scrollbar-subtle:hover::-webkit-scrollbar-thumb {
+  background:
+    var(--scrollbar-thumb);
 }
 
 /*

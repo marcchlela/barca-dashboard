@@ -1,0 +1,159 @@
+{
+  "source": "StatsHawk REST API",
+  "capturedAt": "2026-09-25",
+  "credentialIncluded": false,
+  "experiment": {
+    "requests": 7,
+    "weightedUnits": 11,
+    "monthlyFreeAllowance": 5000,
+    "endpoints": [
+      "GET /v1/competitions",
+      "GET /v1/competitions/laliga/editions/2026/games?date=2026-09-19",
+      "GET /v1/contests/cst_06g95vb5bhv131tnctf3ykgy60",
+      "GET /v1/contests/cst_06g95vb5bhv131tnctf3ykgy60/boxscore",
+      "GET /v1/competitions/laliga/capabilities",
+      "GET /v1/teams/team_06fhmv155htp373pf205dh6ftm/roster",
+      "GET /v1/persons/per_06fhmsy8sxyr127w7hy7se6tbr/overview?competition=laliga&season=2026"
+    ]
+  },
+  "contest": {
+    "id": "cst_06g95vb5bhv131tnctf3ykgy60",
+    "competitionId": "comp_06fhmv124hzf52b300gyb739nr",
+    "status": "final",
+    "kickoff": "2026-09-19T19:00:00Z",
+    "venue": "Ramón Sánchez Pizjuán Stadium",
+    "homeTeam": {
+      "id": "team_06fhmv1599s653rvc8ezs3fg6m",
+      "name": "Sevilla",
+      "score": 1
+    },
+    "awayTeam": {
+      "id": "team_06fhmv155htp373pf205dh6ftm",
+      "name": "Barcelona",
+      "score": 3
+    }
+  },
+  "boxscore": {
+    "finalized": true,
+    "appearanceCount": 46,
+    "barcelonaAppearanceCount": 23,
+    "barcelonaRowsWithActivity": 16,
+    "actualMeasureKeys": [
+      "assists",
+      "clean_sheet",
+      "fouls",
+      "goals",
+      "goals_conceded",
+      "intc",
+      "minutes",
+      "pass_pct",
+      "passes",
+      "passes_cmp",
+      "red",
+      "save_pct",
+      "saves",
+      "shot_accuracy",
+      "shots",
+      "sot",
+      "tackles",
+      "yellow"
+    ],
+    "playerRows": [
+      {
+        "person": "Rodri",
+        "phase": "outfield",
+        "measures": {
+          "minutes": 90,
+          "passes": 73,
+          "passes_cmp": 66,
+          "pass_pct": 0.9041095890410958,
+          "shots": 2,
+          "sot": 0,
+          "tackles": 5,
+          "intc": 3,
+          "fouls": 2,
+          "goals": 0,
+          "assists": 0
+        }
+      },
+      {
+        "person": "Eric García",
+        "phase": "outfield",
+        "measures": {
+          "minutes": 90,
+          "passes": 73,
+          "passes_cmp": 69,
+          "pass_pct": 0.9452054794520548,
+          "shots": 1,
+          "sot": 0,
+          "tackles": 1,
+          "intc": 1,
+          "fouls": 1,
+          "goals": 0,
+          "assists": 0
+        }
+      },
+      {
+        "person": "João Cancelo",
+        "phase": "outfield",
+        "measures": {
+          "minutes": 90,
+          "passes": 57,
+          "passes_cmp": 54,
+          "pass_pct": 0.9473684210526316,
+          "shots": 1,
+          "sot": 1,
+          "tackles": 2,
+          "intc": 2,
+          "fouls": 1,
+          "goals": 0,
+          "assists": 0
+        }
+      },
+      {
+        "person": "Pau Cubarsí",
+        "phase": "outfield",
+        "measures": {
+          "minutes": 90,
+          "passes": 98,
+          "passes_cmp": 92,
+          "pass_pct": 0.9387755102040816,
+          "shots": 1,
+          "sot": 0,
+          "tackles": 0,
+          "intc": 1,
+          "fouls": 0,
+          "goals": 0,
+          "assists": 0
+        }
+      }
+    ]
+  },
+  "capabilityVsActual": {
+    "advertisedButAbsentFromThisMatch": ["xg", "xa"],
+    "actualCoverageOnly": true
+  },
+  "roster": {
+    "rowCount": 35,
+    "source": "appearance",
+    "positionsPresent": true,
+    "shirtNumbersPresentInSample": false,
+    "confirmedMatchLineup": false
+  },
+  "playerOverview": {
+    "personId": "per_06fhmsy8sxyr127w7hy7se6tbr",
+    "person": "Rodri",
+    "currentTeam": "Barcelona",
+    "seasonStatPhases": ["outfield"]
+  },
+  "notVerified": [
+    "confirmed lineup",
+    "bench",
+    "formation",
+    "match position",
+    "match shirt number",
+    "xG or xA for this contest",
+    "player ratings",
+    "soccer injury history"
+  ]
+}

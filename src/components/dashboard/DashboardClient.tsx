@@ -18,6 +18,7 @@ import MatchStage from "../match/MatchStage";
 import SeasonStory from "../season/SeasonStory";
 import BarcaPulse from "../shell/BarcaPulse";
 import StadiumRail from "../shell/StadiumRail";
+import ThemeScrollbarSync from "../theme/ThemeScrollbarSync";
 
 import type {
   DashboardOverview,
@@ -256,6 +257,9 @@ export default function DashboardClient({
       |--------------------------------------------------------------------------
       */}
 
+      <ThemeScrollbarSync
+        theme={theme}
+      />
       <DashboardSyncController
         matchState={
           automaticMatchState

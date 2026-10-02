@@ -1,0 +1,18 @@
+{
+  "capturedAt": "2026-09-25",
+  "source": "StatsBomb Open Data competitions catalogue",
+  "catalogueEntries": 80,
+  "target": {
+    "competition": "La Liga",
+    "season": "2026/27",
+    "available": false
+  },
+  "newestAvailableLaLigaSeason": {
+    "competition_id": 11,
+    "season_id": 90,
+    "country_name": "Spain",
+    "competition_name": "La Liga",
+    "season_name": "2020/2021"
+  },
+  "note": "The open dataset is rich and legitimate for historical research, but cannot resolve the current test match."
+}
