@@ -1,0 +1,196 @@
+name: barca-dashboard
+
+services:
+  db:
+    image: postgres:18-alpine
+    container_name: barca-dashboard-db
+    restart: unless-stopped
+
+    env_file:
+      - ${BARCA_DASHBOARD_ENV_FILE:-/srv/barca-dashboard/.env.production}
+
+    volumes:
+      - barca_dashboard_pgdata:/var/lib/postgresql
+      - /srv/barca-dashboard/backups:/backups:ro
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+
+    networks:
+      - barca_dashboard
+
+
+  migrate:
+    build:
+      context: .
+      target: migrate
+
+    env_file:
+      - ${BARCA_DASHBOARD_ENV_FILE:-/srv/barca-dashboard/.env.production}
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    restart: "no"
+
+    networks:
+      - barca_dashboard
+
+
+  app:
+    build:
+      context: .
+      target: web
+
+    container_name: barca-dashboard-app
+
+    restart: unless-stopped
+
+    env_file:
+      - ${BARCA_DASHBOARD_ENV_FILE:-/srv/barca-dashboard/.env.production}
+
+    environment:
+      PORT: 3000
+      HOSTNAME: 0.0.0.0
+
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+    ports:
+      - "127.0.0.1:3006:3000"
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/api/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 4
+      start_period: 25s
+
+    networks:
+      - barca_dashboard
+
+
+  backup:
+    image: postgres:18-alpine
+
+    container_name: barca-dashboard-backup
+
+    restart: unless-stopped
+
+    env_file:
+      - ${BARCA_DASHBOARD_ENV_FILE:-/srv/barca-dashboard/.env.production}
+
+    environment:
+      BACKUP_INTERVAL_SECONDS: ${BACKUP_INTERVAL_SECONDS:-86400}
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-14}
+
+    volumes:
+      - /srv/barca-dashboard/backups:/backups
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    entrypoint:
+      - /bin/sh
+      - -c
+
+    command:
+      - |
+        while true; do
+          stamp=$$(date -u +%Y%m%d-%H%M%S)
+          target="/backups/barca-dashboard-$$stamp.dump"
+
+          if PGPASSWORD="$$POSTGRES_PASSWORD" \
+            pg_dump \
+              -h db \
+              -U "$$POSTGRES_USER" \
+              -d "$$POSTGRES_DB" \
+              -Fc \
+              -f "$$target.tmp"
+          then
+            mv "$$target.tmp" "$$target"
+
+            find /backups \
+              -maxdepth 1 \
+              -type f \
+              -name 'barca-dashboard-*.dump' \
+              -mtime "+$${BACKUP_RETENTION_DAYS}" \
+              -delete
+          else
+            rm -f "$$target.tmp"
+          fi
+
+          sleep "$${BACKUP_INTERVAL_SECONDS}"
+        done
+
+    networks:
+      - barca_dashboard
+
+
+  media-scheduler:
+    image: alpine:3.22
+
+    container_name: barca-dashboard-media-scheduler
+
+    restart: unless-stopped
+
+    env_file:
+      - ${BARCA_DASHBOARD_ENV_FILE:-/srv/barca-dashboard/.env.production}
+
+    environment:
+      MEDIA_SYNC_INTERVAL_SECONDS: ${MEDIA_SYNC_INTERVAL_SECONDS:-10800}
+
+    depends_on:
+      app:
+        condition: service_healthy
+
+    entrypoint:
+      - /bin/sh
+      - -c
+
+    command:
+      - |
+        while true; do
+          echo "[media-scheduler] running match media worker"
+
+          wget \
+            -qO- \
+            --header "Authorization: Bearer $${INTERNAL_JOB_SECRET}" \
+            --post-data "" \
+            http://app:3000/api/internal/jobs/match-media \
+            || true
+
+          echo
+          echo "[media-scheduler] sleeping $${MEDIA_SYNC_INTERVAL_SECONDS}s"
+
+          sleep "$${MEDIA_SYNC_INTERVAL_SECONDS}"
+        done
+
+    networks:
+      - barca_dashboard
+
+
+volumes:
+  barca_dashboard_pgdata:
+
+
+networks:
+  barca_dashboard:
+    driver: bridge
