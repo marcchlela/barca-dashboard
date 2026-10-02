@@ -240,6 +240,28 @@ type MatchContext = {
   };
 };
 
+type UsageTracker = {
+  requests:
+    number;
+
+  uploadPages:
+    number;
+
+  videosInspected:
+    number;
+};
+
+type WritePlan = {
+  created:
+    number;
+
+  updated:
+    number;
+
+  unchanged:
+    number;
+};
+
 export type MatchMediaCandidate = {
   videoId:
     string;
@@ -322,19 +344,79 @@ export type MatchMediaSyncResult = {
   rejected:
     MatchMediaCandidate[];
 
-  writePlan: {
-    created:
-      number;
-
-    updated:
-      number;
-
-    unchanged:
-      number;
-  };
+  writePlan:
+    WritePlan;
 
   persisted:
     boolean;
+};
+
+export type MatchMediaBatchResult = {
+  dryRun:
+    boolean;
+
+  matches:
+    number;
+
+  youtube: {
+    channelId:
+      string;
+
+    channelName:
+      string;
+
+    uploadsPlaylist:
+      string;
+
+    requests:
+      number;
+
+    uploadPages:
+      number;
+
+    videosInspected:
+      number;
+  };
+
+  writePlan:
+    WritePlan;
+
+  results: Array<{
+    matchId:
+      string;
+
+    fixture: {
+      kickoff:
+        string;
+
+      home:
+        string;
+
+      away:
+        string;
+
+      score:
+        string;
+    };
+
+    ok:
+      boolean;
+
+    accepted:
+      MatchMediaCandidate[];
+
+    rejectedCount:
+      number;
+
+    writePlan:
+      WritePlan;
+
+    persisted:
+      boolean;
+
+    error:
+      string | null;
+  }>;
 };
 
 export async function syncOfficialMatchMedia(
@@ -347,14 +429,7 @@ export async function syncOfficialMatchMedia(
   },
 ): Promise<MatchMediaSyncResult> {
   const apiKey =
-    process.env
-      .YOUTUBE_API_KEY;
-
-  if (!apiKey) {
-    throw new Error(
-      "YOUTUBE_API_KEY is not configured.",
-    );
-  }
+    requireYouTubeApiKey();
 
   const match =
     await loadMatch(
@@ -381,93 +456,22 @@ export async function syncOfficialMatchMedia(
     );
   }
 
-  const context:
-    MatchContext = {
-      id:
-        match.id,
+  const context =
+    makeMatchContext(
+      match,
+    );
 
-      seasonId:
-        match.seasonId,
+  const usage:
+    UsageTracker = {
+      requests:
+        0,
 
-      kickoff:
-        match.kickoff
-          .toString(),
+      uploadPages:
+        0,
 
-      competition: {
-        code:
-          match.competition
-            .code,
-
-        name:
-          match.competition
-            .name,
-
-        shortName:
-          match.competition
-            .shortName,
-      },
-
-      homeTeam: {
-        id:
-          match.homeTeam.id,
-
-        name:
-          match.homeTeam
-            .name,
-
-        shortName:
-          match.homeTeam
-            .shortName,
-
-        code:
-          match.homeTeam
-            .code,
-
-        isBarcelona:
-          match.homeTeam
-            .isBarcelona,
-      },
-
-      awayTeam: {
-        id:
-          match.awayTeam.id,
-
-        name:
-          match.awayTeam
-            .name,
-
-        shortName:
-          match.awayTeam
-            .shortName,
-
-        code:
-          match.awayTeam
-            .code,
-
-        isBarcelona:
-          match.awayTeam
-            .isBarcelona,
-      },
-
-      score: {
-        home:
-          match.homeScore,
-
-        away:
-          match.awayScore,
-      },
+      videosInspected:
+        0,
     };
-
-  const usage = {
-    requests:
-      0,
-
-    uploadPages:
-      0,
-
-    videosInspected:
-      0,
-  };
 
   const channel =
     await fetchOfficialChannel(
@@ -475,11 +479,35 @@ export async function syncOfficialMatchMedia(
       usage,
     );
 
+  const kickoffMs =
+    new Date(
+      context.kickoff,
+    ).getTime();
+
+  const start =
+    new Date(
+      kickoffMs -
+        WINDOW_BEFORE_HOURS *
+          60 *
+          60 *
+          1000,
+    ).toISOString();
+
+  const end =
+    new Date(
+      kickoffMs +
+        WINDOW_AFTER_HOURS *
+          60 *
+          60 *
+          1000,
+    ).toISOString();
+
   const videos =
-    await fetchVideosAroundMatch(
+    await fetchOfficialYoutubeVideosBetween(
       apiKey,
       channel.uploadsPlaylist,
-      context.kickoff,
+      start,
+      end,
       usage,
     );
 
@@ -518,20 +546,29 @@ export async function syncOfficialMatchMedia(
         compareCandidates,
       );
 
-  const writePlan = {
-    created:
-      0,
-
-    updated:
-      0,
-
-    unchanged:
-      0,
-  };
+  const writePlan =
+    makeEmptyWritePlan();
 
   if (
-    !input.dryRun
+    input.dryRun
   ) {
+    const existingSource =
+      await db.orm.public.DataSource
+        .where({
+          code:
+            DATA_SOURCE.code,
+        })
+        .first();
+
+    await calculateDryRunWritePlan({
+      accepted,
+      context,
+      existingSourceId:
+        existingSource?.id ??
+        null,
+      writePlan,
+    });
+  } else {
     const dataSource =
       await ensureDataSource();
 
@@ -547,56 +584,6 @@ export async function syncOfficialMatchMedia(
         writePlan,
       });
     }
-  } else {
-    const existingSource =
-      await db.orm.public.DataSource
-        .where({
-          code:
-            DATA_SOURCE.code,
-        })
-        .first();
-
-    for (
-      const candidate
-      of accepted
-    ) {
-      if (
-        !existingSource
-      ) {
-        writePlan.created +=
-          1;
-
-        continue;
-      }
-
-      const existing =
-        await db.orm.public.MediaItem
-          .where({
-            dataSourceId:
-              existingSource.id,
-
-            externalMediaId:
-              candidate.videoId,
-          })
-          .first();
-
-      if (!existing) {
-        writePlan.created +=
-          1;
-      } else if (
-        mediaRowMatches(
-          existing,
-          candidate,
-          context,
-        )
-      ) {
-        writePlan.unchanged +=
-          1;
-      } else {
-        writePlan.updated +=
-          1;
-      }
-    }
   }
 
   return {
@@ -606,21 +593,10 @@ export async function syncOfficialMatchMedia(
     matchId:
       context.id,
 
-    fixture: {
-      kickoff:
-        context.kickoff,
-
-      home:
-        context.homeTeam
-          .name,
-
-      away:
-        context.awayTeam
-          .name,
-
-      score:
-        `${context.score.home}-${context.score.away}`,
-    },
+    fixture:
+      fixtureSummary(
+        context,
+      ),
 
     youtube: {
       channelId:
@@ -654,6 +630,394 @@ export async function syncOfficialMatchMedia(
 
     persisted:
       !input.dryRun,
+  };
+}
+
+/*
+ * Batched version used by the automatic worker.
+ *
+ * Instead of fetching the official Barça upload feed independently
+ * for every fixture, we:
+ *
+ * 1. load every requested match;
+ * 2. calculate one overall YouTube time range;
+ * 3. fetch that upload range once;
+ * 4. filter the same video pool per match;
+ * 5. run the exact same trusted candidate scorer;
+ * 6. persist idempotently.
+ */
+export async function syncOfficialMatchMediaBatch(
+  input: {
+    matchIds:
+      string[];
+
+    dryRun:
+      boolean;
+  },
+): Promise<MatchMediaBatchResult> {
+  const apiKey =
+    requireYouTubeApiKey();
+
+  const uniqueMatchIds =
+    Array.from(
+      new Set(
+        input.matchIds,
+      ),
+    );
+
+  if (
+    uniqueMatchIds.length ===
+    0
+  ) {
+    return emptyBatchResult(
+      input.dryRun,
+    );
+  }
+
+  const contexts:
+    MatchContext[] =
+    [];
+
+  for (
+    const matchId
+    of uniqueMatchIds
+  ) {
+    const match =
+      await loadMatch(
+        matchId,
+      );
+
+    if (
+      match.status !==
+      "finished"
+    ) {
+      continue;
+    }
+
+    if (
+      match.homeScore ===
+        null ||
+      match.awayScore ===
+        null
+    ) {
+      continue;
+    }
+
+    contexts.push(
+      makeMatchContext(
+        match,
+      ),
+    );
+  }
+
+  if (
+    contexts.length ===
+    0
+  ) {
+    return emptyBatchResult(
+      input.dryRun,
+    );
+  }
+
+  const kickoffTimes =
+    contexts.map(
+      (
+        context,
+      ) =>
+        new Date(
+          context.kickoff,
+        ).getTime(),
+    );
+
+  const rangeStart =
+    new Date(
+      Math.min(
+        ...kickoffTimes,
+      ) -
+        WINDOW_BEFORE_HOURS *
+          60 *
+          60 *
+          1000,
+    ).toISOString();
+
+  const rangeEnd =
+    new Date(
+      Math.max(
+        ...kickoffTimes,
+      ) +
+        WINDOW_AFTER_HOURS *
+          60 *
+          60 *
+          1000,
+    ).toISOString();
+
+  const usage:
+    UsageTracker = {
+      requests:
+        0,
+
+      uploadPages:
+        0,
+
+      videosInspected:
+        0,
+    };
+
+  const channel =
+    await fetchOfficialChannel(
+      apiKey,
+      usage,
+    );
+
+  const pooledVideos =
+    await fetchOfficialYoutubeVideosBetween(
+      apiKey,
+      channel.uploadsPlaylist,
+      rangeStart,
+      rangeEnd,
+      usage,
+    );
+
+  const dataSource =
+    input.dryRun
+      ? null
+      : await ensureDataSource();
+
+  const existingSource =
+    input.dryRun
+      ? await db.orm.public.DataSource
+          .where({
+            code:
+              DATA_SOURCE.code,
+          })
+          .first()
+      : null;
+
+  const results:
+    MatchMediaBatchResult[
+      "results"
+    ] =
+    [];
+
+  for (
+    const context
+    of contexts
+  ) {
+    const kickoffMs =
+      new Date(
+        context.kickoff,
+      ).getTime();
+
+    const matchWindowStart =
+      kickoffMs -
+      WINDOW_BEFORE_HOURS *
+        60 *
+        60 *
+        1000;
+
+    const matchWindowEnd =
+      kickoffMs +
+      WINDOW_AFTER_HOURS *
+        60 *
+        60 *
+        1000;
+
+    const videosForMatch =
+      pooledVideos.filter(
+        (
+          video,
+        ) => {
+          const publishedMs =
+            new Date(
+              video.snippet
+                .publishedAt,
+            ).getTime();
+
+          return (
+            publishedMs >=
+              matchWindowStart &&
+            publishedMs <=
+              matchWindowEnd
+          );
+        },
+      );
+
+    const evaluated =
+      videosForMatch.map(
+        (
+          video,
+        ) =>
+          evaluateVideo(
+            video,
+            context,
+          ),
+      );
+
+    const accepted =
+      evaluated
+        .filter(
+          (
+            candidate,
+          ) =>
+            candidate.accepted,
+        )
+        .sort(
+          compareCandidates,
+        );
+
+    const writePlan =
+      makeEmptyWritePlan();
+
+    try {
+      if (
+        input.dryRun
+      ) {
+        await calculateDryRunWritePlan({
+          accepted,
+          context,
+          existingSourceId:
+            existingSource?.id ??
+            null,
+          writePlan,
+        });
+      } else {
+        if (!dataSource) {
+          throw new Error(
+            "Official YouTube data source was not initialized.",
+          );
+        }
+
+        for (
+          const candidate
+          of accepted
+        ) {
+          await persistCandidate({
+            candidate,
+            context,
+            dataSourceId:
+              dataSource.id,
+            writePlan,
+          });
+        }
+      }
+
+      results.push({
+        matchId:
+          context.id,
+
+        fixture:
+          fixtureSummary(
+            context,
+          ),
+
+        ok:
+          true,
+
+        accepted,
+
+        rejectedCount:
+          evaluated.length -
+          accepted.length,
+
+        writePlan,
+
+        persisted:
+          !input.dryRun,
+
+        error:
+          null,
+      });
+    } catch (
+      error
+    ) {
+      results.push({
+        matchId:
+          context.id,
+
+        fixture:
+          fixtureSummary(
+            context,
+          ),
+
+        ok:
+          false,
+
+        accepted,
+
+        rejectedCount:
+          evaluated.length -
+          accepted.length,
+
+        writePlan,
+
+        persisted:
+          false,
+
+        error:
+          error instanceof Error
+            ? error.message
+            : String(
+                error,
+              ),
+      });
+    }
+  }
+
+  const totalWritePlan =
+    results.reduce(
+      (
+        total,
+        result,
+      ) => ({
+        created:
+          total.created +
+          result.writePlan
+            .created,
+
+        updated:
+          total.updated +
+          result.writePlan
+            .updated,
+
+        unchanged:
+          total.unchanged +
+          result.writePlan
+            .unchanged,
+      }),
+      makeEmptyWritePlan(),
+    );
+
+  return {
+    dryRun:
+      input.dryRun,
+
+    matches:
+      contexts.length,
+
+    youtube: {
+      channelId:
+        YOUTUBE_CHANNEL_ID,
+
+      channelName:
+        channel.channelName,
+
+      uploadsPlaylist:
+        channel.uploadsPlaylist,
+
+      requests:
+        usage.requests,
+
+      uploadPages:
+        usage.uploadPages,
+
+      videosInspected:
+        usage.videosInspected,
+    },
+
+    writePlan:
+      totalWritePlan,
+
+    results,
   };
 }
 
@@ -698,14 +1062,146 @@ async function loadMatch(
   return match;
 }
 
+function makeMatchContext(
+  match:
+    Awaited<
+      ReturnType<
+        typeof loadMatch
+      >
+    >,
+): MatchContext {
+  if (
+    match.homeScore ===
+      null ||
+    match.awayScore ===
+      null
+  ) {
+    throw new Error(
+      "Finished match is missing its final score.",
+    );
+  }
+
+  return {
+    id:
+      match.id,
+
+    seasonId:
+      match.seasonId,
+
+    kickoff:
+      match.kickoff
+        .toString(),
+
+    competition: {
+      code:
+        match.competition
+          .code,
+
+      name:
+        match.competition
+          .name,
+
+      shortName:
+        match.competition
+          .shortName,
+    },
+
+    homeTeam: {
+      id:
+        match.homeTeam.id,
+
+      name:
+        match.homeTeam
+          .name,
+
+      shortName:
+        match.homeTeam
+          .shortName,
+
+      code:
+        match.homeTeam
+          .code,
+
+      isBarcelona:
+        match.homeTeam
+          .isBarcelona,
+    },
+
+    awayTeam: {
+      id:
+        match.awayTeam.id,
+
+      name:
+        match.awayTeam
+          .name,
+
+      shortName:
+        match.awayTeam
+          .shortName,
+
+      code:
+        match.awayTeam
+          .code,
+
+      isBarcelona:
+        match.awayTeam
+          .isBarcelona,
+    },
+
+    score: {
+      home:
+        match.homeScore,
+
+      away:
+        match.awayScore,
+    },
+  };
+}
+
+function fixtureSummary(
+  context:
+    MatchContext,
+) {
+  return {
+    kickoff:
+      context.kickoff,
+
+    home:
+      context.homeTeam
+        .name,
+
+    away:
+      context.awayTeam
+        .name,
+
+    score:
+      `${context.score.home}-${context.score.away}`,
+  };
+}
+
+function requireYouTubeApiKey() {
+  const apiKey =
+    process.env
+      .YOUTUBE_API_KEY;
+
+  if (!apiKey) {
+    throw new Error(
+      "YOUTUBE_API_KEY is not configured.",
+    );
+  }
+
+  return apiKey;
+}
+
 async function fetchOfficialChannel(
   apiKey:
     string,
 
-  usage: {
-    requests:
-      number;
-  },
+  usage:
+    Pick<
+      UsageTracker,
+      "requests"
+    >,
 ) {
   const url =
     new URL(
@@ -731,7 +1227,9 @@ async function fetchOfficialChannel(
     1;
 
   const payload =
-    await fetchJson<YouTubeChannelResponse>(
+    await fetchJson<
+      YouTubeChannelResponse
+    >(
       url,
     );
 
@@ -764,45 +1262,31 @@ async function fetchOfficialChannel(
   };
 }
 
-async function fetchVideosAroundMatch(
+async function fetchOfficialYoutubeVideosBetween(
   apiKey:
     string,
 
   uploadsPlaylist:
     string,
 
-  kickoff:
+  start:
     string,
 
-  usage: {
-    requests:
-      number;
+  end:
+    string,
 
-    uploadPages:
-      number;
-
-    videosInspected:
-      number;
-  },
+  usage:
+    UsageTracker,
 ) {
-  const kickoffMs =
+  const startMs =
     new Date(
-      kickoff,
+      start,
     ).getTime();
 
-  const startMs =
-    kickoffMs -
-    WINDOW_BEFORE_HOURS *
-      60 *
-      60 *
-      1000;
-
   const endMs =
-    kickoffMs +
-    WINDOW_AFTER_HOURS *
-      60 *
-      60 *
-      1000;
+    new Date(
+      end,
+    ).getTime();
 
   const playlistItems:
     YouTubePlaylistItem[] =
@@ -856,7 +1340,9 @@ async function fetchVideosAroundMatch(
       1;
 
     const payload =
-      await fetchJson<YouTubePlaylistResponse>(
+      await fetchJson<
+        YouTubePlaylistResponse
+      >(
         url,
       );
 
@@ -906,6 +1392,12 @@ async function fetchVideosAroundMatch(
         ),
       );
 
+    /*
+     * Upload playlists are newest-first.
+     *
+     * Once the oldest item on the current page is older than the
+     * earliest time we care about, all following pages are older too.
+     */
     if (
       Number.isFinite(
         oldestMs,
@@ -987,7 +1479,9 @@ async function fetchVideosAroundMatch(
       1;
 
     const payload =
-      await fetchJson<YouTubeVideosResponse>(
+      await fetchJson<
+        YouTubeVideosResponse
+      >(
         url,
       );
 
@@ -1342,15 +1836,13 @@ function evaluateVideo(
   }
 
   const accepted =
-    isSafeAutomaticMatch(
-      {
-        score,
-        mediaType,
-        opponentMention,
-        exactScore,
-        embeddable,
-      },
-    );
+    isSafeAutomaticMatch({
+      score,
+      mediaType,
+      opponentMention,
+      exactScore,
+      embeddable,
+    });
 
   reasons.push(
     accepted
@@ -1393,18 +1885,6 @@ function isSafeAutomaticMatch(
     return false;
   }
 
-  /*
-   * V1 intentionally only auto-ingests the safest
-   * match-specific media.
-   *
-   * Highlights:
-   * - must mention opponent
-   * - and either have exact score OR a very strong score
-   *
-   * Other media:
-   * - must mention opponent
-   * - and clear a higher confidence threshold
-   */
   if (
     input.mediaType ===
     "match_highlight"
@@ -1421,6 +1901,10 @@ function isSafeAutomaticMatch(
     );
   }
 
+  /*
+   * Secondary match media such as Un Dia De Partit must still have
+   * strong fixture evidence before it is linked automatically.
+   */
   return (
     input.opponentMention &&
     input.score >=
@@ -1477,6 +1961,26 @@ function classifyMedia(
     return "training";
   }
 
+  /*
+   * These official Barça videos frequently include the exact match
+   * score but are behind-the-scenes match films, not the canonical
+   * highlights package.
+   */
+  if (
+    containsAny(
+      normalizedTitle,
+      [
+        "un dia de partit",
+        "un dia de partido",
+        "matchday documentary",
+        "matchday feature",
+        "behind the scenes",
+      ],
+    )
+  ) {
+    return "other";
+  }
+
   if (
     exactScore ||
     containsAny(
@@ -1518,6 +2022,7 @@ function exclusionReason(
   const blocked = [
     "barca live",
     "barcelona live",
+
     "women",
     "womens",
     "women s",
@@ -1549,6 +2054,7 @@ function exclusionReason(
     "u18",
     "u 19",
     "u19",
+
     "barca athletic",
     "barcelona athletic",
     "barca atletic",
@@ -1619,13 +2125,10 @@ function hasExactFixtureScore(
   }
 
   /*
-   * Preserve score separators when detecting a result.
+   * Keep score separators intact here.
    *
-   * This avoids false positives such as:
-   *
-   *   LALIGA 26/27
-   *
-   * being interpreted as a 2–7 score.
+   * This prevents season strings such as "26/27" from accidentally
+   * being treated as a 2–7 scoreline.
    */
   const scoreText =
     title
@@ -1724,22 +2227,24 @@ function teamAliases(
 
     const reduced =
       normalized
-        .split(" ")
+        .split(
+          " ",
+        )
         .filter(
           (
             token,
           ) =>
             ![
-            "fc",
-            "cf",
-            "ud",
-            "cd",
-            "club",
-            "real",
-            "de",
-            "del",
-            "the",
-          ].includes(
+              "fc",
+              "cf",
+              "ud",
+              "cd",
+              "club",
+              "real",
+              "de",
+              "del",
+              "the",
+            ].includes(
               token,
             ),
         )
@@ -1758,15 +2263,17 @@ function teamAliases(
     }
 
     const meaningfulTokens =
-  reduced
-    .split(" ")
-    .filter(
-      (
-        token,
-      ) =>
-        token.length >=
-        4,
-    );
+      reduced
+        .split(
+          " ",
+        )
+        .filter(
+          (
+            token,
+          ) =>
+            token.length >=
+            4,
+        );
 
     if (
       meaningfulTokens.length >=
@@ -1784,15 +2291,13 @@ function teamAliases(
     }
 
     const distinctive =
-      reduced
-        .split(" ")
-        .filter(
-          (
-            token,
-          ) =>
-            token.length >=
-            5,
-        );
+      meaningfulTokens.filter(
+        (
+          token,
+        ) =>
+          token.length >=
+          5,
+      );
 
     if (
       distinctive.length ===
@@ -1867,7 +2372,7 @@ function competitionAliases(
 
   if (
     code ===
-      "PD"
+    "PD"
   ) {
     aliases.add(
       "laliga",
@@ -1880,7 +2385,7 @@ function competitionAliases(
 
   if (
     code ===
-      "CL"
+    "CL"
   ) {
     aliases.add(
       "champions league",
@@ -1974,6 +2479,72 @@ function makeCandidate(
   };
 }
 
+async function calculateDryRunWritePlan(
+  input: {
+    accepted:
+      MatchMediaCandidate[];
+
+    context:
+      MatchContext;
+
+    existingSourceId:
+      string | null;
+
+    writePlan:
+      WritePlan;
+  },
+) {
+  for (
+    const candidate
+    of input.accepted
+  ) {
+    if (
+      !input.existingSourceId
+    ) {
+      input.writePlan
+        .created +=
+        1;
+
+      continue;
+    }
+
+    const existing =
+      await db.orm.public.MediaItem
+        .where({
+          dataSourceId:
+            input.existingSourceId,
+
+          externalMediaId:
+            candidate.videoId,
+        })
+        .first();
+
+    if (!existing) {
+      input.writePlan
+        .created +=
+        1;
+
+      continue;
+    }
+
+    if (
+      mediaRowMatches(
+        existing,
+        candidate,
+        input.context,
+      )
+    ) {
+      input.writePlan
+        .unchanged +=
+        1;
+    } else {
+      input.writePlan
+        .updated +=
+        1;
+    }
+  }
+}
+
 async function ensureDataSource() {
   const existing =
     await db.orm.public.DataSource
@@ -2065,16 +2636,8 @@ async function persistCandidate(
     dataSourceId:
       string;
 
-    writePlan: {
-      created:
-        number;
-
-      updated:
-        number;
-
-      unchanged:
-        number;
-    };
+    writePlan:
+      WritePlan;
   },
 ) {
   const existing =
@@ -2268,6 +2831,58 @@ function mediaRowMatches(
   );
 }
 
+function makeEmptyWritePlan():
+  WritePlan {
+  return {
+    created:
+      0,
+
+    updated:
+      0,
+
+    unchanged:
+      0,
+  };
+}
+
+function emptyBatchResult(
+  dryRun:
+    boolean,
+): MatchMediaBatchResult {
+  return {
+    dryRun,
+
+    matches:
+      0,
+
+    youtube: {
+      channelId:
+        YOUTUBE_CHANNEL_ID,
+
+      channelName:
+        "FC Barcelona",
+
+      uploadsPlaylist:
+        "",
+
+      requests:
+        0,
+
+      uploadPages:
+        0,
+
+      videosInspected:
+        0,
+    },
+
+    writePlan:
+      makeEmptyWritePlan(),
+
+    results:
+      [],
+  };
+}
+
 async function fetchJson<T>(
   url:
     URL,
@@ -2402,16 +3017,6 @@ function normalize(
       " ",
     )
     .trim();
-}
-
-function escapeRegExp(
-  value:
-    string,
-) {
-  return value.replace(
-    /[.*+?^${}()|[\]\\]/g,
-    "\\$&",
-  );
 }
 
 function compareCandidates(
