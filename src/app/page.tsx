@@ -7,21 +7,28 @@ import {
 
 /*
 |--------------------------------------------------------------------------
-| Overview data loader
+| Dynamic overview
 |--------------------------------------------------------------------------
 |
-| Keep the try/catch OUTSIDE of JSX rendering.
+| The dashboard depends on live database data.
 |
-| React's error-boundaries lint correctly warns that constructing JSX inside
-| a try/catch doesn't actually catch render errors.
+| Never prerender this page during `next build`, because the production
+| Docker build intentionally does not connect to the runtime PostgreSQL
+| container.
 |
-| So this function ONLY fetches the data and returns either:
-|
-| DashboardOverview
-|
-| or
-|
-| null
+| Instead, load the current canonical database state on each request.
+|--------------------------------------------------------------------------
+*/
+
+export const dynamic =
+  "force-dynamic";
+
+export const revalidate =
+  0;
+
+/*
+|--------------------------------------------------------------------------
+| Overview data loader
 |--------------------------------------------------------------------------
 */
 
@@ -29,18 +36,6 @@ async function loadDashboardOverview() {
   try {
     return await getDashboardOverview();
   } catch (error) {
-    /*
-    |--------------------------------------------------------------------------
-    | Server-side logging
-    |--------------------------------------------------------------------------
-    |
-    | The real database/network error is logged here for development.
-    |
-    | We deliberately don't expose raw DB errors, stack traces, credentials,
-    | etc. to the user-facing UI.
-    |--------------------------------------------------------------------------
-    */
-
     console.error(
       "DASHBOARD OVERVIEW LOAD FAILED:",
       error,
@@ -60,23 +55,11 @@ export default async function Home() {
   const overview =
     await loadDashboardOverview();
 
-  /*
-  |--------------------------------------------------------------------------
-  | Database / data provider unavailable
-  |--------------------------------------------------------------------------
-  */
-
   if (!overview) {
     return (
       <DashboardUnavailable />
     );
   }
-
-  /*
-  |--------------------------------------------------------------------------
-  | Normal dashboard
-  |--------------------------------------------------------------------------
-  */
 
   return (
     <DashboardClient
