@@ -52,6 +52,10 @@
       "model": "MediaItem",
       "namespace": "public"
     },
+    "media_review_candidate": {
+      "model": "MediaReviewCandidate",
+      "namespace": "public"
+    },
     "model_version": {
       "model": "ModelVersion",
       "namespace": "public"
@@ -386,12 +390,37 @@
               }
             ]
           },
+          "MediaReviewStatus": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "Pending",
+                "value": "pending"
+              },
+              {
+                "name": "Approved",
+                "value": "approved"
+              },
+              {
+                "name": "Rejected",
+                "value": "rejected"
+              }
+            ]
+          },
           "MediaType": {
             "codecId": "pg/text@1",
             "members": [
               {
                 "name": "MatchHighlight",
                 "value": "match_highlight"
+              },
+              {
+                "name": "MatchFeature",
+                "value": "match_feature"
+              },
+              {
+                "name": "MatchPreview",
+                "value": "match_preview"
               },
               {
                 "name": "GoalClip",
@@ -837,6 +866,21 @@
                 },
                 "to": {
                   "model": "MediaItem",
+                  "namespace": "public"
+                }
+              },
+              "mediaReviewCandidates": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "dataSourceId"
+                  ]
+                },
+                "to": {
+                  "model": "MediaReviewCandidate",
                   "namespace": "public"
                 }
               },
@@ -1873,6 +1917,21 @@
                 },
                 "to": {
                   "model": "MediaItem",
+                  "namespace": "public"
+                }
+              },
+              "mediaReviewCandidates": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "matchId"
+                  ]
+                },
+                "to": {
+                  "model": "MediaReviewCandidate",
                   "namespace": "public"
                 }
               },
@@ -3191,6 +3250,278 @@
               },
               "namespaceId": "public",
               "table": "media_item"
+            }
+          },
+          "MediaReviewCandidate": {
+            "fields": {
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "dataSourceId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "durationSeconds": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "embeddable": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
+              "externalMediaId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "lastSeenAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "matchId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "publishedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "reasons": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/json@1",
+                  "kind": "scalar"
+                }
+              },
+              "reviewNote": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "reviewedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "score": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "seasonId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "MediaReviewStatus",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "thumbnailUrl": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "title": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "type": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "MediaType",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "url": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "dataSource": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "dataSourceId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "DataSource",
+                  "namespace": "public"
+                }
+              },
+              "match": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "matchId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Match",
+                  "namespace": "public"
+                }
+              },
+              "season": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "seasonId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Season",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "dataSourceId": {
+                  "column": "dataSourceId"
+                },
+                "durationSeconds": {
+                  "column": "durationSeconds"
+                },
+                "embeddable": {
+                  "column": "embeddable"
+                },
+                "externalMediaId": {
+                  "column": "externalMediaId"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "lastSeenAt": {
+                  "column": "lastSeenAt"
+                },
+                "matchId": {
+                  "column": "matchId"
+                },
+                "publishedAt": {
+                  "column": "publishedAt"
+                },
+                "reasons": {
+                  "column": "reasons"
+                },
+                "reviewNote": {
+                  "column": "reviewNote"
+                },
+                "reviewedAt": {
+                  "column": "reviewedAt"
+                },
+                "score": {
+                  "column": "score"
+                },
+                "seasonId": {
+                  "column": "seasonId"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "thumbnailUrl": {
+                  "column": "thumbnailUrl"
+                },
+                "title": {
+                  "column": "title"
+                },
+                "type": {
+                  "column": "type"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                },
+                "url": {
+                  "column": "url"
+                }
+              },
+              "namespaceId": "public",
+              "table": "media_review_candidate"
             }
           },
           "ModelVersion": {
@@ -4689,6 +5020,21 @@
                 },
                 "to": {
                   "model": "MediaItem",
+                  "namespace": "public"
+                }
+              },
+              "mediaReviewCandidates": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "seasonId"
+                  ]
+                },
+                "to": {
+                  "model": "MediaReviewCandidate",
                   "namespace": "public"
                 }
               },
@@ -7641,8 +7987,8 @@
             "media_item": {
               "checks": [
                 {
-                  "expression": "\"type\" IN ('match_highlight', 'goal_clip', 'interview', 'press_conference', 'training', 'historical', 'other')",
-                  "name": "media_item_type_check_0b2bf1f8",
+                  "expression": "\"type\" IN ('match_highlight', 'match_feature', 'match_preview', 'goal_clip', 'interview', 'press_conference', 'training', 'historical', 'other')",
+                  "name": "media_item_type_check_4eb91d94",
                   "prefix": "media_item_type_check"
                 }
               ],
@@ -7843,6 +8189,253 @@
                 ]
               },
               "uniques": []
+            },
+            "media_review_candidate": {
+              "checks": [
+                {
+                  "expression": "\"status\" IN ('pending', 'approved', 'rejected')",
+                  "name": "media_review_candidate_status_check_19a2b525",
+                  "prefix": "media_review_candidate_status_check"
+                },
+                {
+                  "expression": "\"type\" IN ('match_highlight', 'match_feature', 'match_preview', 'goal_clip', 'interview', 'press_conference', 'training', 'historical', 'other')",
+                  "name": "media_review_candidate_type_check_4eb91d94",
+                  "prefix": "media_review_candidate_type_check"
+                }
+              ],
+              "columns": {
+                "createdAt": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "dataSourceId": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "durationSeconds": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "embeddable": {
+                  "codecId": "pg/bool@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": true
+                  },
+                  "nativeType": "bool",
+                  "nullable": false
+                },
+                "externalMediaId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "lastSeenAt": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "matchId": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "publishedAt": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "reasons": {
+                  "codecId": "pg/json@1",
+                  "nativeType": "json",
+                  "nullable": false
+                },
+                "reviewNote": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "reviewedAt": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "score": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "seasonId": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "pending"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "MediaReviewStatus",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "thumbnailUrl": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "title": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "type": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "MediaType",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "url": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "source": {
+                    "columns": [
+                      "seasonId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "media_review_candidate"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "season"
+                  }
+                },
+                {
+                  "source": {
+                    "columns": [
+                      "matchId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "media_review_candidate"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "football_match"
+                  }
+                },
+                {
+                  "source": {
+                    "columns": [
+                      "dataSourceId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "media_review_candidate"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "data_source"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "dataSourceId"
+                  ],
+                  "name": "media_review_candidate_dataSourceId_idx_536a4d74",
+                  "prefix": "media_review_candidate_dataSourceId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "matchId"
+                  ],
+                  "name": "media_review_candidate_matchId_idx_4caf5ecc",
+                  "prefix": "media_review_candidate_matchId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "seasonId"
+                  ],
+                  "name": "media_review_candidate_seasonId_idx_aa50cbae",
+                  "prefix": "media_review_candidate_seasonId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "seasonId",
+                    "status"
+                  ],
+                  "name": "media_review_candidate_seasonId_status_idx_0da2dd50",
+                  "prefix": "media_review_candidate_seasonId_status_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "status"
+                  ],
+                  "name": "media_review_candidate_status_idx_e98638ab",
+                  "prefix": "media_review_candidate_status_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "dataSourceId",
+                    "externalMediaId",
+                    "matchId"
+                  ]
+                }
+              ]
             },
             "model_version": {
               "columns": {
@@ -9865,10 +10458,20 @@
                 "abandoned"
               ]
             },
+            "MediaReviewStatus": {
+              "kind": "valueSet",
+              "values": [
+                "pending",
+                "approved",
+                "rejected"
+              ]
+            },
             "MediaType": {
               "kind": "valueSet",
               "values": [
                 "match_highlight",
+                "match_feature",
+                "match_preview",
                 "goal_clip",
                 "interview",
                 "press_conference",
@@ -9929,10 +10532,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "ab80e523f0f42c7647e39a2c23ef6b102102f5b0f68a5f04b61bbce06c2326a4"
+    "storageHash": "f64562ada54d6648dbe850b4390eeeecf0279a74d9d50886a664aad1cae62da1"
   },
   "execution": {
-    "executionHash": "c52f5cea5ddccedf784326ed70031eddf18d45ebab8569b47ae3ad552aa9518f",
+    "executionHash": "18708be17734550a7ebd0fe0b923287a5725c760e3eb280920ca01380fdc51a5",
     "mutations": {
       "defaults": [
         {
@@ -10230,6 +10833,32 @@
             "column": "updatedAt",
             "namespace": "public",
             "table": "media_item"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "media_review_candidate"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updatedAt",
+            "namespace": "public",
+            "table": "media_review_candidate"
           }
         },
         {

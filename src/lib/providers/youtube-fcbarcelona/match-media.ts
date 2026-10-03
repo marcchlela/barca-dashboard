@@ -5,6 +5,12 @@ import {
 } from "temporal-polyfill";
 
 import {
+  makeEmptyReviewQueuePlan,
+  syncMediaReviewQueue,
+  type ReviewQueuePlan,
+} from "./review-queue";
+
+import {
   db,
 } from "../../../prisma/db";
 
@@ -42,6 +48,8 @@ const MAX_UPLOAD_PAGES =
 
 type MediaType =
   | "match_highlight"
+  | "match_feature"
+  | "match_preview"
   | "goal_clip"
   | "interview"
   | "press_conference"
@@ -345,7 +353,10 @@ export type MatchMediaSyncResult = {
     MatchMediaCandidate[];
 
   writePlan:
-    WritePlan;
+  WritePlan;
+
+  reviewPlan:
+    ReviewQueuePlan;
 
   persisted:
     boolean;
@@ -548,6 +559,9 @@ export async function syncOfficialMatchMedia(
 
   const writePlan =
     makeEmptyWritePlan();
+  
+  let reviewPlan =
+    makeEmptyReviewQueuePlan();
 
   if (
     input.dryRun
@@ -569,22 +583,38 @@ export async function syncOfficialMatchMedia(
       writePlan,
     });
   } else {
-    const dataSource =
-      await ensureDataSource();
+  const dataSource =
+    await ensureDataSource();
 
-    for (
-      const candidate
-      of accepted
-    ) {
-      await persistCandidate({
-        candidate,
-        context,
-        dataSourceId:
-          dataSource.id,
-        writePlan,
-      });
-    }
+  for (
+    const candidate
+    of accepted
+  ) {
+    await persistCandidate({
+      candidate,
+      context,
+      dataSourceId:
+        dataSource.id,
+      writePlan,
+    });
   }
+
+  reviewPlan =
+    await syncMediaReviewQueue({
+      seasonId:
+        context.seasonId,
+
+      matchId:
+        context.id,
+
+      dataSourceId:
+        dataSource.id,
+
+      accepted,
+
+      rejected,
+    });
+}
 
   return {
     dryRun:
@@ -627,6 +657,8 @@ export async function syncOfficialMatchMedia(
       ),
 
     writePlan,
+
+    reviewPlan,
 
     persisted:
       !input.dryRun,
@@ -864,6 +896,17 @@ export async function syncOfficialMatchMediaBatch(
         .sort(
           compareCandidates,
         );
+      const rejected =
+        evaluated
+          .filter(
+            (
+              candidate,
+            ) =>
+              !candidate.accepted,
+          )
+          .sort(
+            compareCandidates,
+          );
 
     const writePlan =
       makeEmptyWritePlan();
@@ -899,6 +942,20 @@ export async function syncOfficialMatchMediaBatch(
             writePlan,
           });
         }
+        await syncMediaReviewQueue({
+          seasonId:
+            context.seasonId,
+
+          matchId:
+            context.id,
+
+          dataSourceId:
+            dataSource.id,
+
+          accepted,
+
+          rejected,
+        });
       }
 
       results.push({
@@ -1885,6 +1942,19 @@ function isSafeAutomaticMatch(
     return false;
   }
 
+    /*
+  * Match previews are intentionally human-reviewed.
+  *
+  * They are related to the fixture, but they're pre-match content and should
+  * never be attached automatically as post-match media.
+  */
+  if (
+    input.mediaType ===
+    "match_preview"
+  ) {
+    return false;
+  }
+
   if (
     input.mediaType ===
     "match_highlight"
@@ -1919,6 +1989,25 @@ function classifyMedia(
   exactScore:
     boolean,
 ): MediaType {
+  /*
+   * Pre-match editorial content.
+   *
+   * Keep this BEFORE the score/highlight checks so previews never get
+   * accidentally classified as canonical highlights.
+   */
+  if (
+    containsAny(
+      normalizedTitle,
+      [
+        "match preview",
+        "preview",
+        "previa",
+      ],
+    )
+  ) {
+    return "match_preview";
+  }
+
   if (
     containsAny(
       normalizedTitle,
@@ -1962,9 +2051,7 @@ function classifyMedia(
   }
 
   /*
-   * These official Barça videos frequently include the exact match
-   * score but are behind-the-scenes match films, not the canonical
-   * highlights package.
+   * Barça match films / behind-the-scenes productions.
    */
   if (
     containsAny(
@@ -1975,10 +2062,11 @@ function classifyMedia(
         "matchday documentary",
         "matchday feature",
         "behind the scenes",
+        "behind the scenes matchday",
       ],
     )
   ) {
-    return "other";
+    return "match_feature";
   }
 
   if (

@@ -89,12 +89,22 @@ enum DataConfidence {
 enum MediaType {
   @@type("pg/text@1")
   MatchHighlight = "match_highlight"
+  MatchFeature = "match_feature"
+  MatchPreview = "match_preview"
   GoalClip = "goal_clip"
   Interview = "interview"
   PressConference = "press_conference"
   Training = "training"
   Historical = "historical"
   Other = "other"
+}
+
+enum MediaReviewStatus {
+  @@type("pg/text@1")
+
+  Pending = "pending"
+  Approved = "approved"
+  Rejected = "rejected"
 }
 
 enum WatchType {
@@ -165,6 +175,7 @@ model Season {
   kitThemes        KitTheme[]
   trophyWins       TrophyWin[]
   mediaItems       MediaItem[]
+  mediaReviewCandidates MediaReviewCandidate[]
   moments          SeasonMoment[]
   absences         PlayerAbsence[]
 
@@ -301,6 +312,7 @@ model Match {
   teamStats          MatchStatistic[]
   playerStats        PlayerMatchStatistic[]
   mediaItems         MediaItem[]
+  mediaReviewCandidates MediaReviewCandidate[]
   predictions        Prediction[]
   diaryEntry         MatchDiaryEntry?
   seasonMoments      SeasonMoment[]
@@ -548,6 +560,39 @@ model MediaItem {
   @@map("media_item")
 }
 
+model MediaReviewCandidate {
+  id              Uuid                 @id @default(uuid())
+  seasonId        Uuid
+  matchId         Uuid
+  dataSourceId    Uuid
+  externalMediaId String
+  type            MediaType
+  title           String
+  url             String
+  thumbnailUrl    String?
+  publishedAt     DateTime?
+  durationSeconds Int?
+  embeddable      Boolean              @default(true)
+  score           Int
+  reasons         Json
+  status          MediaReviewStatus    @default(Pending)
+  reviewedAt      DateTime?
+  reviewNote      String?
+  lastSeenAt      DateTime
+  createdAt       temporal.createdAt()
+  updatedAt       temporal.updatedAt()
+
+  season          Season               @relation(fields:[seasonId], references:[id])
+  match           Match                @relation(fields:[matchId], references:[id])
+  dataSource      DataSource           @relation(fields:[dataSourceId], references:[id])
+
+  @@unique([dataSourceId, externalMediaId, matchId])
+  @@index([status])
+  @@index([matchId])
+  @@index([seasonId, status])
+  @@map("media_review_candidate")
+}
+
 model KitTheme {
   id              Uuid                 @id @default(uuid())
   seasonId        Uuid
@@ -695,6 +740,7 @@ model DataSource {
   matchStats       MatchStatistic[]
   playerMatchStats PlayerMatchStatistic[]
   mediaItems       MediaItem[]
+  mediaReviewCandidates MediaReviewCandidate[]
   seasonMoments    SeasonMoment[]
   absences         PlayerAbsence[]
 

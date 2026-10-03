@@ -34,7 +34,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'f64562ada54d6648dbe850b4390eeeecf0279a74d9d50886a664aad1cae62da1'>;
+  StorageHashBase<'adc58e3b93370e080f82bbf60683c43f566a9ce68f6849e8465736e3c736bd58'>;
 export type ExecutionHash =
   ExecutionHashBase<'18708be17734550a7ebd0fe0b923287a5725c760e3eb280920ca01380fdc51a5'>;
 export type ProfileHash =
@@ -468,8 +468,6 @@ export type FieldOutputTypes = {
       readonly id: CodecTypes['pg/uuid@1']['output'];
       readonly type:
         | 'match_highlight'
-        | 'match_feature'
-        | 'match_preview'
         | 'goal_clip'
         | 'interview'
         | 'press_conference'
@@ -498,8 +496,6 @@ export type FieldOutputTypes = {
       readonly externalMediaId: CodecTypes['pg/text@1']['output'];
       readonly type:
         | 'match_highlight'
-        | 'match_feature'
-        | 'match_preview'
         | 'goal_clip'
         | 'interview'
         | 'press_conference'
@@ -959,8 +955,6 @@ export type FieldInputTypes = {
       readonly id: CodecTypes['pg/uuid@1']['input'];
       readonly type:
         | 'match_highlight'
-        | 'match_feature'
-        | 'match_preview'
         | 'goal_clip'
         | 'interview'
         | 'press_conference'
@@ -989,8 +983,6 @@ export type FieldInputTypes = {
       readonly externalMediaId: CodecTypes['pg/text@1']['input'];
       readonly type:
         | 'match_highlight'
-        | 'match_feature'
-        | 'match_preview'
         | 'goal_clip'
         | 'interview'
         | 'press_conference'
@@ -1461,8 +1453,6 @@ export type StorageColumnTypes = {
       readonly title: CodecTypes['pg/text@1']['output'];
       readonly type:
         | 'match_highlight'
-        | 'match_feature'
-        | 'match_preview'
         | 'goal_clip'
         | 'interview'
         | 'press_conference'
@@ -1492,8 +1482,6 @@ export type StorageColumnTypes = {
       readonly title: CodecTypes['pg/text@1']['output'];
       readonly type:
         | 'match_highlight'
-        | 'match_feature'
-        | 'match_preview'
         | 'goal_clip'
         | 'interview'
         | 'press_conference'
@@ -1952,8 +1940,6 @@ export type StorageColumnInputTypes = {
       readonly title: CodecTypes['pg/text@1']['input'];
       readonly type:
         | 'match_highlight'
-        | 'match_feature'
-        | 'match_preview'
         | 'goal_clip'
         | 'interview'
         | 'press_conference'
@@ -1983,8 +1969,6 @@ export type StorageColumnInputTypes = {
       readonly title: CodecTypes['pg/text@1']['input'];
       readonly type:
         | 'match_highlight'
-        | 'match_feature'
-        | 'match_preview'
         | 'goal_clip'
         | 'interview'
         | 'press_conference'
@@ -2596,8 +2580,6 @@ export namespace Models {
     id: CodecTypes['pg/uuid@1']['output'];
     type:
       | 'match_highlight'
-      | 'match_feature'
-      | 'match_preview'
       | 'goal_clip'
       | 'interview'
       | 'press_conference'
@@ -2631,8 +2613,6 @@ export namespace Models {
     externalMediaId: CodecTypes['pg/text@1']['output'];
     type:
       | 'match_highlight'
-      | 'match_feature'
-      | 'match_preview'
       | 'goal_clip'
       | 'interview'
       | 'press_conference'
@@ -6243,8 +6223,6 @@ type ContractBase = Omit<
               readonly kind: 'valueSet';
               readonly values: readonly [
                 'match_highlight',
-                'match_feature',
-                'match_preview',
                 'goal_clip',
                 'interview',
                 'press_conference',
@@ -10000,8 +9978,6 @@ type ContractBase = Omit<
             readonly codecId: 'pg/text@1';
             readonly members: readonly [
               { readonly name: 'MatchHighlight'; readonly value: 'match_highlight' },
-              { readonly name: 'MatchFeature'; readonly value: 'match_feature' },
-              { readonly name: 'MatchPreview'; readonly value: 'match_preview' },
               { readonly name: 'GoalClip'; readonly value: 'goal_clip' },
               { readonly name: 'Interview'; readonly value: 'interview' },
               { readonly name: 'PressConference'; readonly value: 'press_conference' },

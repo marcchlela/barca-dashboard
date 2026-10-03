@@ -1,0 +1,170 @@
+[
+  {
+    "id": "dropCheckConstraint.media_item.media_item_type_check_0b2bf1f8",
+    "label": "Drop check constraint \"media_item_type_check_0b2bf1f8\" on \"media_item\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "media_item_type_check_0b2bf1f8",
+        "table": "media_item"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"media_item_type_check_0b2bf1f8\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_item_type_check_0b2bf1f8",
+          "public",
+          "\"public\".\"media_item\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop check constraint \"media_item_type_check_0b2bf1f8\"",
+        "sql": "ALTER TABLE \"public\".\"media_item\" DROP CONSTRAINT \"media_item_type_check_0b2bf1f8\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"media_item_type_check_0b2bf1f8\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_item_type_check_0b2bf1f8",
+          "public",
+          "\"public\".\"media_item\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dropCheckConstraint.media_review_candidate.media_review_candidate_type_check_0b2bf1f8",
+    "label": "Drop check constraint \"media_review_candidate_type_check_0b2bf1f8\" on \"media_review_candidate\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "media_review_candidate_type_check_0b2bf1f8",
+        "table": "media_review_candidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"media_review_candidate_type_check_0b2bf1f8\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_review_candidate_type_check_0b2bf1f8",
+          "public",
+          "\"public\".\"media_review_candidate\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop check constraint \"media_review_candidate_type_check_0b2bf1f8\"",
+        "sql": "ALTER TABLE \"public\".\"media_review_candidate\" DROP CONSTRAINT \"media_review_candidate_type_check_0b2bf1f8\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"media_review_candidate_type_check_0b2bf1f8\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_review_candidate_type_check_0b2bf1f8",
+          "public",
+          "\"public\".\"media_review_candidate\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.media_item.media_item_type_check_4eb91d94",
+    "label": "Add check constraint \"media_item_type_check_4eb91d94\" on \"media_item\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "media_item_type_check_4eb91d94",
+        "table": "media_item"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"media_item_type_check_4eb91d94\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_item_type_check_4eb91d94",
+          "public",
+          "\"public\".\"media_item\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"media_item_type_check_4eb91d94\"",
+        "sql": "ALTER TABLE \"public\".\"media_item\" ADD CONSTRAINT \"media_item_type_check_4eb91d94\" CHECK (\"type\" IN ('match_highlight', 'match_feature', 'match_preview', 'goal_clip', 'interview', 'press_conference', 'training', 'historical', 'other'))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"media_item_type_check_4eb91d94\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_item_type_check_4eb91d94",
+          "public",
+          "\"public\".\"media_item\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.media_review_candidate.media_review_candidate_type_check_4eb91d94",
+    "label": "Add check constraint \"media_review_candidate_type_check_4eb91d94\" on \"media_review_candidate\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "media_review_candidate_type_check_4eb91d94",
+        "table": "media_review_candidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"media_review_candidate_type_check_4eb91d94\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_review_candidate_type_check_4eb91d94",
+          "public",
+          "\"public\".\"media_review_candidate\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"media_review_candidate_type_check_4eb91d94\"",
+        "sql": "ALTER TABLE \"public\".\"media_review_candidate\" ADD CONSTRAINT \"media_review_candidate_type_check_4eb91d94\" CHECK (\"type\" IN ('match_highlight', 'match_feature', 'match_preview', 'goal_clip', 'interview', 'press_conference', 'training', 'historical', 'other'))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"media_review_candidate_type_check_4eb91d94\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_review_candidate_type_check_4eb91d94",
+          "public",
+          "\"public\".\"media_review_candidate\""
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,404 @@
+[
+  {
+    "id": "table.media_review_candidate",
+    "label": "Create table \"media_review_candidate\"",
+    "summary": "Creates table \"media_review_candidate\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "media_review_candidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"media_review_candidate\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"media_review_candidate\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"media_review_candidate\"",
+        "sql": "CREATE TABLE \"public\".\"media_review_candidate\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"dataSourceId\" uuid NOT NULL,\n  \"durationSeconds\" int4,\n  \"embeddable\" bool DEFAULT true NOT NULL,\n  \"externalMediaId\" text NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"lastSeenAt\" timestamptz NOT NULL,\n  \"matchId\" uuid NOT NULL,\n  \"publishedAt\" timestamptz,\n  \"reasons\" json NOT NULL,\n  \"reviewNote\" text,\n  \"reviewedAt\" timestamptz,\n  \"score\" int4 NOT NULL,\n  \"seasonId\" uuid NOT NULL,\n  \"status\" text DEFAULT 'pending' NOT NULL,\n  \"thumbnailUrl\" text,\n  \"title\" text NOT NULL,\n  \"type\" text NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  \"url\" text NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"media_review_candidate_status_check_19a2b525\" CHECK (\"status\" IN ('pending', 'approved', 'rejected')),\n  CONSTRAINT \"media_review_candidate_type_check_0b2bf1f8\" CHECK (\"type\" IN ('match_highlight', 'goal_clip', 'interview', 'press_conference', 'training', 'historical', 'other'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"media_review_candidate\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"media_review_candidate\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.media_review_candidate.media_review_candidate_dataSourceId_externalMediaId_matchId_key",
+    "label": "Add unique constraint on \"media_review_candidate\" (dataSourceId, externalMediaId, matchId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "media_review_candidate_dataSourceId_externalMediaId_matchId_key",
+        "table": "media_review_candidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"media_review_candidate_dataSourceId_externalMediaId_matchId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_review_candidate_dataSourceId_externalMediaId_matchId_key",
+          "public",
+          "\"public\".\"media_review_candidate\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"media_review_candidate_dataSourceId_externalMediaId_matchId_key\"",
+        "sql": "ALTER TABLE \"public\".\"media_review_candidate\" ADD CONSTRAINT \"media_review_candidate_dataSourceId_externalMediaId_matchId_key\" UNIQUE (\"dataSourceId\", \"externalMediaId\", \"matchId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"media_review_candidate_dataSourceId_externalMediaId_matchId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_review_candidate_dataSourceId_externalMediaId_matchId_key",
+          "public",
+          "\"public\".\"media_review_candidate\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.media_review_candidate.media_review_candidate_dataSourceId_idx_536a4d74",
+    "label": "Create index \"media_review_candidate_dataSourceId_idx_536a4d74\" on \"media_review_candidate\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "media_review_candidate_dataSourceId_idx_536a4d74",
+        "table": "media_review_candidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"media_review_candidate_dataSourceId_idx_536a4d74\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"media_review_candidate_dataSourceId_idx_536a4d74\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"media_review_candidate_dataSourceId_idx_536a4d74\"",
+        "sql": "CREATE INDEX \"media_review_candidate_dataSourceId_idx_536a4d74\" ON \"public\".\"media_review_candidate\" (\"dataSourceId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"media_review_candidate_dataSourceId_idx_536a4d74\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"media_review_candidate_dataSourceId_idx_536a4d74\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.media_review_candidate.media_review_candidate_matchId_idx_4caf5ecc",
+    "label": "Create index \"media_review_candidate_matchId_idx_4caf5ecc\" on \"media_review_candidate\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "media_review_candidate_matchId_idx_4caf5ecc",
+        "table": "media_review_candidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"media_review_candidate_matchId_idx_4caf5ecc\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"media_review_candidate_matchId_idx_4caf5ecc\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"media_review_candidate_matchId_idx_4caf5ecc\"",
+        "sql": "CREATE INDEX \"media_review_candidate_matchId_idx_4caf5ecc\" ON \"public\".\"media_review_candidate\" (\"matchId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"media_review_candidate_matchId_idx_4caf5ecc\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"media_review_candidate_matchId_idx_4caf5ecc\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.media_review_candidate.media_review_candidate_seasonId_idx_aa50cbae",
+    "label": "Create index \"media_review_candidate_seasonId_idx_aa50cbae\" on \"media_review_candidate\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "media_review_candidate_seasonId_idx_aa50cbae",
+        "table": "media_review_candidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"media_review_candidate_seasonId_idx_aa50cbae\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"media_review_candidate_seasonId_idx_aa50cbae\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"media_review_candidate_seasonId_idx_aa50cbae\"",
+        "sql": "CREATE INDEX \"media_review_candidate_seasonId_idx_aa50cbae\" ON \"public\".\"media_review_candidate\" (\"seasonId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"media_review_candidate_seasonId_idx_aa50cbae\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"media_review_candidate_seasonId_idx_aa50cbae\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.media_review_candidate.media_review_candidate_seasonId_status_idx_0da2dd50",
+    "label": "Create index \"media_review_candidate_seasonId_status_idx_0da2dd50\" on \"media_review_candidate\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "media_review_candidate_seasonId_status_idx_0da2dd50",
+        "table": "media_review_candidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"media_review_candidate_seasonId_status_idx_0da2dd50\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"media_review_candidate_seasonId_status_idx_0da2dd50\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"media_review_candidate_seasonId_status_idx_0da2dd50\"",
+        "sql": "CREATE INDEX \"media_review_candidate_seasonId_status_idx_0da2dd50\" ON \"public\".\"media_review_candidate\" (\"seasonId\", \"status\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"media_review_candidate_seasonId_status_idx_0da2dd50\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"media_review_candidate_seasonId_status_idx_0da2dd50\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.media_review_candidate.media_review_candidate_status_idx_e98638ab",
+    "label": "Create index \"media_review_candidate_status_idx_e98638ab\" on \"media_review_candidate\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "media_review_candidate_status_idx_e98638ab",
+        "table": "media_review_candidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"media_review_candidate_status_idx_e98638ab\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"media_review_candidate_status_idx_e98638ab\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"media_review_candidate_status_idx_e98638ab\"",
+        "sql": "CREATE INDEX \"media_review_candidate_status_idx_e98638ab\" ON \"public\".\"media_review_candidate\" (\"status\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"media_review_candidate_status_idx_e98638ab\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"media_review_candidate_status_idx_e98638ab\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.media_review_candidate.media_review_candidate_seasonId_fkey",
+    "label": "Add foreign key \"media_review_candidate_seasonId_fkey\" on \"media_review_candidate\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "media_review_candidate_seasonId_fkey",
+        "table": "media_review_candidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"media_review_candidate_seasonId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_review_candidate_seasonId_fkey",
+          "public",
+          "\"public\".\"media_review_candidate\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"media_review_candidate_seasonId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"media_review_candidate\"\nADD CONSTRAINT \"media_review_candidate_seasonId_fkey\"\nFOREIGN KEY (\"seasonId\")\nREFERENCES \"public\".\"season\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"media_review_candidate_seasonId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_review_candidate_seasonId_fkey",
+          "public",
+          "\"public\".\"media_review_candidate\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.media_review_candidate.media_review_candidate_matchId_fkey",
+    "label": "Add foreign key \"media_review_candidate_matchId_fkey\" on \"media_review_candidate\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "media_review_candidate_matchId_fkey",
+        "table": "media_review_candidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"media_review_candidate_matchId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_review_candidate_matchId_fkey",
+          "public",
+          "\"public\".\"media_review_candidate\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"media_review_candidate_matchId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"media_review_candidate\"\nADD CONSTRAINT \"media_review_candidate_matchId_fkey\"\nFOREIGN KEY (\"matchId\")\nREFERENCES \"public\".\"football_match\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"media_review_candidate_matchId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_review_candidate_matchId_fkey",
+          "public",
+          "\"public\".\"media_review_candidate\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.media_review_candidate.media_review_candidate_dataSourceId_fkey",
+    "label": "Add foreign key \"media_review_candidate_dataSourceId_fkey\" on \"media_review_candidate\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "media_review_candidate_dataSourceId_fkey",
+        "table": "media_review_candidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"media_review_candidate_dataSourceId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_review_candidate_dataSourceId_fkey",
+          "public",
+          "\"public\".\"media_review_candidate\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"media_review_candidate_dataSourceId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"media_review_candidate\"\nADD CONSTRAINT \"media_review_candidate_dataSourceId_fkey\"\nFOREIGN KEY (\"dataSourceId\")\nREFERENCES \"public\".\"data_source\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"media_review_candidate_dataSourceId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_review_candidate_dataSourceId_fkey",
+          "public",
+          "\"public\".\"media_review_candidate\""
+        ]
+      }
+    ]
+  }
+]
