@@ -1,19 +1,22 @@
-import AdminPlaceholder from "../../../components/admin/AdminPlaceholder";
+import AdminDataIssues from "../../../components/admin/AdminDataIssues";
 
-export default function AdminIssuesPage() {
+import {
+  getAdminDataIssues,
+} from "../../../lib/admin/issues";
+
+export const dynamic =
+  "force-dynamic";
+
+export const revalidate =
+  0;
+
+export default async function AdminIssuesPage() {
+  const data =
+    await getAdminDataIssues();
+
   return (
-    <AdminPlaceholder
-      eyebrow="Canonical QA"
-      title="Data Issues"
-      description="One place for gaps, conflicts and unresolved canonical data that need attention."
-      items={[
-        "Finished matches missing official highlights.",
-        "Missing player or team statistics.",
-        "Missing or incomplete confirmed lineups.",
-        "Unresolved provider-player mappings.",
-        "Missing portraits or important metadata.",
-        "QA failures and manual overrides.",
-      ]}
+    <AdminDataIssues
+      data={data}
     />
   );
 }

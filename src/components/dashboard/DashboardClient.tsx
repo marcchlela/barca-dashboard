@@ -223,7 +223,7 @@ export default function DashboardClient({
         theme-environment
         relative
         min-h-screen
-        overflow-hidden
+        overflow-x-clip
 
         px-3
         py-4

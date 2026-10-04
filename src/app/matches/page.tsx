@@ -1,11 +1,24 @@
-import SectionPlaceholder from "../../components/shell/SectionPlaceholder";
+import MatchesPageClient from "../../components/matches/MatchesPageClient";
 
-export default function MatchesPage() {
+import {
+  getMatchesOverview,
+} from "../../lib/matches/get-matches-overview";
+
+export const dynamic =
+  "force-dynamic";
+
+export const revalidate =
+  0;
+
+export default async function MatchesPage() {
+  const data =
+    await getMatchesOverview();
+
   return (
-    <SectionPlaceholder
-      eyebrow="Fixtures & Results"
-      title="Matches"
-      description="The complete Barça schedule, results, calendar, competition filtering and match history will live here."
+    <MatchesPageClient
+      data={
+        data
+      }
     />
   );
 }

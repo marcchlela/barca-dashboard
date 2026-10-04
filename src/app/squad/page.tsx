@@ -1,11 +1,24 @@
-import SectionPlaceholder from "../../components/shell/SectionPlaceholder";
+import SquadPageClient from "../../components/squad/SquadPageClient";
 
-export default function SquadPage() {
+import {
+  getSquadOverview,
+} from "../../lib/squad/get-squad-overview";
+
+export const dynamic =
+  "force-dynamic";
+
+export const revalidate =
+  0;
+
+export default async function SquadPage() {
+  const data =
+    await getSquadOverview();
+
   return (
-    <SectionPlaceholder
-      eyebrow="First Team"
-      title="Squad"
-      description="Players, profiles, positions, form, availability, season statistics and your favourite-player system will live here."
+    <SquadPageClient
+      data={
+        data
+      }
     />
   );
 }

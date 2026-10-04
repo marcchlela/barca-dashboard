@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import {
@@ -284,13 +285,13 @@ export default function AdminProvidersOverview({
         />
 
         <PipelineMetric
-          icon={
-            Waypoints
-          }
-          label="Rich Match Coverage"
-          value={`${data.matchContext.richCoveredMatches}/${data.matchContext.finishedMatches}`}
-          detail="Events / team stats / player stats"
-        />
+            icon={
+                Waypoints
+            }
+            label="Combined Rich Match Coverage"
+            value={`${data.matchContext.richCoveredMatches}/${data.matchContext.finishedMatches}`}
+            detail="Events / team stats / player stats"
+            />
 
         <PipelineMetric
           icon={
@@ -502,14 +503,24 @@ function ProviderCard({
       provider.status,
     );
 
+  const isMediaProvider =
+    provider.code ===
+    "youtube-fcbarcelona-official";
+
   return (
     <article
-      className="
+      className={`
         flex
         min-h-[340px]
         flex-col
         border
-      "
+
+        ${
+          isMediaProvider
+            ? "xl:col-span-2"
+            : ""
+        }
+      `}
       style={{
         borderColor:
           theme.colors.border,
@@ -534,54 +545,70 @@ function ProviderCard({
             theme.colors.border,
         }}
       >
-        <div className="min-w-0">
-          <p
-            className="
-              text-[7px]
-              uppercase
-              tracking-[0.16em]
-            "
-            style={{
-              color:
-                theme.colors.textMuted,
-            }}
-          >
-            {
-              provider.category
+        <div
+          className="
+            flex
+            min-w-0
+            items-center
+            gap-3
+          "
+        >
+          <ProviderLogo
+            provider={
+              provider
             }
-          </p>
+          />
 
-          <div
-            className="
-              mt-2
-              flex
-              items-center
-              gap-2
-            "
-          >
-            <h4
+          <div className="min-w-0">
+            <p
               className="
-                truncate
-                text-[15px]
+                text-[8px]
                 font-medium
-                tracking-[-0.02em]
+                uppercase
+                tracking-[0.15em]
               "
+              style={{
+                color:
+                  theme.colors.textMuted,
+              }}
             >
               {
-                provider.name
+                provider.category
               }
-            </h4>
+            </p>
 
-            {provider.official ? (
-              <BadgeCheck
-                size={13}
-                className="shrink-0"
-                style={{
-                  color:
-                    theme.colors.accent,
-                }}
-              />
-            ) : null}
+            <div
+              className="
+                mt-1.5
+                flex
+                items-center
+                gap-2
+              "
+            >
+              <h4
+                className="
+                  truncate
+                  text-[15px]
+                  font-medium
+                  tracking-[-0.02em]
+                "
+              >
+                {
+                  provider.name
+                }
+              </h4>
+
+              {provider.official ? (
+                <BadgeCheck
+                  size={13}
+                  className="shrink-0"
+                  style={{
+                    color:
+                      theme.colors.accent,
+                  }}
+                />
+              ) : null}
+            </div>
           </div>
         </div>
 
@@ -607,7 +634,8 @@ function ProviderCard({
       >
         <p
           className="
-            text-[10px]
+            max-w-4xl
+            text-[11px]
             leading-5
           "
           style={{
@@ -668,13 +696,19 @@ function ProviderCard({
         {/* CORE STATE */}
 
         <div
-          className="
+          className={`
             mt-5
             grid
             grid-cols-2
             gap-px
             border
-          "
+
+            ${
+              isMediaProvider
+                ? "xl:grid-cols-4"
+                : ""
+            }
+          `}
           style={{
             borderColor:
               theme.colors.border,
@@ -728,12 +762,18 @@ function ProviderCard({
         {/* DATA DETAIL */}
 
         <div
-          className="
+          className={`
             mt-4
             grid
             grid-cols-3
             gap-y-3
-          "
+
+            ${
+              isMediaProvider
+                ? "sm:grid-cols-6"
+                : ""
+            }
+          `}
         >
           <CountItem
             label="Mappings"
@@ -814,7 +854,8 @@ function ProviderCard({
             <div>
               <p
                 className="
-                  text-[7px]
+                  text-[8px]
+                  font-medium
                   uppercase
                   tracking-[0.12em]
                 "
@@ -829,7 +870,7 @@ function ProviderCard({
               <p
                 className="
                   mt-1
-                  text-[8px]
+                  text-[9px]
                 "
               >
                 {provider.lastActivity
@@ -863,8 +904,7 @@ function ProviderCard({
             </span>
           </div>
 
-          {provider.code ===
-          "youtube-fcbarcelona-official" ? (
+          {isMediaProvider ? (
             <Link
               href="/admin/media"
               className="
@@ -897,6 +937,145 @@ function ProviderCard({
         </div>
       </div>
     </article>
+  );
+}
+
+const PROVIDER_LOGOS:
+  Record<
+    string,
+    {
+      src:
+        string;
+
+      alt:
+        string;
+    }
+  > = {
+  "football-data-org": {
+    src:
+      "/providers/football-data.png",
+
+    alt:
+      "football-data.org",
+  },
+
+  "goal-api": {
+    src:
+      "/providers/goal.png",
+
+    alt:
+      "GOAL",
+  },
+
+  "big-balls-data": {
+    src:
+      "/providers/big-balls.png",
+
+    alt:
+      "Big Balls Sports Data",
+  },
+
+  statshawk: {
+    src:
+      "/providers/statshawk.png",
+
+    alt:
+      "StatsHawk",
+  },
+
+  "youtube-fcbarcelona-official": {
+    src:
+      "/providers/youtube.png",
+
+    alt:
+      "YouTube",
+  },
+};
+
+function ProviderLogo({
+  provider,
+}: {
+  provider:
+    AdminProvider;
+}) {
+  const theme =
+    kitThemes.home;
+
+  const logo =
+    PROVIDER_LOGOS[
+      provider.code
+    ];
+
+  if (!logo) {
+    return (
+      <div
+        className="
+          flex
+          h-9
+          w-9
+          shrink-0
+          items-center
+          justify-center
+          border
+          text-[8px]
+          font-medium
+          uppercase
+          tracking-[0.08em]
+        "
+        style={{
+          borderColor:
+            theme.colors.border,
+
+          color:
+            theme.colors.textMuted,
+
+          backgroundColor:
+            theme.colors.backgroundElevated,
+        }}
+      >
+        {provider.name
+          .slice(
+            0,
+            2,
+          )
+          .toUpperCase()}
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="
+        relative
+        h-9
+        w-9
+        shrink-0
+        overflow-hidden
+        border
+      "
+      style={{
+        borderColor:
+          theme.colors.border,
+
+        backgroundColor:
+          theme.colors.backgroundElevated,
+      }}
+    >
+      <Image
+        src={
+          logo.src
+        }
+        alt={
+          logo.alt
+        }
+        fill
+        sizes="36px"
+        className="
+          object-contain
+          p-1.5
+        "
+      />
+    </div>
   );
 }
 
@@ -1113,9 +1292,10 @@ function MiniMetric({
     >
       <p
         className="
-          text-[6px]
-          uppercase
-          tracking-[0.13em]
+            text-[8px]
+            font-medium
+            uppercase
+            tracking-[0.12em]
         "
         style={{
           color:
@@ -1128,7 +1308,7 @@ function MiniMetric({
       <p
         className="
           mt-1.5
-          text-[10px]
+          text-[11px]
           font-medium
           tabular-nums
         "
@@ -1179,10 +1359,11 @@ function CountItem({
     <div>
       <p
         className="
-          text-[6px]
-          uppercase
-          tracking-[0.12em]
-        "
+            text-[8px]
+            font-medium
+            uppercase
+            tracking-[0.11em]
+            "
         style={{
           color:
             theme.colors.textMuted,

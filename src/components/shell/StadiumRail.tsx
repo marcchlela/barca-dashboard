@@ -123,7 +123,17 @@ function DesktopRail({
 }) {
   return (
     <aside
-      className="relative flex min-h-[653px] h-full flex-col border-r pr-5"
+      className="
+        sticky
+        top-5
+        flex
+        h-[calc(100vh-40px)]
+        min-h-[653px]
+        self-start
+        flex-col
+        border-r
+        pr-5
+      "
       style={{
         borderColor:
           theme.colors.border,

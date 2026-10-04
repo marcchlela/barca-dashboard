@@ -5,51 +5,120 @@ export type FootballDataArea = {
   flag: string | null;
 };
 
+export type FootballDataPerson = {
+  id: number;
+
+  firstName:
+    string | null;
+
+  lastName:
+    string | null;
+
+  name:
+    string;
+
+  position:
+    string | null;
+
+  dateOfBirth:
+    string | null;
+
+  nationality:
+    string | null;
+
+  shirtNumber:
+    number | null;
+
+  marketValue?:
+    number | null;
+
+  contract?: {
+    start?:
+      string | null;
+
+    until?:
+      string | null;
+  } | null;
+};
+
 export type FootballDataTeam = {
   id: number;
-  area?: FootballDataArea;
 
-  name: string;
-  shortName: string | null;
-  tla: string | null;
+  area?:
+    FootballDataArea;
 
-  crest: string | null;
+  name:
+    string;
 
-  address?: string | null;
-  website?: string | null;
+  shortName:
+    string | null;
 
-  founded?: number | null;
+  tla:
+    string | null;
 
-  clubColors?: string | null;
-  venue?: string | null;
+  crest:
+    string | null;
 
-  lastUpdated?: string;
+  address?:
+    string | null;
+
+  website?:
+    string | null;
+
+  founded?:
+    number | null;
+
+  clubColors?:
+    string | null;
+
+  venue?:
+    string | null;
+
+  squad?:
+    FootballDataPerson[];
+
+  lastUpdated?:
+    string;
 };
 
 export type FootballDataCompetition = {
-  id: number;
+  id:
+    number;
 
-  area: FootballDataArea;
+  area:
+    FootballDataArea;
 
-  name: string;
-  code: string;
+  name:
+    string;
 
-  type: string;
+  code:
+    string;
 
-  emblem: string | null;
+  type:
+    string;
 
-  currentSeason?: FootballDataSeason | null;
+  emblem:
+    string | null;
+
+  currentSeason?:
+    FootballDataSeason | null;
 };
 
 export type FootballDataSeason = {
-  id: number;
+  id:
+    number;
 
-  startDate: string;
-  endDate: string;
+  startDate:
+    string;
 
-  currentMatchday: number | null;
+  endDate:
+    string;
 
-  winner?: FootballDataTeam | null;
+  currentMatchday:
+    number | null;
+
+  winner?:
+    FootballDataTeam | null;
 };
 
 export type FootballDataScore = {
@@ -66,32 +135,51 @@ export type FootballDataScore = {
     | null;
 
   fullTime: {
-    home: number | null;
-    away: number | null;
+    home:
+      number | null;
+
+    away:
+      number | null;
   };
 
   halfTime: {
-    home: number | null;
-    away: number | null;
+    home:
+      number | null;
+
+    away:
+      number | null;
   };
 };
 
 export type FootballDataMatch = {
-  area: FootballDataArea;
+  area:
+    FootballDataArea;
 
   competition: {
-    id: number;
-    name: string;
-    code: string;
-    type: string;
-    emblem: string | null;
+    id:
+      number;
+
+    name:
+      string;
+
+    code:
+      string;
+
+    type:
+      string;
+
+    emblem:
+      string | null;
   };
 
-  season: FootballDataSeason;
+  season:
+    FootballDataSeason;
 
-  id: number;
+  id:
+    number;
 
-  utcDate: string;
+  utcDate:
+    string;
 
   status:
     | "SCHEDULED"
@@ -104,74 +192,126 @@ export type FootballDataMatch = {
     | "CANCELLED"
     | "AWARDED";
 
-  matchday: number | null;
+  matchday:
+    number | null;
 
-  stage: string | null;
+  stage:
+    string | null;
 
-  group: string | null;
+  group:
+    string | null;
 
-  lastUpdated: string;
+  lastUpdated:
+    string;
 
-  homeTeam: FootballDataTeam;
-  awayTeam: FootballDataTeam;
+  homeTeam:
+    FootballDataTeam;
 
-  score: FootballDataScore;
+  awayTeam:
+    FootballDataTeam;
+
+  score:
+    FootballDataScore;
 };
 
 export type FootballDataMatchesResponse = {
-  filters: Record<string, unknown>;
+  filters:
+    Record<
+      string,
+      unknown
+    >;
 
   resultSet: {
-    count: number;
-    competitions?: string;
-    first?: string;
-    last?: string;
-    played?: number;
+    count:
+      number;
+
+    competitions?:
+      string;
+
+    first?:
+      string;
+
+    last?:
+      string;
+
+    played?:
+      number;
   };
 
-  competition?: FootballDataCompetition;
+  competition?:
+    FootballDataCompetition;
 
-  matches: FootballDataMatch[];
+  matches:
+    FootballDataMatch[];
 };
 
 export type FootballDataStandingTableRow = {
-  position: number;
+  position:
+    number;
 
-  team: FootballDataTeam;
+  team:
+    FootballDataTeam;
 
-  playedGames: number;
+  playedGames:
+    number;
 
-  form: string | null;
+  form:
+    string | null;
 
-  won: number;
-  draw: number;
-  lost: number;
+  won:
+    number;
 
-  points: number;
+  draw:
+    number;
 
-  goalsFor: number;
-  goalsAgainst: number;
-  goalDifference: number;
+  lost:
+    number;
+
+  points:
+    number;
+
+  goalsFor:
+    number;
+
+  goalsAgainst:
+    number;
+
+  goalDifference:
+    number;
 };
 
 export type FootballDataStanding = {
-  stage: string;
+  stage:
+    string;
 
-  type: "TOTAL" | "HOME" | "AWAY";
+  type:
+    | "TOTAL"
+    | "HOME"
+    | "AWAY";
 
-  group: string | null;
+  group:
+    string | null;
 
-  table: FootballDataStandingTableRow[];
+  table:
+    FootballDataStandingTableRow[];
 };
 
 export type FootballDataStandingsResponse = {
-  filters: Record<string, unknown>;
+  filters:
+    Record<
+      string,
+      unknown
+    >;
 
-  area: FootballDataArea;
+  area:
+    FootballDataArea;
 
-  competition: FootballDataCompetition;
+  competition:
+    FootballDataCompetition;
 
-  season: FootballDataSeason;
+  season:
+    FootballDataSeason;
 
-  standings: FootballDataStanding[];
+  standings:
+    FootballDataStanding[];
 };

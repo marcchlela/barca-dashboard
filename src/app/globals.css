@@ -189,3 +189,24 @@ html {
     opacity,
     transform;
 }
+
+/* ---------------------------------------------------------
+   Interactive cursor behaviour
+   --------------------------------------------------------- */
+
+a[href],
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]),
+summary,
+select,
+label[for],
+input[type="checkbox"],
+input[type="radio"],
+input[type="range"] {
+  cursor: pointer;
+}
+
+button:disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
+}

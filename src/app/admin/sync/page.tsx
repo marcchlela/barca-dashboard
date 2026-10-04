@@ -1,19 +1,22 @@
-import AdminPlaceholder from "../../../components/admin/AdminPlaceholder";
+import AdminSyncControl from "../../../components/admin/AdminSyncControl";
 
-export default function AdminSyncPage() {
+import {
+  getAdminSyncData,
+} from "../../../lib/admin/sync";
+
+export const dynamic =
+  "force-dynamic";
+
+export const revalidate =
+  0;
+
+export default async function AdminSyncPage() {
+  const data =
+    await getAdminSyncData();
+
   return (
-    <AdminPlaceholder
-      eyebrow="Operations"
-      title="Sync Control"
-      description="Safe manual controls for jobs that normally run automatically in the background."
-      items={[
-        "Run incremental fixture sync.",
-        "Sync or repair one selected match.",
-        "Run Match Media worker.",
-        "Rescan official media for one match.",
-        "Run canonical QA.",
-        "Show clear confirmation and result logs for every operation.",
-      ]}
+    <AdminSyncControl
+      data={data}
     />
   );
 }
