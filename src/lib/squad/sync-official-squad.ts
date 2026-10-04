@@ -71,18 +71,16 @@ type ExistingCanonicalPlayer = {
 | Official first-team roster reconciliation
 |--------------------------------------------------------------------------
 |
-| SquadMembership represents official season first-team membership.
+| The official Barça season manifest owns:
 |
-| Match lineups do not own this relationship.
+| - first-team membership
+| - shirt number
+| - canonical season position
+| - verified core metadata
+| - preferred official player portrait
 |
-| The official roster manifest can:
-|
-| - resolve existing canonical players
-| - create missing canonical identities
-| - fill verified metadata
-| - restore current squad memberships
-| - close stale memberships
-| - provide official portrait fallbacks
+| Match providers still own match data, appearances and statistics, but they
+| do not own first-team membership or the preferred profile portrait.
 |--------------------------------------------------------------------------
 */
 
@@ -142,6 +140,9 @@ export async function syncCurrentBarcelonaOfficialSquad() {
         0,
 
       portraitFilled:
+        0,
+
+      portraitReplaced:
         0,
 
       membershipsCreated:
@@ -251,6 +252,9 @@ export async function syncCurrentBarcelonaOfficialSquad() {
   let portraitFilled =
     0;
 
+  let portraitReplaced =
+    0;
+
   let membershipsCreated =
     0;
 
@@ -285,7 +289,7 @@ export async function syncCurrentBarcelonaOfficialSquad() {
 
     /*
     |--------------------------------------------------------------------------
-    | Create missing canonical identity
+    | Create missing canonical player
     |--------------------------------------------------------------------------
     */
 
@@ -375,7 +379,7 @@ export async function syncCurrentBarcelonaOfficialSquad() {
 
     /*
     |--------------------------------------------------------------------------
-    | Existing metadata
+    | Existing canonical metadata
     |--------------------------------------------------------------------------
     */
 
@@ -431,9 +435,13 @@ export async function syncCurrentBarcelonaOfficialSquad() {
       existingFoot ??
       definition.preferredFoot;
 
+    /*
+     * Official Barça portrait now has
+     * priority over provider portraits.
+     */
     const nextPortrait =
-      existingPortrait ??
-      officialPortrait;
+      officialPortrait ??
+      existingPortrait;
 
     const nextPosition:
       CanonicalPlayerPosition =
@@ -450,7 +458,7 @@ export async function syncCurrentBarcelonaOfficialSquad() {
 
     /*
     |--------------------------------------------------------------------------
-    | Name cleanup
+    | Name
     |--------------------------------------------------------------------------
     */
 
@@ -466,7 +474,7 @@ export async function syncCurrentBarcelonaOfficialSquad() {
 
     /*
     |--------------------------------------------------------------------------
-    | Missing metadata
+    | Birth date
     |--------------------------------------------------------------------------
     */
 
@@ -480,6 +488,12 @@ export async function syncCurrentBarcelonaOfficialSquad() {
         true;
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Nationality
+    |--------------------------------------------------------------------------
+    */
+
     if (
       !existingNationality
     ) {
@@ -489,6 +503,12 @@ export async function syncCurrentBarcelonaOfficialSquad() {
       playerChanged =
         true;
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Preferred foot
+    |--------------------------------------------------------------------------
+    */
 
     if (
       !existingFoot
@@ -500,6 +520,12 @@ export async function syncCurrentBarcelonaOfficialSquad() {
         true;
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Portrait
+    |--------------------------------------------------------------------------
+    */
+
     if (
       !existingPortrait &&
       nextPortrait
@@ -509,7 +535,28 @@ export async function syncCurrentBarcelonaOfficialSquad() {
 
       playerChanged =
         true;
+    } else if (
+      officialPortrait &&
+      officialPortrait !==
+        existingPortrait
+    ) {
+      /*
+       * Existing provider portrait is
+       * replaced by the official Barça
+       * portrait.
+       */
+      portraitReplaced +=
+        1;
+
+      playerChanged =
+        true;
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Position
+    |--------------------------------------------------------------------------
+    */
 
     if (
       player.primaryPosition ===
@@ -518,6 +565,12 @@ export async function syncCurrentBarcelonaOfficialSquad() {
       playerChanged =
         true;
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Active state
+    |--------------------------------------------------------------------------
+    */
 
     if (
       !player.isActive
@@ -528,7 +581,7 @@ export async function syncCurrentBarcelonaOfficialSquad() {
 
     /*
     |--------------------------------------------------------------------------
-    | Persist canonical player
+    | Persist player
     |--------------------------------------------------------------------------
     */
 
@@ -649,7 +702,7 @@ export async function syncCurrentBarcelonaOfficialSquad() {
 
         /*
          * Captain state is reconciled
-         * immediately after this sync.
+         * after this operation.
          */
         isCaptain:
           existingMembership
@@ -673,9 +726,6 @@ export async function syncCurrentBarcelonaOfficialSquad() {
   /*
   |--------------------------------------------------------------------------
   | Close stale memberships
-  |--------------------------------------------------------------------------
-  |
-  | We only do this if every official player resolved successfully.
   |--------------------------------------------------------------------------
   */
 
@@ -760,6 +810,8 @@ export async function syncCurrentBarcelonaOfficialSquad() {
 
     portraitFilled,
 
+    portraitReplaced,
+
     membershipsCreated,
 
     membershipsUpdated,
@@ -807,11 +859,11 @@ export async function syncCurrentBarcelonaOfficialSquad() {
               entry.definition
                 .preferredFoot,
 
-            hasOfficialPortrait:
-              Boolean(
-                entry.definition
-                  .portraitUrl,
-              ),
+            portraitSource:
+              entry.definition
+                .portraitUrl
+                ? "fc-barcelona-official"
+                : "provider",
           }),
         ),
   };
@@ -855,7 +907,7 @@ function resolveOfficialPlayer(
 
   /*
   |--------------------------------------------------------------------------
-  | Exact canonical / alias match
+  | Exact name / alias
   |--------------------------------------------------------------------------
   */
 
@@ -891,7 +943,7 @@ function resolveOfficialPlayer(
 
   /*
   |--------------------------------------------------------------------------
-  | Verified DOB fallback
+  | DOB fallback
   |--------------------------------------------------------------------------
   */
 
@@ -923,7 +975,7 @@ function resolveOfficialPlayer(
 
   /*
   |--------------------------------------------------------------------------
-  | Resolve ambiguous names with DOB
+  | Ambiguous name + DOB
   |--------------------------------------------------------------------------
   */
 

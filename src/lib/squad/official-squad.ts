@@ -32,11 +32,11 @@ export type OfficialSquadPlayer = {
     OfficialPreferredFoot;
 
   /*
-   * Optional verified portrait fallback.
+   * Official FC Barcelona first-team
+   * portrait.
    *
-   * Normal provider portraits remain the
-   * default source. This is only used when
-   * providers do not give us a portrait.
+   * For the verified season roster this
+   * is our preferred portrait source.
    */
   portraitUrl?:
     string;
@@ -58,10 +58,10 @@ export type OfficialSquadManifest = {
 | Verified first-team squad manifests
 |--------------------------------------------------------------------------
 |
-| SquadMembership must represent the actual season first-team squad.
+| SquadMembership represents the real first-team roster.
 |
-| A player appearing in a match lineup does NOT automatically make them a
-| permanent first-team squad member.
+| Official FC Barcelona player portraits are also stored here so the whole
+| squad uses one consistent visual source.
 |--------------------------------------------------------------------------
 */
 
@@ -78,6 +78,12 @@ const OFFICIAL_SQUAD_MANIFESTS:
         "2026-09-02T00:00:00Z",
 
       players: [
+        /*
+        |--------------------------------------------------------------------------
+        | Goalkeepers
+        |--------------------------------------------------------------------------
+        */
+
         {
           displayName:
             "Joan García",
@@ -101,7 +107,74 @@ const OFFICIAL_SQUAD_MANIFESTS:
 
           preferredFoot:
             "right",
+
+          portraitUrl:
+            "https://www.fcbarcelona.com/photo-resources/2026/07/21/5d0c5826-9ec5-4625-a97b-3b8d0ca98418/01-Joan_Garcia.png?height=790&width=670",
         },
+
+        {
+          displayName:
+            "Wojciech Szczęsny",
+
+          aliases: [
+            "Wojciech Szczęsny",
+            "Wojciech Szczesny",
+            "Szczęsny",
+            "Szczesny",
+          ],
+
+          birthDate:
+            "1990-04-18",
+
+          nationality:
+            "Poland",
+
+          shirtNumber:
+            13,
+
+          position:
+            "goalkeeper",
+
+          preferredFoot:
+            "right",
+
+          portraitUrl:
+            "https://www.fcbarcelona.com/photo-resources/2026/07/21/52a7bf3e-6f10-4319-b820-ed0f38e7afa1/25-Szczesny.png?height=790&width=670",
+        },
+
+        {
+          displayName:
+            "Dominik Livaković",
+
+          aliases: [
+            "Dominik Livaković",
+            "Dominik Livakovic",
+          ],
+
+          birthDate:
+            "1995-01-09",
+
+          nationality:
+            "Croatia",
+
+          shirtNumber:
+            25,
+
+          position:
+            "goalkeeper",
+
+          preferredFoot:
+            "right",
+
+          portraitUrl:
+            "https://www.fcbarcelona.com/photo-resources/2026/08/26/f1059387-7c3e-434a-8854-8f9a8d29b4f7/Livakovic-.png?height=790&width=670",
+        },
+
+        /*
+        |--------------------------------------------------------------------------
+        | Defenders
+        |--------------------------------------------------------------------------
+        */
 
         {
           displayName:
@@ -127,6 +200,9 @@ const OFFICIAL_SQUAD_MANIFESTS:
 
           preferredFoot:
             "right",
+
+          portraitUrl:
+            "https://www.fcbarcelona.com/photo-resources/2026/08/19/7d3f20c8-d349-42e6-90a5-d70a6a2f86b7/00-Cancelo.png?height=790&width=670",
         },
 
         {
@@ -152,31 +228,9 @@ const OFFICIAL_SQUAD_MANIFESTS:
 
           preferredFoot:
             "left",
-        },
 
-        {
-          displayName:
-            "Brian Fariñas",
-
-          aliases: [
-            "Brian Fariñas",
-            "Brian Farinas",
-          ],
-
-          birthDate:
-            "2006-02-09",
-
-          nationality:
-            "Spain",
-
-          shirtNumber:
-            4,
-
-          position:
-            "midfielder",
-
-          preferredFoot:
-            "right",
+          portraitUrl:
+            "https://www.fcbarcelona.com/photo-resources/2026/07/21/e6ad1688-d559-4991-a2a0-3c7fbfd1b14f/03-Balde.png?height=790&width=670",
         },
 
         {
@@ -203,6 +257,186 @@ const OFFICIAL_SQUAD_MANIFESTS:
 
           preferredFoot:
             "right",
+
+          portraitUrl:
+            "https://www.fcbarcelona.com/photo-resources/2026/07/21/a321161c-87a5-4d8d-b05e-b547e0080e98/02-Cubarsi.png?height=790&width=670",
+        },
+
+        {
+          displayName:
+            "Xavi Espart",
+
+          aliases: [
+            "Xavi Espart",
+            "Xavi Espart Font",
+          ],
+
+          birthDate:
+            "2007-05-21",
+
+          nationality:
+            "Spain",
+
+          shirtNumber:
+            12,
+
+          position:
+            "defender",
+
+          preferredFoot:
+            "right",
+
+          portraitUrl:
+            "https://www.fcbarcelona.com/photo-resources/2026/08/26/d83f3960-8967-4b02-9f2c-363fc34fd2f7/12-XAVI_ESPART-TRANSP.png?height=790&width=670",
+        },
+
+        {
+          displayName:
+            "Andreas Christensen",
+
+          aliases: [
+            "Andreas Christensen",
+            "Andreas Bødtker Christensen",
+          ],
+
+          birthDate:
+            "1996-04-10",
+
+          nationality:
+            "Denmark",
+
+          shirtNumber:
+            15,
+
+          position:
+            "defender",
+
+          preferredFoot:
+            "right",
+
+          portraitUrl:
+            "https://www.fcbarcelona.com/photo-resources/2026/07/21/6e0054f3-5ae7-4b3a-a92c-af81cee28235/15-Christensen.png?height=790&width=670",
+        },
+
+        {
+          displayName:
+            "Gerard Martín",
+
+          aliases: [
+            "Gerard Martín",
+            "Gerard Martin",
+          ],
+
+          birthDate:
+            "2002-02-26",
+
+          nationality:
+            "Spain",
+
+          shirtNumber:
+            18,
+
+          position:
+            "defender",
+
+          preferredFoot:
+            "left",
+
+          portraitUrl:
+            "https://www.fcbarcelona.com/photo-resources/2026/07/21/04d96175-c81e-4fd4-9743-34d4532e1a70/18-Martin.png?height=790&width=670",
+        },
+
+        {
+          displayName:
+            "Jules Koundé",
+
+          aliases: [
+            "Jules Koundé",
+            "Jules Kounde",
+            "Jules Olivier Koundé",
+          ],
+
+          birthDate:
+            "1998-11-12",
+
+          nationality:
+            "France",
+
+          shirtNumber:
+            23,
+
+          position:
+            "defender",
+
+          preferredFoot:
+            "right",
+
+          portraitUrl:
+            "https://www.fcbarcelona.com/photo-resources/2026/07/21/6e0885df-ddcc-44c7-b55f-a421606004c0/23-Kounde.png?height=790&width=670",
+        },
+
+        {
+          displayName:
+            "Eric García",
+
+          aliases: [
+            "Eric García",
+            "Eric Garcia",
+            "Eric García Martret",
+            "Eric Garcia Martret",
+          ],
+
+          birthDate:
+            "2001-01-09",
+
+          nationality:
+            "Spain",
+
+          shirtNumber:
+            24,
+
+          position:
+            "defender",
+
+          preferredFoot:
+            "right",
+
+          portraitUrl:
+            "https://www.fcbarcelona.com/photo-resources/2026/07/21/cf862ceb-2d47-4489-8db6-e65d770443ad/24-Eric_Garcia.png?height=790&width=670",
+        },
+
+        /*
+        |--------------------------------------------------------------------------
+        | Midfielders
+        |--------------------------------------------------------------------------
+        */
+
+        {
+          displayName:
+            "Brian Fariñas",
+
+          aliases: [
+            "Brian Fariñas",
+            "Brian Farinas",
+          ],
+
+          birthDate:
+            "2006-02-09",
+
+          nationality:
+            "Spain",
+
+          shirtNumber:
+            4,
+
+          position:
+            "midfielder",
+
+          preferredFoot:
+            "right",
+
+          portraitUrl:
+            "https://www.fcbarcelona.com/photo-resources/2026/09/03/b05e6b1b-fe32-4420-b981-36507d7dfeb0/04-Brian_Farinas.png?height=790&width=670",
         },
 
         {
@@ -229,6 +463,9 @@ const OFFICIAL_SQUAD_MANIFESTS:
 
           preferredFoot:
             "right",
+
+          portraitUrl:
+            "https://www.fcbarcelona.com/photo-resources/2026/07/21/816698d5-5eb4-4947-bcdb-a3771ce71398/06-Gavi.png?height=790&width=670",
         },
 
         {
@@ -255,6 +492,9 @@ const OFFICIAL_SQUAD_MANIFESTS:
 
           preferredFoot:
             "right",
+
+          portraitUrl:
+            "https://www.fcbarcelona.com/photo-resources/2026/07/21/2d251fe0-dd9c-45cf-9789-125254d39a65/16-Fermin.png?height=790&width=670",
         },
 
         {
@@ -283,184 +523,9 @@ const OFFICIAL_SQUAD_MANIFESTS:
 
           preferredFoot:
             "right",
-        },
 
-        {
-          displayName:
-            "Gabriel Jesus",
-
-          aliases: [
-            "Gabriel Jesus",
-            "Gabriel Fernando de Jesus",
-          ],
-
-          birthDate:
-            "1997-04-03",
-
-          nationality:
-            "Brazil",
-
-          shirtNumber:
-            9,
-
-          position:
-            "forward",
-
-          preferredFoot:
-            "right",
-        },
-
-        {
-          displayName:
-            "Lamine Yamal",
-
-          aliases: [
-            "Lamine Yamal",
-            "Lamine Yamal Nasraoui Ebana",
-          ],
-
-          birthDate:
-            "2007-07-13",
-
-          nationality:
-            "Spain",
-
-          shirtNumber:
-            10,
-
-          position:
-            "forward",
-
-          preferredFoot:
-            "left",
-        },
-
-        {
-          displayName:
-            "Raphinha",
-
-          aliases: [
-            "Raphinha",
-            "Raphael Dias Belloli",
-            "Raphael Dias",
-          ],
-
-          birthDate:
-            "1996-12-14",
-
-          nationality:
-            "Brazil",
-
-          shirtNumber:
-            11,
-
-          position:
-            "forward",
-
-          preferredFoot:
-            "left",
-        },
-
-        {
-          displayName:
-            "Xavi Espart",
-
-          aliases: [
-            "Xavi Espart",
-            "Xavi Espart Font",
-          ],
-
-          birthDate:
-            "2007-05-21",
-
-          nationality:
-            "Spain",
-
-          shirtNumber:
-            12,
-
-          position:
-            "defender",
-
-          preferredFoot:
-            "right",
-        },
-
-        {
-          displayName:
-            "Wojciech Szczęsny",
-
-          aliases: [
-            "Wojciech Szczęsny",
-            "Wojciech Szczesny",
-            "Szczęsny",
-            "Szczesny",
-          ],
-
-          birthDate:
-            "1990-04-18",
-
-          nationality:
-            "Poland",
-
-          shirtNumber:
-            13,
-
-          position:
-            "goalkeeper",
-
-          preferredFoot:
-            "right",
-        },
-
-        {
-          displayName:
-            "Karim Adeyemi",
-
-          aliases: [
-            "Karim Adeyemi",
-            "Karim-David Adeyemi",
-          ],
-
-          birthDate:
-            "2002-01-18",
-
-          nationality:
-            "Germany",
-
-          shirtNumber:
-            14,
-
-          position:
-            "forward",
-
-          preferredFoot:
-            "left",
-        },
-
-        {
-          displayName:
-            "Andreas Christensen",
-
-          aliases: [
-            "Andreas Christensen",
-            "Andreas Bødtker Christensen",
-          ],
-
-          birthDate:
-            "1996-04-10",
-
-          nationality:
-            "Denmark",
-
-          shirtNumber:
-            15,
-
-          position:
-            "defender",
-
-          preferredFoot:
-            "right",
+          portraitUrl:
+            "https://www.fcbarcelona.com/photo-resources/2026/07/21/02b47c57-d919-47b7-8e39-d744c58c68dd/08-Pedri.png?height=790&width=670",
         },
 
         {
@@ -490,84 +555,9 @@ const OFFICIAL_SQUAD_MANIFESTS:
 
           preferredFoot:
             "right",
-        },
-
-        {
-          displayName:
-            "Anthony Gordon",
-
-          aliases: [
-            "Anthony Gordon",
-            "Anthony Michael Gordon",
-          ],
-
-          birthDate:
-            "2001-02-24",
-
-          nationality:
-            "England",
-
-          shirtNumber:
-            17,
-
-          position:
-            "forward",
-
-          preferredFoot:
-            "right",
-        },
-
-        {
-          displayName:
-            "Gerard Martín",
-
-          aliases: [
-            "Gerard Martín",
-            "Gerard Martin",
-          ],
-
-          birthDate:
-            "2002-02-26",
-
-          nationality:
-            "Spain",
-
-          shirtNumber:
-            18,
-
-          position:
-            "defender",
-
-          preferredFoot:
-            "left",
-        },
-
-        {
-          displayName:
-            "Roony Bardghji",
-
-          aliases: [
-            "Roony Bardghji",
-            "Roony",
-          ],
-
-          birthDate:
-            "2005-11-15",
-
-          nationality:
-            "Sweden",
-
-          shirtNumber:
-            19,
-
-          position:
-            "forward",
-
-          preferredFoot:
-            "left",
 
           portraitUrl:
-            "https://www.fcbarcelona.com/photo-resources/2026/07/21/279612fb-8157-4cc6-8cf9-b2bff451487f/28-Bardghji.png?height=790&width=670",
+            "https://www.fcbarcelona.com/photo-resources/2026/08/18/e8a9d0db-9e45-4f40-8db5-c91530aefc21/00-Rodri.png?height=790&width=670",
         },
 
         {
@@ -594,6 +584,9 @@ const OFFICIAL_SQUAD_MANIFESTS:
 
           preferredFoot:
             "right",
+
+          portraitUrl:
+            "https://www.fcbarcelona.com/photo-resources/2026/07/21/d0846fb5-c160-474f-a5ea-b5c404e9c5cd/20-Olmo.png?height=790&width=670",
         },
 
         {
@@ -648,84 +641,184 @@ const OFFICIAL_SQUAD_MANIFESTS:
 
           preferredFoot:
             "left",
+
+          portraitUrl:
+            "https://www.fcbarcelona.com/photo-resources/2026/07/21/72069942-2745-42e2-85a5-3e85004443ca/22-Bernal.png?height=790&width=670",
         },
+
+        /*
+        |--------------------------------------------------------------------------
+        | Forwards
+        |--------------------------------------------------------------------------
+        */
 
         {
           displayName:
-            "Jules Koundé",
+            "Gabriel Jesus",
 
           aliases: [
-            "Jules Koundé",
-            "Jules Kounde",
-            "Jules Olivier Koundé",
+            "Gabriel Jesus",
+            "Gabriel Fernando de Jesus",
           ],
 
           birthDate:
-            "1998-11-12",
+            "1997-04-03",
 
           nationality:
-            "France",
+            "Brazil",
 
           shirtNumber:
-            23,
+            9,
 
           position:
-            "defender",
+            "forward",
 
           preferredFoot:
             "right",
+
+          portraitUrl:
+            "https://www.fcbarcelona.com/photo-resources/2026/09/03/f8d954d8-3841-490c-9db0-1614995ec68d/09-Gabriel_Jesus.png?height=790&width=670",
         },
 
         {
           displayName:
-            "Eric García",
+            "Lamine Yamal",
 
           aliases: [
-            "Eric García",
-            "Eric Garcia",
-            "Eric García Martret",
-            "Eric Garcia Martret",
+            "Lamine Yamal",
+            "Lamine Yamal Nasraoui Ebana",
           ],
 
           birthDate:
-            "2001-01-09",
+            "2007-07-13",
 
           nationality:
             "Spain",
 
           shirtNumber:
-            24,
+            10,
 
           position:
-            "defender",
+            "forward",
 
           preferredFoot:
-            "right",
+            "left",
+
+          portraitUrl:
+            "https://www.fcbarcelona.com/photo-resources/2026/07/21/d8c055dc-f43e-4125-9789-34c86fb99a1c/10-Lamine.png?height=790&width=670",
         },
 
         {
           displayName:
-            "Dominik Livaković",
+            "Raphinha",
 
           aliases: [
-            "Dominik Livaković",
-            "Dominik Livakovic",
+            "Raphinha",
+            "Raphael Dias Belloli",
+            "Raphael Dias",
           ],
 
           birthDate:
-            "1995-01-09",
+            "1996-12-14",
 
           nationality:
-            "Croatia",
+            "Brazil",
 
           shirtNumber:
-            25,
+            11,
 
           position:
-            "goalkeeper",
+            "forward",
+
+          preferredFoot:
+            "left",
+
+          portraitUrl:
+            "https://www.fcbarcelona.com/photo-resources/2026/07/21/799c94b4-fa33-4472-bb6b-4b537baf219c/11-Raphinha.png?height=790&width=670",
+        },
+
+        {
+          displayName:
+            "Karim Adeyemi",
+
+          aliases: [
+            "Karim Adeyemi",
+            "Karim-David Adeyemi",
+          ],
+
+          birthDate:
+            "2002-01-18",
+
+          nationality:
+            "Germany",
+
+          shirtNumber:
+            14,
+
+          position:
+            "forward",
+
+          preferredFoot:
+            "left",
+
+          portraitUrl:
+            "https://www.fcbarcelona.com/photo-resources/2026/07/24/545eed77-cb8c-48f7-a762-f9d459c45bf5/00-Adeyemi.png?height=790&width=670",
+        },
+
+        {
+          displayName:
+            "Anthony Gordon",
+
+          aliases: [
+            "Anthony Gordon",
+            "Anthony Michael Gordon",
+          ],
+
+          birthDate:
+            "2001-02-24",
+
+          nationality:
+            "England",
+
+          shirtNumber:
+            17,
+
+          position:
+            "forward",
 
           preferredFoot:
             "right",
+
+          portraitUrl:
+            "https://www.fcbarcelona.com/photo-resources/2026/07/21/8dfb11f8-dbb7-46e8-ab7e-4bb47f44d05e/00-Gordon.png?height=790&width=670",
+        },
+
+        {
+          displayName:
+            "Roony Bardghji",
+
+          aliases: [
+            "Roony Bardghji",
+            "Roony",
+          ],
+
+          birthDate:
+            "2005-11-15",
+
+          nationality:
+            "Sweden",
+
+          shirtNumber:
+            19,
+
+          position:
+            "forward",
+
+          preferredFoot:
+            "left",
+
+          portraitUrl:
+            "https://www.fcbarcelona.com/photo-resources/2026/07/21/279612fb-8157-4cc6-8cf9-b2bff451487f/28-Bardghji.png?height=790&width=670",
         },
 
         {
