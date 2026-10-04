@@ -1,0 +1,151 @@
+﻿{
+    "ok":  true,
+    "startedAt":  "2026-10-04T13:58:48.642Z",
+    "finishedAt":  "2026-10-04T13:58:50.261Z",
+    "durationMs":  1619,
+    "result":  {
+                   "season":  "2026/27",
+                   "providers":  {
+                                     "statsHawk":  {
+                                                       "targetMatch":  {
+                                                                           "id":  "dc0f3ba4-90ae-439d-b839-f15e15854fd4",
+                                                                           "competition":  "Primera Division",
+                                                                           "home":  "Sevilla FC",
+                                                                           "away":  "FC Barcelona",
+                                                                           "kickoff":  "2026-09-19T19:00:00Z"
+                                                                       },
+                                                       "rosterPlayers":  41,
+                                                       "requestCount":  3,
+                                                       "expectedUnits":  5,
+                                                       "quotaRemaining":  4950,
+                                                       "mappingsCreated":  0,
+                                                       "unresolved":  [
+                                                                          {
+                                                                              "personId":  "per_06fhmv20b5sc3aty3rsakr3gx0",
+                                                                              "providerName":  "Diego Kochen",
+                                                                              "reason":  "no_unique_safe_identity"
+                                                                          },
+                                                                          {
+                                                                              "personId":  "per_06fhmv21enzh357r59rex0nqfc",
+                                                                              "providerName":  "Ronald AraÃºjo",
+                                                                              "reason":  "no_unique_safe_identity"
+                                                                          },
+                                                                          {
+                                                                              "personId":  "per_06fhmv22j1sg13eaey77cm5zag",
+                                                                              "providerName":  "Jofre Torrents",
+                                                                              "reason":  "no_unique_safe_identity"
+                                                                          },
+                                                                          {
+                                                                              "personId":  "per_06fhmv22qxxd58dvraztnsyj8g",
+                                                                              "providerName":  "Frenkie de Jong",
+                                                                              "reason":  "no_unique_safe_identity"
+                                                                          },
+                                                                          {
+                                                                              "personId":  "per_06fhmv23vhwd1aapwd2ewepqqw",
+                                                                              "providerName":  "Juan HernÃ¡ndez",
+                                                                              "reason":  "no_unique_safe_identity"
+                                                                          },
+                                                                          {
+                                                                              "personId":  "per_06fhmv247dtf1amk5xeh7fx5g8",
+                                                                              "providerName":  "Guille FernÃ¡ndez",
+                                                                              "reason":  "no_unique_safe_identity"
+                                                                          },
+                                                                          {
+                                                                              "personId":  "per_06fhmv24ddrw3bfcb9053hjter",
+                                                                              "providerName":  "TomÃ¡s MarquÃ©s",
+                                                                              "reason":  "no_unique_safe_identity"
+                                                                          },
+                                                                          {
+                                                                              "personId":  "per_06fhmv24k9yz127mq1ardae2b0",
+                                                                              "providerName":  "Robert Lewandowski",
+                                                                              "reason":  "no_unique_safe_identity"
+                                                                          },
+                                                                          {
+                                                                              "personId":  "per_06fhmv24s5s316vbwttw10rtmw",
+                                                                              "providerName":  "Marcus Rashford",
+                                                                              "reason":  "no_unique_safe_identity"
+                                                                          },
+                                                                          {
+                                                                              "personId":  "per_06fhmv255dzr171pkgyqc5me24",
+                                                                              "providerName":  "Ferran Torres",
+                                                                              "reason":  "no_unique_safe_identity"
+                                                                          },
+                                                                          {
+                                                                              "personId":  "per_06fhmv25bdwc577v9azyz5zrtg",
+                                                                              "providerName":  "Roony Bardghji",
+                                                                              "reason":  "no_unique_safe_identity"
+                                                                          },
+                                                                          {
+                                                                              "personId":  "per_06fhmv25q9yh7bgjsdqkfbee2w",
+                                                                              "providerName":  "Daniel RodrÃ­guez",
+                                                                              "reason":  "no_unique_safe_identity"
+                                                                          },
+                                                                          {
+                                                                              "personId":  "per_06fhmv25x5s877q2gcd7r9zpqw",
+                                                                              "providerName":  "Toni FernÃ¡ndez",
+                                                                              "reason":  "no_unique_safe_identity"
+                                                                          },
+                                                                          {
+                                                                              "personId":  "per_06fwcdt9ydzt32q93dprwnzzd0",
+                                                                              "providerName":  "Jesse Bisiwu",
+                                                                              "reason":  "no_unique_safe_identity"
+                                                                          }
+                                                                      ]
+                                                   },
+                                     "footballData":  {
+                                                          "rosterPlayers":  28,
+                                                          "mappingsCreated":  0,
+                                                          "unresolved":  [
+                                                                             {
+                                                                                 "providerId":  "7559",
+                                                                                 "providerName":  "Frenkie de Jong",
+                                                                                 "reason":  "no_unique_safe_identity"
+                                                                             },
+                                                                             {
+                                                                                 "providerId":  "184723",
+                                                                                 "providerName":  "Roony Bardghji",
+                                                                                 "reason":  "no_unique_safe_identity"
+                                                                             },
+                                                                             {
+                                                                                 "providerId":  "298634",
+                                                                                 "providerName":  "Jesse Bisiwu",
+                                                                                 "reason":  "no_unique_safe_identity"
+                                                                             }
+                                                                         ]
+                                                      },
+                                     "wikidata":  {
+                                                      "resolved":  3,
+                                                      "preferredFootFilled":  0,
+                                                      "nationalityFilled":  0
+                                                  }
+                                 },
+                   "canonical":  {
+                                     "currentSquad":  28,
+                                     "candidates":  28,
+                                     "playersUpdated":  0,
+                                     "playersUnchanged":  28,
+                                     "portraitsReplaced":  0,
+                                     "fieldsFilled":  {
+                                                          "birthDate":  0,
+                                                          "nationality":  0,
+                                                          "preferredFoot":  0,
+                                                          "portrait":  0,
+                                                          "position":  0
+                                                      }
+                                 },
+                   "leadership":  {
+                                      "season":  "2026/27",
+                                      "supported":  true,
+                                      "updated":  0,
+                                      "captains":  [
+                                                       "Raphinha",
+                                                       "Pedri",
+                                                       "Eric GarcÃ­a",
+                                                       "Lamine Yamal"
+                                                   ],
+                                      "unresolved":  [
+                                                         "Frenkie de Jong"
+                                                     ]
+                                  }
+               }
+}

@@ -1098,86 +1098,124 @@ export function normalizeStatsHawkRoster(
         ),
 
       birthDate:
-        stringValue(
-          bio,
-          "dob",
-          "birth_date",
-          "date_of_birth",
-        ) ??
-        stringValue(
-          person,
-          "dob",
-          "birth_date",
-          "date_of_birth",
-        ),
+  stringValue(
+    bio,
+    "dob",
+    "birth_date",
+    "date_of_birth",
+    "birthDate",
+    "dateOfBirth",
+  ) ??
+  stringValue(
+    person,
+    "dob",
+    "birth_date",
+    "date_of_birth",
+    "birthDate",
+    "dateOfBirth",
+  ),
 
-      height:
-        numberValue(
-          bio,
-          "height_cm",
-          "height_inches",
-          "height",
-        ) ??
-        stringValue(
-          bio,
-          "height_cm",
-          "height_inches",
-          "height",
-        ),
+height:
+  numberValue(
+    bio,
+    "height_cm",
+    "height_inches",
+    "height",
+    "heightCm",
+    "heightInches",
+  ) ??
+  stringValue(
+    bio,
+    "height_cm",
+    "height_inches",
+    "height",
+    "heightCm",
+    "heightInches",
+  ),
 
-      weight:
-        numberValue(
-          bio,
-          "weight_kg",
-          "weight_lbs",
-          "weight",
-        ) ??
-        stringValue(
-          bio,
-          "weight_kg",
-          "weight_lbs",
-          "weight",
-        ),
+weight:
+  numberValue(
+    bio,
+    "weight_kg",
+    "weight_lbs",
+    "weight",
+    "weightKg",
+    "weightLbs",
+  ) ??
+  stringValue(
+    bio,
+    "weight_kg",
+    "weight_lbs",
+    "weight",
+    "weightKg",
+    "weightLbs",
+  ),
 
-      nationality:
-        stringValue(
-          bio,
-          "nationality",
-          "citizenship",
-        ) ??
-        stringValue(
-          person,
-          "nationality",
-          "citizenship",
-        ),
+nationality:
+  stringValue(
+    bio,
+    "nationality",
+    "citizenship",
+    "country",
+    "country_name",
+    "countryName",
+  ) ??
+  stringValue(
+    person,
+    "nationality",
+    "citizenship",
+    "country",
+    "country_name",
+    "countryName",
+  ),
 
-      preferredFoot:
-        stringValue(
-          bio,
-          "preferred_foot",
-          "foot",
-        ) ??
-        stringValue(
-          person,
-          "preferred_foot",
-          "foot",
-        ),
+preferredFoot:
+  stringValue(
+    bio,
+    "preferred_foot",
+    "preferredFoot",
+    "dominant_foot",
+    "dominantFoot",
+    "footedness",
+    "foot",
+  ) ??
+  stringValue(
+    person,
+    "preferred_foot",
+    "preferredFoot",
+    "dominant_foot",
+    "dominantFoot",
+    "footedness",
+    "foot",
+  ),
 
-      portraitUrl:
-        stringValue(
-          bio,
-          "portrait_url",
-          "photo_url",
-          "image_url",
-          "headshot_url",
-        ) ??
-        stringValue(
-          person,
-          "portrait_url",
-          "photo_url",
-          "image_url",
-          "headshot_url",
-        ),
+portraitUrl:
+  stringValue(
+    bio,
+    "portrait_url",
+    "portraitUrl",
+    "photo_url",
+    "photoUrl",
+    "image_url",
+    "imageUrl",
+    "headshot_url",
+    "headshotUrl",
+    "avatar_url",
+    "avatarUrl",
+  ) ??
+  stringValue(
+    person,
+    "portrait_url",
+    "portraitUrl",
+    "photo_url",
+    "photoUrl",
+    "image_url",
+    "imageUrl",
+    "headshot_url",
+    "headshotUrl",
+    "avatar_url",
+    "avatarUrl",
+  ),
 
       rawPosition,
     });

@@ -15,6 +15,9 @@ type CaptainDefinition = {
 
   aliases:
     string[];
+
+  birthDate:
+    string;
 };
 
 /*
@@ -22,8 +25,11 @@ type CaptainDefinition = {
 | Verified seasonal leadership
 |--------------------------------------------------------------------------
 |
-| SquadMembership currently has a boolean isCaptain rather than an ordered
-| captain hierarchy, so this represents membership of the captain group.
+| SquadMembership currently stores a boolean isCaptain rather than captain
+| order, so these are members of the season's captain group.
+|
+| DOB is used only as a hard identity fallback when provider/canonical naming
+| differs unexpectedly.
 |--------------------------------------------------------------------------
 */
 
@@ -37,6 +43,9 @@ const CAPTAIN_GROUPS:
         label:
           "Raphinha",
 
+        birthDate:
+          "1996-12-14",
+
         aliases: [
           "Raphinha",
           "Raphael Dias Belloli",
@@ -47,6 +56,9 @@ const CAPTAIN_GROUPS:
       {
         label:
           "Pedri",
+
+        birthDate:
+          "2002-11-25",
 
         aliases: [
           "Pedri",
@@ -59,6 +71,9 @@ const CAPTAIN_GROUPS:
         label:
           "Eric Garcia",
 
+        birthDate:
+          "2001-01-09",
+
         aliases: [
           "Eric Garcia",
           "Eric Garcia Martret",
@@ -70,6 +85,9 @@ const CAPTAIN_GROUPS:
         label:
           "Frenkie de Jong",
 
+        birthDate:
+          "1997-05-12",
+
         aliases: [
           "Frenkie de Jong",
           "Frenkie",
@@ -80,6 +98,9 @@ const CAPTAIN_GROUPS:
       {
         label:
           "Lamine Yamal",
+
+        birthDate:
+          "2007-07-13",
 
         aliases: [
           "Lamine Yamal",
@@ -163,12 +184,6 @@ export async function syncCurrentBarcelonaCaptains() {
       )
       .all();
 
-  /*
-  |--------------------------------------------------------------------------
-  | Resolve definitions
-  |--------------------------------------------------------------------------
-  */
-
   const resolvedPlayerIds =
     new Set<string>();
 
@@ -179,6 +194,12 @@ export async function syncCurrentBarcelonaCaptains() {
   const unresolved:
     string[] =
     [];
+
+  /*
+  |--------------------------------------------------------------------------
+  | Resolve each captain
+  |--------------------------------------------------------------------------
+  */
 
   for (
     const definition
@@ -191,17 +212,20 @@ export async function syncCurrentBarcelonaCaptains() {
         ),
       );
 
-    const matches =
+    /*
+     * First choice:
+     *
+     * canonical/provider naming
+     */
+
+    let matches =
       memberships.filter(
         (
           membership,
         ) => {
-          const player =
-            membership.player;
-
           const candidates =
             playerNameCandidates(
-              player,
+              membership.player,
             );
 
           return candidates.some(
@@ -214,6 +238,35 @@ export async function syncCurrentBarcelonaCaptains() {
           );
         },
       );
+
+    /*
+     * Hard fallback:
+     *
+     * unique date of birth in the
+     * current Barça squad.
+     *
+     * This safely handles strange name
+     * formatting without fuzzy guessing.
+     */
+
+    if (
+      matches.length !==
+      1
+    ) {
+      matches =
+        memberships.filter(
+          (
+            membership,
+          ) =>
+            dateKey(
+              membership.player
+                .birthDate
+                ?.toString() ??
+                null,
+            ) ===
+            definition.birthDate,
+        );
+    }
 
     if (
       matches.length !==
@@ -375,4 +428,31 @@ function normalizeName(
       value,
     ),
   );
+}
+
+/*
+|--------------------------------------------------------------------------
+| Date identity
+|--------------------------------------------------------------------------
+*/
+
+function dateKey(
+  value:
+    string | null |
+    undefined,
+) {
+  if (!value) {
+    return null;
+  }
+
+  const match =
+    value.match(
+      /(\d{4})-(\d{2})-(\d{2})/,
+    );
+
+  if (!match) {
+    return null;
+  }
+
+  return `${match[1]}-${match[2]}-${match[3]}`;
 }

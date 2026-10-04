@@ -1486,77 +1486,96 @@ export async function syncRichMatch(
             ? match.awayTeamId
             : match.homeTeamId;
 
-        for (
-          const resolved
-          of resolvedGoalPlayers.filter(
-            (player) =>
-              player.teamId ===
-              barcelonaTeamId,
-          )
-        ) {
-          const existing =
-            await orm.public.SquadMembership
-              .where({
-                seasonId:
-                  match.seasonId,
+        /*
+|--------------------------------------------------------------------------
+| Existing first-team membership enrichment
+|--------------------------------------------------------------------------
+|
+| IMPORTANT:
+|
+| Match lineups do NOT own SquadMembership.
+|
+| A youth / reserve player can appear in a first-team lineup without being
+| permanently promoted into the official season squad.
+|
+| Official roster reconciliation owns membership creation and closure.
+| GOAL may only enrich an already-existing membership.
+|--------------------------------------------------------------------------
+*/
 
-                teamId:
-                  resolved.teamId,
+for (
+  const resolved
+  of resolvedGoalPlayers.filter(
+    (
+      player,
+    ) =>
+      player.teamId ===
+      barcelonaTeamId,
+  )
+) {
+  const existing =
+    await orm.public.SquadMembership
+      .where({
+        seasonId:
+          match.seasonId,
 
-                playerId:
-                  resolved.playerId,
-              })
-              .first();
+        teamId:
+          resolved.teamId,
 
-          const membershipData =
-            {
-              shirtNumber:
-                resolved.player.shirtNumber ??
-                existing?.shirtNumber ??
-                null,
+        playerId:
+          resolved.playerId,
+      })
+      .first();
 
-              position:
-                resolved.player.primaryPosition !==
-                "unknown"
-                  ? resolved.player.primaryPosition
-                  : existing?.position ??
-                    "unknown",
+  /*
+   * Lineup participant only.
+   *
+   * Player + LineupPlayer still exist and
+   * historic match data remains intact.
+   */
+  if (!existing) {
+    continue;
+  }
 
-              isCaptain:
-                existing?.isCaptain ??
-                false,
-            };
+  const membershipData = {
+    shirtNumber:
+      resolved.player.shirtNumber ??
+      existing.shirtNumber ??
+      null,
 
-          await ensureSimpleRow(
-            counts.squadMemberships,
-            existing,
-            membershipData,
+    position:
+      resolved.player.primaryPosition !==
+        "unknown"
+        ? resolved.player.primaryPosition
+        : existing.position,
 
-            () =>
-              orm.public.SquadMembership.create({
-                seasonId:
-                  match.seasonId,
+    isCaptain:
+      existing.isCaptain,
+  };
 
-                teamId:
-                  resolved.teamId,
+  await ensureSimpleRow(
+    counts.squadMemberships,
+    existing,
+    membershipData,
 
-                playerId:
-                  resolved.playerId,
+    /*
+     * Existing is guaranteed above, so
+     * this branch can never execute.
+     */
+    async () =>
+      existing,
 
-                ...membershipData,
-              }),
-
-            () =>
-              orm.public.SquadMembership
-                .where({
-                  id:
-                    existing!.id,
-                })
-                .update(
-                  membershipData,
-                ),
-          );
-        }
+    () =>
+      orm.public.SquadMembership
+        .where({
+          id:
+            existing.id,
+        })
+        .update(
+          membershipData,
+        ),
+  );
+}
 
         await ensureLineupSide(
           orm,

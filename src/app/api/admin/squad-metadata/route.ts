@@ -3,6 +3,10 @@ import {
 } from "next/server";
 
 import {
+  syncCurrentBarcelonaOfficialSquad,
+} from "../../../../lib/squad/sync-official-squad";
+
+import {
   syncCurrentBarcelonaSquadMetadata,
 } from "../../../../lib/squad/sync-squad-metadata";
 
@@ -42,7 +46,22 @@ export async function POST() {
 
     /*
     |--------------------------------------------------------------------------
-    | Player metadata
+    | 01 — authoritative season roster
+    |--------------------------------------------------------------------------
+    |
+    | This must happen first.
+    |
+    | Metadata providers and leadership logic should operate on the actual
+    | verified current first-team membership set.
+    |--------------------------------------------------------------------------
+    */
+
+    const officialRoster =
+      await syncCurrentBarcelonaOfficialSquad();
+
+    /*
+    |--------------------------------------------------------------------------
+    | 02 — provider metadata
     |--------------------------------------------------------------------------
     */
 
@@ -51,7 +70,7 @@ export async function POST() {
 
     /*
     |--------------------------------------------------------------------------
-    | Leadership
+    | 03 — leadership
     |--------------------------------------------------------------------------
     */
 
@@ -76,6 +95,8 @@ export async function POST() {
         startedAt.getTime(),
 
       result: {
+        officialRoster,
+
         ...metadata,
 
         leadership,

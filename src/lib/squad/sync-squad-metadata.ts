@@ -221,23 +221,23 @@ export async function syncCurrentBarcelonaSquadMetadata() {
 
   type CandidateMetadata = {
     birthDate:
-        string | null;
+      string | null;
 
     nationality:
-        string | null;
+      string | null;
 
     preferredFoot:
-        string | null;
+      string | null;
 
     portraitUrl:
-        string | null;
+      string | null;
 
     position:
-        CanonicalPlayerPosition | null;
+      CanonicalPlayerPosition | null;
 
     sources:
-        string[];
-    };
+      string[];
+  };
 
   const metadata =
     new Map<
@@ -667,10 +667,6 @@ export async function syncCurrentBarcelonaSquadMetadata() {
   |--------------------------------------------------------------------------
   | Wikidata fallback
   |--------------------------------------------------------------------------
-  |
-  | Only used for canonical players still missing preferred foot and/or
-  | nationality. DOB is mandatory and is used as the hard identity check.
-  |--------------------------------------------------------------------------
   */
 
   let wikidataResolved =
@@ -860,6 +856,11 @@ export async function syncCurrentBarcelonaSquadMetadata() {
         candidate.portraitUrl,
       );
 
+    const existingPortrait =
+      normalizePortraitUrl(
+        player.portraitUrl,
+      );
+
     const nextBirthDate =
       player.birthDate ??
       providerBirthDate;
@@ -873,12 +874,24 @@ export async function syncCurrentBarcelonaSquadMetadata() {
       providerFoot;
 
     /*
-     * Only replace the existing GOAL image if a provider actually gives
-     * us a different portrait.
-     */
+    |--------------------------------------------------------------------------
+    | Portrait priority
+    |--------------------------------------------------------------------------
+    |
+    | Official FC Barcelona portraits have priority once stored.
+    |
+    | This prevents a later provider sync from downgrading a nice official
+    | portrait back to a smaller / lower-quality provider headshot.
+    |--------------------------------------------------------------------------
+    */
+
     const nextPortraitUrl =
-      providerPortrait ??
-      player.portraitUrl;
+      isOfficialBarcelonaPortrait(
+        existingPortrait,
+      )
+        ? existingPortrait
+        : providerPortrait ??
+          existingPortrait;
 
     const nextPosition =
       player.primaryPosition !==
@@ -927,8 +940,8 @@ export async function syncCurrentBarcelonaSquadMetadata() {
     }
 
     if (
-      providerPortrait &&
-      providerPortrait !==
+      nextPortraitUrl &&
+      nextPortraitUrl !==
         player.portraitUrl
     ) {
       fieldsFilled.portrait +=
@@ -986,6 +999,12 @@ export async function syncCurrentBarcelonaSquadMetadata() {
     playersUpdated +=
       1;
   }
+
+  /*
+  |--------------------------------------------------------------------------
+  | Result
+  |--------------------------------------------------------------------------
+  */
 
   return {
     season:
@@ -1268,16 +1287,6 @@ function resolveStatsHawkPlayer(
       };
     }
   }
-
-  /*
-  |--------------------------------------------------------------------------
-  | DOB + position
-  |--------------------------------------------------------------------------
-  |
-  | This fixes nickname/accent/provider-name differences such as:
-  | Ronald Araújo / Araujo and similar cases.
-  |--------------------------------------------------------------------------
-  */
 
   const providerDob =
     dateKey(
@@ -1902,6 +1911,39 @@ function normalizePortraitUrl(
   }
 
   return null;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Portrait priority
+|--------------------------------------------------------------------------
+*/
+
+function isOfficialBarcelonaPortrait(
+  value:
+    string | null |
+    undefined,
+) {
+  if (!value) {
+    return false;
+  }
+
+  try {
+    const url =
+      new URL(
+        value,
+      );
+
+    return (
+      url.hostname ===
+        "www.fcbarcelona.com" ||
+      url.hostname.endsWith(
+        ".fcbarcelona.com",
+      )
+    );
+  } catch {
+    return false;
+  }
 }
 
 function statsHawkSupportsCompetition(

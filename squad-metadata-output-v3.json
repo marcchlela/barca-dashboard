@@ -1,0 +1,353 @@
+﻿{
+    "ok":  true,
+    "startedAt":  "2026-10-04T14:32:42.103Z",
+    "finishedAt":  "2026-10-04T14:32:44.477Z",
+    "durationMs":  2374,
+    "result":  {
+                   "officialRoster":  {
+                                          "season":  "2026/27",
+                                          "supported":  true,
+                                          "verifiedAt":  "2026-09-02T00:00:00Z",
+                                          "expected":  27,
+                                          "resolved":  27,
+                                          "playersCreated":  3,
+                                          "playersUpdated":  0,
+                                          "preferredFootFilled":  0,
+                                          "nationalityFilled":  0,
+                                          "birthDateFilled":  0,
+                                          "membershipsCreated":  3,
+                                          "membershipsUpdated":  0,
+                                          "membershipsReactivated":  0,
+                                          "membershipsClosed":  4,
+                                          "closureSkipped":  false,
+                                          "unresolved":  [
+
+                                                         ],
+                                          "currentRoster":  [
+                                                                {
+                                                                    "playerId":  "80a44f7f-fb07-4abc-b49e-054f29b3f7df",
+                                                                    "name":  "Joan GarcÃ­a",
+                                                                    "number":  1,
+                                                                    "position":  "goalkeeper",
+                                                                    "preferredFoot":  "right"
+                                                                },
+                                                                {
+                                                                    "playerId":  "4154514a-3a5f-4417-b1c6-f446f67800d3",
+                                                                    "name":  "JoÃ£o Cancelo",
+                                                                    "number":  2,
+                                                                    "position":  "defender",
+                                                                    "preferredFoot":  "right"
+                                                                },
+                                                                {
+                                                                    "playerId":  "9382f37d-20a6-4c72-a04e-9eaad4dcb20a",
+                                                                    "name":  "Alejandro Balde",
+                                                                    "number":  3,
+                                                                    "position":  "defender",
+                                                                    "preferredFoot":  "left"
+                                                                },
+                                                                {
+                                                                    "playerId":  "29f6bdd5-ec83-4f40-988b-4389ac536044",
+                                                                    "name":  "Brian FariÃ±as",
+                                                                    "number":  4,
+                                                                    "position":  "midfielder",
+                                                                    "preferredFoot":  "right"
+                                                                },
+                                                                {
+                                                                    "playerId":  "02a7b88b-fe74-401f-aa63-664a3b643e0d",
+                                                                    "name":  "Pau CubarsÃ­",
+                                                                    "number":  5,
+                                                                    "position":  "defender",
+                                                                    "preferredFoot":  "right"
+                                                                },
+                                                                {
+                                                                    "playerId":  "74a00769-6d37-4c0d-a19d-8b96830a2d04",
+                                                                    "name":  "Gavi",
+                                                                    "number":  6,
+                                                                    "position":  "midfielder",
+                                                                    "preferredFoot":  "right"
+                                                                },
+                                                                {
+                                                                    "playerId":  "469ad85f-c83b-4d67-8e96-00cb66ae7065",
+                                                                    "name":  "FermÃ­n LÃ³pez",
+                                                                    "number":  7,
+                                                                    "position":  "midfielder",
+                                                                    "preferredFoot":  "right"
+                                                                },
+                                                                {
+                                                                    "playerId":  "af19f84d-dcf0-4ddd-901b-f00b684230ce",
+                                                                    "name":  "Pedri",
+                                                                    "number":  8,
+                                                                    "position":  "midfielder",
+                                                                    "preferredFoot":  "right"
+                                                                },
+                                                                {
+                                                                    "playerId":  "4d866c9c-0c18-422e-bf90-3789719422bc",
+                                                                    "name":  "Gabriel Jesus",
+                                                                    "number":  9,
+                                                                    "position":  "forward",
+                                                                    "preferredFoot":  "right"
+                                                                },
+                                                                {
+                                                                    "playerId":  "c1eafbb2-eacb-41de-a295-c0d4b04906a5",
+                                                                    "name":  "Lamine Yamal",
+                                                                    "number":  10,
+                                                                    "position":  "forward",
+                                                                    "preferredFoot":  "left"
+                                                                },
+                                                                {
+                                                                    "playerId":  "f60cef59-bbbd-49ef-8fc0-89f4c9acfcff",
+                                                                    "name":  "Raphinha",
+                                                                    "number":  11,
+                                                                    "position":  "forward",
+                                                                    "preferredFoot":  "left"
+                                                                },
+                                                                {
+                                                                    "playerId":  "38c1755c-d3a3-4b7f-8271-cb7bcc80de58",
+                                                                    "name":  "Xavi Espart",
+                                                                    "number":  12,
+                                                                    "position":  "defender",
+                                                                    "preferredFoot":  "right"
+                                                                },
+                                                                {
+                                                                    "playerId":  "7e8b91fa-f658-4056-9b0a-a4d65fd652cd",
+                                                                    "name":  "Wojciech SzczÄsny",
+                                                                    "number":  13,
+                                                                    "position":  "goalkeeper",
+                                                                    "preferredFoot":  "right"
+                                                                },
+                                                                {
+                                                                    "playerId":  "51e722a0-d23e-4abc-b175-dd379affcabb",
+                                                                    "name":  "Karim Adeyemi",
+                                                                    "number":  14,
+                                                                    "position":  "forward",
+                                                                    "preferredFoot":  "left"
+                                                                },
+                                                                {
+                                                                    "playerId":  "3c43b9c3-f850-4bdb-89a8-2799f0edf3d6",
+                                                                    "name":  "Andreas Christensen",
+                                                                    "number":  15,
+                                                                    "position":  "defender",
+                                                                    "preferredFoot":  "right"
+                                                                },
+                                                                {
+                                                                    "playerId":  "8eb6e1f1-664f-4e86-b51f-36fb20bde6af",
+                                                                    "name":  "Rodri",
+                                                                    "number":  16,
+                                                                    "position":  "midfielder",
+                                                                    "preferredFoot":  "right"
+                                                                },
+                                                                {
+                                                                    "playerId":  "6060291c-0060-4ee2-8b33-2be913896106",
+                                                                    "name":  "Anthony Gordon",
+                                                                    "number":  17,
+                                                                    "position":  "forward",
+                                                                    "preferredFoot":  "right"
+                                                                },
+                                                                {
+                                                                    "playerId":  "6ab9f7b7-a056-4d0b-bde4-6db2807b27bd",
+                                                                    "name":  "Gerard MartÃ­n",
+                                                                    "number":  18,
+                                                                    "position":  "defender",
+                                                                    "preferredFoot":  "left"
+                                                                },
+                                                                {
+                                                                    "playerId":  "40e38079-b73e-4ec4-875c-6dec9f179621",
+                                                                    "name":  "Roony Bardghji",
+                                                                    "number":  19,
+                                                                    "position":  "forward",
+                                                                    "preferredFoot":  "left"
+                                                                },
+                                                                {
+                                                                    "playerId":  "e79251c4-c69d-46b6-a856-5cf50d6cd735",
+                                                                    "name":  "Dani Olmo",
+                                                                    "number":  20,
+                                                                    "position":  "midfielder",
+                                                                    "preferredFoot":  "right"
+                                                                },
+                                                                {
+                                                                    "playerId":  "dcbc0a2b-d38f-4bfd-ae05-202664f82776",
+                                                                    "name":  "Frenkie de Jong",
+                                                                    "number":  21,
+                                                                    "position":  "midfielder",
+                                                                    "preferredFoot":  "right"
+                                                                },
+                                                                {
+                                                                    "playerId":  "fd2212d1-d053-4c50-ac02-29c69889768e",
+                                                                    "name":  "Marc Bernal",
+                                                                    "number":  22,
+                                                                    "position":  "midfielder",
+                                                                    "preferredFoot":  "left"
+                                                                },
+                                                                {
+                                                                    "playerId":  "aa6125e6-ee3d-401a-962b-22bd9255892a",
+                                                                    "name":  "Jules KoundÃ©",
+                                                                    "number":  23,
+                                                                    "position":  "defender",
+                                                                    "preferredFoot":  "right"
+                                                                },
+                                                                {
+                                                                    "playerId":  "1559fa1e-69c2-46e1-8d06-1a7cb6295be4",
+                                                                    "name":  "Eric GarcÃ­a",
+                                                                    "number":  24,
+                                                                    "position":  "defender",
+                                                                    "preferredFoot":  "right"
+                                                                },
+                                                                {
+                                                                    "playerId":  "c48feda5-d5d7-4a0a-918d-b052833a4ad7",
+                                                                    "name":  "Dominik LivakoviÄ",
+                                                                    "number":  25,
+                                                                    "position":  "goalkeeper",
+                                                                    "preferredFoot":  "right"
+                                                                },
+                                                                {
+                                                                    "playerId":  "e69f4aa4-2f8d-4dc4-91cb-0af409ea342b",
+                                                                    "name":  "Jesse Bisiwu",
+                                                                    "number":  27,
+                                                                    "position":  "forward",
+                                                                    "preferredFoot":  "right"
+                                                                },
+                                                                {
+                                                                    "playerId":  "83d0cb70-8e93-43c1-999b-73642424e0bb",
+                                                                    "name":  "Hamza Abdelkarim",
+                                                                    "number":  29,
+                                                                    "position":  "forward",
+                                                                    "preferredFoot":  "both"
+                                                                }
+                                                            ]
+                                      },
+                   "season":  "2026/27",
+                   "providers":  {
+                                     "statsHawk":  {
+                                                       "targetMatch":  {
+                                                                           "id":  "dc0f3ba4-90ae-439d-b839-f15e15854fd4",
+                                                                           "competition":  "Primera Division",
+                                                                           "home":  "Sevilla FC",
+                                                                           "away":  "FC Barcelona",
+                                                                           "kickoff":  "2026-09-19T19:00:00Z"
+                                                                       },
+                                                       "rosterPlayers":  41,
+                                                       "requestCount":  3,
+                                                       "expectedUnits":  5,
+                                                       "quotaRemaining":  4937,
+                                                       "mappingsCreated":  3,
+                                                       "unresolved":  [
+                                                                          {
+                                                                              "personId":  "per_06fhmv20b5sc3aty3rsakr3gx0",
+                                                                              "providerName":  "Diego Kochen",
+                                                                              "reason":  "no_unique_safe_identity"
+                                                                          },
+                                                                          {
+                                                                              "personId":  "per_06fhmv20h1y6106r0vyzt4attw",
+                                                                              "providerName":  "Eder Aller",
+                                                                              "reason":  "no_unique_safe_identity"
+                                                                          },
+                                                                          {
+                                                                              "personId":  "per_06fhmv21enzh357r59rex0nqfc",
+                                                                              "providerName":  "Ronald AraÃºjo",
+                                                                              "reason":  "no_unique_safe_identity"
+                                                                          },
+                                                                          {
+                                                                              "personId":  "per_06fhmv22j1sg13eaey77cm5zag",
+                                                                              "providerName":  "Jofre Torrents",
+                                                                              "reason":  "no_unique_safe_identity"
+                                                                          },
+                                                                          {
+                                                                              "personId":  "per_06fhmv23vhwd1aapwd2ewepqqw",
+                                                                              "providerName":  "Juan HernÃ¡ndez",
+                                                                              "reason":  "no_unique_safe_identity"
+                                                                          },
+                                                                          {
+                                                                              "personId":  "per_06fhmv247dtf1amk5xeh7fx5g8",
+                                                                              "providerName":  "Guille FernÃ¡ndez",
+                                                                              "reason":  "no_unique_safe_identity"
+                                                                          },
+                                                                          {
+                                                                              "personId":  "per_06fhmv24ddrw3bfcb9053hjter",
+                                                                              "providerName":  "TomÃ¡s MarquÃ©s",
+                                                                              "reason":  "no_unique_safe_identity"
+                                                                          },
+                                                                          {
+                                                                              "personId":  "per_06fhmv24k9yz127mq1ardae2b0",
+                                                                              "providerName":  "Robert Lewandowski",
+                                                                              "reason":  "no_unique_safe_identity"
+                                                                          },
+                                                                          {
+                                                                              "personId":  "per_06fhmv24s5s316vbwttw10rtmw",
+                                                                              "providerName":  "Marcus Rashford",
+                                                                              "reason":  "no_unique_safe_identity"
+                                                                          },
+                                                                          {
+                                                                              "personId":  "per_06fhmv255dzr171pkgyqc5me24",
+                                                                              "providerName":  "Ferran Torres",
+                                                                              "reason":  "no_unique_safe_identity"
+                                                                          },
+                                                                          {
+                                                                              "personId":  "per_06fhmv25q9yh7bgjsdqkfbee2w",
+                                                                              "providerName":  "Daniel RodrÃ­guez",
+                                                                              "reason":  "no_unique_safe_identity"
+                                                                          },
+                                                                          {
+                                                                              "personId":  "per_06fhmv25x5s877q2gcd7r9zpqw",
+                                                                              "providerName":  "Toni FernÃ¡ndez",
+                                                                              "reason":  "no_unique_safe_identity"
+                                                                          },
+                                                                          {
+                                                                              "personId":  "per_06fvdh0w6xys17yxpxw3xjrwhm",
+                                                                              "providerName":  "Iker RodrÃ­guez",
+                                                                              "reason":  "no_unique_safe_identity"
+                                                                          },
+                                                                          {
+                                                                              "personId":  "per_06fvdh0zxdy55fg1ny7d3szc50",
+                                                                              "providerName":  "Jordi Pesquer",
+                                                                              "reason":  "no_unique_safe_identity"
+                                                                          }
+                                                                      ]
+                                                   },
+                                     "footballData":  {
+                                                          "rosterPlayers":  28,
+                                                          "mappingsCreated":  3,
+                                                          "unresolved":  [
+                                                                             {
+                                                                                 "providerId":  "301129",
+                                                                                 "providerName":  "Iker RodrÃ­guez",
+                                                                                 "reason":  "no_unique_safe_identity"
+                                                                             }
+                                                                         ]
+                                                      },
+                                     "wikidata":  {
+                                                      "resolved":  0,
+                                                      "preferredFootFilled":  0,
+                                                      "nationalityFilled":  0
+                                                  }
+                                 },
+                   "canonical":  {
+                                     "currentSquad":  27,
+                                     "candidates":  27,
+                                     "playersUpdated":  0,
+                                     "playersUnchanged":  27,
+                                     "portraitsReplaced":  0,
+                                     "fieldsFilled":  {
+                                                          "birthDate":  0,
+                                                          "nationality":  0,
+                                                          "preferredFoot":  0,
+                                                          "portrait":  0,
+                                                          "position":  0
+                                                      }
+                                 },
+                   "leadership":  {
+                                      "season":  "2026/27",
+                                      "supported":  true,
+                                      "updated":  1,
+                                      "captains":  [
+                                                       "Raphinha",
+                                                       "Pedri",
+                                                       "Eric GarcÃ­a",
+                                                       "Frenkie de Jong",
+                                                       "Lamine Yamal"
+                                                   ],
+                                      "unresolved":  [
+
+                                                     ]
+                                  }
+               }
+}

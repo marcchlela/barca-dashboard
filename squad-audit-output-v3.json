@@ -1,0 +1,1082 @@
+﻿{
+    "ok":  true,
+    "season":  "2026/27",
+    "generatedAt":  "2026-10-04T14:32:46.425Z",
+    "summary":  {
+                    "currentSquad":  27,
+                    "captains":  5,
+                    "missingBirthDate":  0,
+                    "missingNationality":  0,
+                    "missingPreferredFoot":  0,
+                    "missingPortrait":  4,
+                    "unknownPosition":  0
+                },
+    "missing":  {
+                    "birthDate":  [
+
+                                  ],
+                    "nationality":  [
+
+                                    ],
+                    "preferredFoot":  [
+
+                                      ],
+                    "portrait":  [
+                                     "Roony Bardghji",
+                                     "Frenkie de Jong",
+                                     "Jesse Bisiwu",
+                                     "Hamza Abdelkarim"
+                                 ],
+                    "position":  [
+
+                                 ]
+                },
+    "captains":  [
+                     "Pedri",
+                     "Lamine Yamal",
+                     "Raphinha",
+                     "Frenkie de Jong",
+                     "Eric GarcÃ­a"
+                 ],
+    "portraitHosts":  {
+                          "media.goal-api.com":  23,
+                          "none":  4
+                      },
+    "players":  [
+                    {
+                        "id":  "80a44f7f-fb07-4abc-b49e-054f29b3f7df",
+                        "name":  "Joan GarcÃ­a",
+                        "shirtNumber":  1,
+                        "position":  "goalkeeper",
+                        "captain":  false,
+                        "birthDate":  "2001-05-04",
+                        "nationality":  "Spain",
+                        "preferredFoot":  "right",
+                        "portrait":  {
+                                         "present":  true,
+                                         "host":  "media.goal-api.com",
+                                         "url":  "https://media.goal-api.com/badges/players/96401_j-garcia.jpg"
+                                     },
+                        "mappings":  [
+                                         {
+                                             "source":  "big-balls-data",
+                                             "providerId":  "54aeb0c0-0f83-4163-9f47-8a33dbf15894"
+                                         },
+                                         {
+                                             "source":  "football-data-org",
+                                             "providerId":  "152506"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "cmr7fpkvy2tsfrx067a5gu95t"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "1354267650"
+                                         },
+                                         {
+                                             "source":  "pitchapi-spatial",
+                                             "providerId":  "p_4EUcyF"
+                                         },
+                                         {
+                                             "source":  "statshawk",
+                                             "providerId":  "per_06fhmv2055wv7f3jkpprqaqa2c"
+                                         }
+                                     ]
+                    },
+                    {
+                        "id":  "4154514a-3a5f-4417-b1c6-f446f67800d3",
+                        "name":  "JoÃ£o Cancelo",
+                        "shirtNumber":  2,
+                        "position":  "defender",
+                        "captain":  false,
+                        "birthDate":  "1994-05-27",
+                        "nationality":  "Portugal",
+                        "preferredFoot":  "right",
+                        "portrait":  {
+                                         "present":  true,
+                                         "host":  "media.goal-api.com",
+                                         "url":  "https://media.goal-api.com/badges/players/10435_j-cancelo.jpg"
+                                     },
+                        "mappings":  [
+                                         {
+                                             "source":  "big-balls-data",
+                                             "providerId":  "f8d1d820-c85b-4c1a-969e-7822b71a269d"
+                                         },
+                                         {
+                                             "source":  "football-data-org",
+                                             "providerId":  "2000"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "cmr7bf4tc13ybrx06vwh9w8it"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "253565970"
+                                         },
+                                         {
+                                             "source":  "pitchapi-spatial",
+                                             "providerId":  "p_3nNvXJ"
+                                         },
+                                         {
+                                             "source":  "statshawk",
+                                             "providerId":  "per_06fhmv20wszj36zcb8v72kzbng"
+                                         }
+                                     ]
+                    },
+                    {
+                        "id":  "9382f37d-20a6-4c72-a04e-9eaad4dcb20a",
+                        "name":  "Alejandro Balde",
+                        "shirtNumber":  3,
+                        "position":  "defender",
+                        "captain":  false,
+                        "birthDate":  "2003-10-18",
+                        "nationality":  "Spain",
+                        "preferredFoot":  "left",
+                        "portrait":  {
+                                         "present":  true,
+                                         "host":  "media.goal-api.com",
+                                         "url":  "https://media.goal-api.com/badges/players/100274_a-balde.jpg"
+                                     },
+                        "mappings":  [
+                                         {
+                                             "source":  "big-balls-data",
+                                             "providerId":  "6519d7e2-973d-4993-bbcb-8a5e547989cb"
+                                         },
+                                         {
+                                             "source":  "football-data-org",
+                                             "providerId":  "172761"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "cmr7m5atp5g6frx063ccc86rn"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "387343321"
+                                         },
+                                         {
+                                             "source":  "pitchapi-spatial",
+                                             "providerId":  "p_1VZIVK"
+                                         },
+                                         {
+                                             "source":  "statshawk",
+                                             "providerId":  "per_06fhmv2209sd17avsk16vyz5gr"
+                                         }
+                                     ]
+                    },
+                    {
+                        "id":  "29f6bdd5-ec83-4f40-988b-4389ac536044",
+                        "name":  "Brian FariÃ±as",
+                        "shirtNumber":  4,
+                        "position":  "midfielder",
+                        "captain":  false,
+                        "birthDate":  "2006-02-09",
+                        "nationality":  "Spain",
+                        "preferredFoot":  "right",
+                        "portrait":  {
+                                         "present":  true,
+                                         "host":  "media.goal-api.com",
+                                         "url":  "https://media.goal-api.com/badges/players/396719_brian-farinas.jpg"
+                                     },
+                        "mappings":  [
+                                         {
+                                             "source":  "football-data-org",
+                                             "providerId":  "298638"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "cmrhlgsqm5xjllb07b9196370"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "2550925795"
+                                         },
+                                         {
+                                             "source":  "statshawk",
+                                             "providerId":  "per_06fvdh13bdwt15jvqhx6r9t4sg"
+                                         }
+                                     ]
+                    },
+                    {
+                        "id":  "02a7b88b-fe74-401f-aa63-664a3b643e0d",
+                        "name":  "Pau CubarsÃ­",
+                        "shirtNumber":  5,
+                        "position":  "defender",
+                        "captain":  false,
+                        "birthDate":  "2007-01-22",
+                        "nationality":  "Spain",
+                        "preferredFoot":  "right",
+                        "portrait":  {
+                                         "present":  true,
+                                         "host":  "media.goal-api.com",
+                                         "url":  "https://media.goal-api.com/badges/players/250627_p-cubarsi.jpg"
+                                     },
+                        "mappings":  [
+                                         {
+                                             "source":  "football-data-org",
+                                             "providerId":  "217540"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "cmr7fpswc2wqzrx06pm0hyrgp"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "3279383214"
+                                         },
+                                         {
+                                             "source":  "pitchapi-spatial",
+                                             "providerId":  "p_1L7aow"
+                                         },
+                                         {
+                                             "source":  "statshawk",
+                                             "providerId":  "per_06fhmv2265v834xj36b4xvcdtg"
+                                         }
+                                     ]
+                    },
+                    {
+                        "id":  "74a00769-6d37-4c0d-a19d-8b96830a2d04",
+                        "name":  "Gavi",
+                        "shirtNumber":  6,
+                        "position":  "midfielder",
+                        "captain":  false,
+                        "birthDate":  "2004-08-05",
+                        "nationality":  "Spain",
+                        "preferredFoot":  "right",
+                        "portrait":  {
+                                         "present":  true,
+                                         "host":  "media.goal-api.com",
+                                         "url":  "https://media.goal-api.com/badges/players/100275_gavi.jpg"
+                                     },
+                        "mappings":  [
+                                         {
+                                             "source":  "big-balls-data",
+                                             "providerId":  "cb104d9a-e9e6-401a-a4d0-eb3be4ac4f20"
+                                         },
+                                         {
+                                             "source":  "football-data-org",
+                                             "providerId":  "171992"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "cmr7m5asz5g67rx06noh5gcb9"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "3730351229"
+                                         },
+                                         {
+                                             "source":  "pitchapi-spatial",
+                                             "providerId":  "p_0XxRdx"
+                                         },
+                                         {
+                                             "source":  "statshawk",
+                                             "providerId":  "per_06fhmv239nr278gzjjmbtezmmg"
+                                         }
+                                     ]
+                    },
+                    {
+                        "id":  "469ad85f-c83b-4d67-8e96-00cb66ae7065",
+                        "name":  "FermÃ­n LÃ³pez",
+                        "shirtNumber":  7,
+                        "position":  "midfielder",
+                        "captain":  false,
+                        "birthDate":  "2003-05-11",
+                        "nationality":  "Spain",
+                        "preferredFoot":  "right",
+                        "portrait":  {
+                                         "present":  true,
+                                         "host":  "media.goal-api.com",
+                                         "url":  "https://media.goal-api.com/badges/players/192384_fermin.jpg"
+                                     },
+                        "mappings":  [
+                                         {
+                                             "source":  "football-data-org",
+                                             "providerId":  "214533"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "cmr7fpsom2wp5rx067ewt0abw"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "1790385112"
+                                         },
+                                         {
+                                             "source":  "pitchapi-spatial",
+                                             "providerId":  "p_4foizb"
+                                         },
+                                         {
+                                             "source":  "statshawk",
+                                             "providerId":  "per_06fhmv23nhs61fh8x924pj6qhr"
+                                         }
+                                     ]
+                    },
+                    {
+                        "id":  "af19f84d-dcf0-4ddd-901b-f00b684230ce",
+                        "name":  "Pedri",
+                        "shirtNumber":  8,
+                        "position":  "midfielder",
+                        "captain":  true,
+                        "birthDate":  "2002-11-25",
+                        "nationality":  "Spain",
+                        "preferredFoot":  "right",
+                        "portrait":  {
+                                         "present":  true,
+                                         "host":  "media.goal-api.com",
+                                         "url":  "https://media.goal-api.com/badges/players/100272_pedri.jpg"
+                                     },
+                        "mappings":  [
+                                         {
+                                             "source":  "big-balls-data",
+                                             "providerId":  "93dce7ab-315e-48b3-bf79-6d2c0dfb95ba"
+                                         },
+                                         {
+                                             "source":  "football-data-org",
+                                             "providerId":  "133860"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "cmr7m5att5g6hrx06v7yx54um"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "3145603117"
+                                         },
+                                         {
+                                             "source":  "pitchapi-spatial",
+                                             "providerId":  "p_2WCkgQ"
+                                         },
+                                         {
+                                             "source":  "statshawk",
+                                             "providerId":  "per_06fhmv233ssd76ydpsbv2gx20c"
+                                         }
+                                     ]
+                    },
+                    {
+                        "id":  "4d866c9c-0c18-422e-bf90-3789719422bc",
+                        "name":  "Gabriel Jesus",
+                        "shirtNumber":  9,
+                        "position":  "forward",
+                        "captain":  false,
+                        "birthDate":  "1997-04-03",
+                        "nationality":  "Brazil",
+                        "preferredFoot":  "right",
+                        "portrait":  {
+                                         "present":  true,
+                                         "host":  "media.goal-api.com",
+                                         "url":  "https://media.goal-api.com/badges/players/50186_j-gabriel.jpg"
+                                     },
+                        "mappings":  [
+                                         {
+                                             "source":  "football-data-org",
+                                             "providerId":  "3236"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "cmr7foq1q2kubrx069n64vd5v"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "948941149"
+                                         },
+                                         {
+                                             "source":  "pitchapi-spatial",
+                                             "providerId":  "p_04XyTw"
+                                         },
+                                         {
+                                             "source":  "statshawk",
+                                             "providerId":  "per_06fhmsvw7dv57dg800ztsnvny8"
+                                         }
+                                     ]
+                    },
+                    {
+                        "id":  "c1eafbb2-eacb-41de-a295-c0d4b04906a5",
+                        "name":  "Lamine Yamal",
+                        "shirtNumber":  10,
+                        "position":  "forward",
+                        "captain":  true,
+                        "birthDate":  "2007-07-13",
+                        "nationality":  "Spain",
+                        "preferredFoot":  "left",
+                        "portrait":  {
+                                         "present":  true,
+                                         "host":  "media.goal-api.com",
+                                         "url":  "https://media.goal-api.com/badges/players/236672_y-lamine.jpg"
+                                     },
+                        "mappings":  [
+                                         {
+                                             "source":  "big-balls-data",
+                                             "providerId":  "891c5d95-1b87-4aff-a086-61617bf2a50d"
+                                         },
+                                         {
+                                             "source":  "football-data-org",
+                                             "providerId":  "202283"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "cmr7m5auk5g6xrx060hkzu2u6"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "2532001232"
+                                         },
+                                         {
+                                             "source":  "pitchapi-spatial",
+                                             "providerId":  "p_2e0FPo"
+                                         },
+                                         {
+                                             "source":  "statshawk",
+                                             "providerId":  "per_06fhmv25hdve7dznpracg8pejm"
+                                         }
+                                     ]
+                    },
+                    {
+                        "id":  "f60cef59-bbbd-49ef-8fc0-89f4c9acfcff",
+                        "name":  "Raphinha",
+                        "shirtNumber":  11,
+                        "position":  "forward",
+                        "captain":  true,
+                        "birthDate":  "1996-12-14",
+                        "nationality":  "Brazil",
+                        "preferredFoot":  "left",
+                        "portrait":  {
+                                         "present":  true,
+                                         "host":  "media.goal-api.com",
+                                         "url":  "https://media.goal-api.com/badges/players/64961_raphinha.jpg"
+                                     },
+                        "mappings":  [
+                                         {
+                                             "source":  "big-balls-data",
+                                             "providerId":  "97e95417-1761-40b6-8e3f-3ff7d188eac2"
+                                         },
+                                         {
+                                             "source":  "football-data-org",
+                                             "providerId":  "37428"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "cmr7beebv0utqrx067jm9nx1i"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "3190208711"
+                                         },
+                                         {
+                                             "source":  "pitchapi-spatial",
+                                             "providerId":  "p_2DQMAL"
+                                         },
+                                         {
+                                             "source":  "statshawk",
+                                             "providerId":  "per_06fhmv24zdw858e43wrk8z1w0g"
+                                         }
+                                     ]
+                    },
+                    {
+                        "id":  "38c1755c-d3a3-4b7f-8271-cb7bcc80de58",
+                        "name":  "Xavi Espart",
+                        "shirtNumber":  12,
+                        "position":  "defender",
+                        "captain":  false,
+                        "birthDate":  "2007-05-21",
+                        "nationality":  "Spain",
+                        "preferredFoot":  "right",
+                        "portrait":  {
+                                         "present":  true,
+                                         "host":  "media.goal-api.com",
+                                         "url":  "https://media.goal-api.com/badges/players/338852_x-espart.jpg"
+                                     },
+                        "mappings":  [
+                                         {
+                                             "source":  "big-balls-data",
+                                             "providerId":  "e7f3e357-e9cf-4195-a56c-29ac84fc0164"
+                                         },
+                                         {
+                                             "source":  "football-data-org",
+                                             "providerId":  "287848"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "cmr7m5auw5g75rx06y1fsl5np"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "820569990"
+                                         },
+                                         {
+                                             "source":  "pitchapi-spatial",
+                                             "providerId":  "p_0HYrZ6"
+                                         },
+                                         {
+                                             "source":  "statshawk",
+                                             "providerId":  "per_06fhmv22c1xt16f75jgbxs1wdc"
+                                         }
+                                     ]
+                    },
+                    {
+                        "id":  "7e8b91fa-f658-4056-9b0a-a4d65fd652cd",
+                        "name":  "Wojciech SzczÄsny",
+                        "shirtNumber":  13,
+                        "position":  "goalkeeper",
+                        "captain":  false,
+                        "birthDate":  "1990-04-18",
+                        "nationality":  "Poland",
+                        "preferredFoot":  "right",
+                        "portrait":  {
+                                         "present":  true,
+                                         "host":  "media.goal-api.com",
+                                         "url":  "https://media.goal-api.com/badges/players/10227_w-szczesny.jpg"
+                                     },
+                        "mappings":  [
+                                         {
+                                             "source":  "big-balls-data",
+                                             "providerId":  "931b477a-7625-4a7b-b57d-b4b9c1ba5d71"
+                                         },
+                                         {
+                                             "source":  "football-data-org",
+                                             "providerId":  "2022"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "cmr7m5asw5g65rx06zr89m12w"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "3932445726"
+                                         },
+                                         {
+                                             "source":  "pitchapi-spatial",
+                                             "providerId":  "p_4SHK1Q"
+                                         },
+                                         {
+                                             "source":  "statshawk",
+                                             "providerId":  "per_06fhmv1zz9vj19n5tarp78tef0"
+                                         }
+                                     ]
+                    },
+                    {
+                        "id":  "51e722a0-d23e-4abc-b175-dd379affcabb",
+                        "name":  "Karim Adeyemi",
+                        "shirtNumber":  14,
+                        "position":  "forward",
+                        "captain":  false,
+                        "birthDate":  "2002-01-18",
+                        "nationality":  "Germany",
+                        "preferredFoot":  "left",
+                        "portrait":  {
+                                         "present":  true,
+                                         "host":  "media.goal-api.com",
+                                         "url":  "https://media.goal-api.com/badges/players/96466_k-adeyemi.jpg"
+                                     },
+                        "mappings":  [
+                                         {
+                                             "source":  "big-balls-data",
+                                             "providerId":  "9fff255d-3315-454a-b5bd-56b53fb53c3b"
+                                         },
+                                         {
+                                             "source":  "football-data-org",
+                                             "providerId":  "82515"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "cmr79jdi7057crx06wqr49s48"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "101462621"
+                                         },
+                                         {
+                                             "source":  "pitchapi-spatial",
+                                             "providerId":  "p_2csCfX"
+                                         },
+                                         {
+                                             "source":  "statshawk",
+                                             "providerId":  "per_06fhmwpvjhrp10m5tch4hfmkb4"
+                                         }
+                                     ]
+                    },
+                    {
+                        "id":  "3c43b9c3-f850-4bdb-89a8-2799f0edf3d6",
+                        "name":  "Andreas Christensen",
+                        "shirtNumber":  15,
+                        "position":  "defender",
+                        "captain":  false,
+                        "birthDate":  "1996-04-10",
+                        "nationality":  "Denmark",
+                        "preferredFoot":  "right",
+                        "portrait":  {
+                                         "present":  true,
+                                         "host":  "media.goal-api.com",
+                                         "url":  "https://media.goal-api.com/badges/players/20327_a-christensen.jpg"
+                                     },
+                        "mappings":  [
+                                         {
+                                             "source":  "big-balls-data",
+                                             "providerId":  "f7cedcde-1db5-47b3-bc3c-22304b206aa2"
+                                         },
+                                         {
+                                             "source":  "football-data-org",
+                                             "providerId":  "3455"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "cmr7m5au45g6orx06od2tzyz0"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "1576307869"
+                                         },
+                                         {
+                                             "source":  "pitchapi-spatial",
+                                             "providerId":  "p_4aOZLz"
+                                         },
+                                         {
+                                             "source":  "statshawk",
+                                             "providerId":  "per_06fhmv212xxs54c0x5a44knmcg"
+                                         }
+                                     ]
+                    },
+                    {
+                        "id":  "8eb6e1f1-664f-4e86-b51f-36fb20bde6af",
+                        "name":  "Rodri",
+                        "shirtNumber":  16,
+                        "position":  "midfielder",
+                        "captain":  false,
+                        "birthDate":  "1996-06-22",
+                        "nationality":  "Spain",
+                        "preferredFoot":  "right",
+                        "portrait":  {
+                                         "present":  true,
+                                         "host":  "media.goal-api.com",
+                                         "url":  "https://media.goal-api.com/badges/players/55158_rodri.jpg"
+                                     },
+                        "mappings":  [
+                                         {
+                                             "source":  "big-balls-data",
+                                             "providerId":  "0968898b-e565-4817-ba4e-1e1822889fb0"
+                                         },
+                                         {
+                                             "source":  "football-data-org",
+                                             "providerId":  "3199"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "cmr7fpy542ykbrx06f9a6tayi"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "2389086821"
+                                         },
+                                         {
+                                             "source":  "pitchapi-spatial",
+                                             "providerId":  "p_0Qmeai"
+                                         },
+                                         {
+                                             "source":  "statshawk",
+                                             "providerId":  "per_06fhmsy8sxyr127w7hy7se6tbr"
+                                         }
+                                     ]
+                    },
+                    {
+                        "id":  "6060291c-0060-4ee2-8b33-2be913896106",
+                        "name":  "Anthony Gordon",
+                        "shirtNumber":  17,
+                        "position":  "forward",
+                        "captain":  false,
+                        "birthDate":  "2001-02-24",
+                        "nationality":  "England",
+                        "preferredFoot":  "right",
+                        "portrait":  {
+                                         "present":  true,
+                                         "host":  "media.goal-api.com",
+                                         "url":  "https://media.goal-api.com/badges/players/76163_a-gordon.jpg"
+                                     },
+                        "mappings":  [
+                                         {
+                                             "source":  "big-balls-data",
+                                             "providerId":  "f2d8b956-acb3-49b7-8d56-a2653d79c720"
+                                         },
+                                         {
+                                             "source":  "football-data-org",
+                                             "providerId":  "7848"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "cmr7fpy0m2yivrx06kgqvg05g"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "2240532787"
+                                         },
+                                         {
+                                             "source":  "pitchapi-spatial",
+                                             "providerId":  "p_0vTa4b"
+                                         },
+                                         {
+                                             "source":  "statshawk",
+                                             "providerId":  "per_06fhmte7mss179g12dhx5hxx3w"
+                                         }
+                                     ]
+                    },
+                    {
+                        "id":  "6ab9f7b7-a056-4d0b-bde4-6db2807b27bd",
+                        "name":  "Gerard MartÃ­n",
+                        "shirtNumber":  18,
+                        "position":  "defender",
+                        "captain":  false,
+                        "birthDate":  "2002-02-26",
+                        "nationality":  "Spain",
+                        "preferredFoot":  "left",
+                        "portrait":  {
+                                         "present":  true,
+                                         "host":  "media.goal-api.com",
+                                         "url":  "https://media.goal-api.com/badges/players/132796_g-martin.jpg"
+                                     },
+                        "mappings":  [
+                                         {
+                                             "source":  "big-balls-data",
+                                             "providerId":  "4823ecdc-b647-4f7f-8fd6-506ca3486121"
+                                         },
+                                         {
+                                             "source":  "football-data-org",
+                                             "providerId":  "264320"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "cmr7m5avb5g7frx062fdu17te"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "1547105802"
+                                         },
+                                         {
+                                             "source":  "pitchapi-spatial",
+                                             "providerId":  "p_4bqUUI"
+                                         },
+                                         {
+                                             "source":  "statshawk",
+                                             "providerId":  "per_06fhmv21tdt679zncrnc0rnr1g"
+                                         }
+                                     ]
+                    },
+                    {
+                        "id":  "40e38079-b73e-4ec4-875c-6dec9f179621",
+                        "name":  "Roony Bardghji",
+                        "shirtNumber":  19,
+                        "position":  "forward",
+                        "captain":  false,
+                        "birthDate":  "2005-11-15",
+                        "nationality":  "Sweden",
+                        "preferredFoot":  "left",
+                        "portrait":  {
+                                         "present":  false,
+                                         "host":  null,
+                                         "url":  null
+                                     },
+                        "mappings":  [
+                                         {
+                                             "source":  "football-data-org",
+                                             "providerId":  "184723"
+                                         },
+                                         {
+                                             "source":  "statshawk",
+                                             "providerId":  "per_06fhmv25bdwc577v9azyz5zrtg"
+                                         }
+                                     ]
+                    },
+                    {
+                        "id":  "e79251c4-c69d-46b6-a856-5cf50d6cd735",
+                        "name":  "Dani Olmo",
+                        "shirtNumber":  20,
+                        "position":  "midfielder",
+                        "captain":  false,
+                        "birthDate":  "1998-05-07",
+                        "nationality":  "Spain",
+                        "preferredFoot":  "right",
+                        "portrait":  {
+                                         "present":  true,
+                                         "host":  "media.goal-api.com",
+                                         "url":  "https://media.goal-api.com/badges/players/54973_d-olmo.jpg"
+                                     },
+                        "mappings":  [
+                                         {
+                                             "source":  "big-balls-data",
+                                             "providerId":  "9791da61-954e-48bb-b34f-cc88c70e102f"
+                                         },
+                                         {
+                                             "source":  "football-data-org",
+                                             "providerId":  "23132"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "cmr7m5atn5g6drx06ijbz30pn"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "946035169"
+                                         },
+                                         {
+                                             "source":  "pitchapi-spatial",
+                                             "providerId":  "p_4VY2QR"
+                                         },
+                                         {
+                                             "source":  "statshawk",
+                                             "providerId":  "per_06fhmv22xxr47b7kk7z6t449rr"
+                                         }
+                                     ]
+                    },
+                    {
+                        "id":  "dcbc0a2b-d38f-4bfd-ae05-202664f82776",
+                        "name":  "Frenkie de Jong",
+                        "shirtNumber":  21,
+                        "position":  "midfielder",
+                        "captain":  true,
+                        "birthDate":  "1997-05-12",
+                        "nationality":  "Netherlands",
+                        "preferredFoot":  "right",
+                        "portrait":  {
+                                         "present":  false,
+                                         "host":  null,
+                                         "url":  null
+                                     },
+                        "mappings":  [
+                                         {
+                                             "source":  "football-data-org",
+                                             "providerId":  "7559"
+                                         },
+                                         {
+                                             "source":  "statshawk",
+                                             "providerId":  "per_06fhmv22qxxd58dvraztnsyj8g"
+                                         }
+                                     ]
+                    },
+                    {
+                        "id":  "fd2212d1-d053-4c50-ac02-29c69889768e",
+                        "name":  "Marc Bernal",
+                        "shirtNumber":  22,
+                        "position":  "midfielder",
+                        "captain":  false,
+                        "birthDate":  "2007-05-26",
+                        "nationality":  "Spain",
+                        "preferredFoot":  "left",
+                        "portrait":  {
+                                         "present":  true,
+                                         "host":  "media.goal-api.com",
+                                         "url":  "https://media.goal-api.com/badges/players/255180_m-bernal.jpg"
+                                     },
+                        "mappings":  [
+                                         {
+                                             "source":  "big-balls-data",
+                                             "providerId":  "ad90cc03-897c-4b2e-8728-41eca3de727e"
+                                         },
+                                         {
+                                             "source":  "football-data-org",
+                                             "providerId":  "264321"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "cmr7fqngo37uorx0671bq7846"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "2622952689"
+                                         },
+                                         {
+                                             "source":  "pitchapi-spatial",
+                                             "providerId":  "p_2BDI7G"
+                                         },
+                                         {
+                                             "source":  "statshawk",
+                                             "providerId":  "per_06fhmv241hz67epm80vpreqd88"
+                                         }
+                                     ]
+                    },
+                    {
+                        "id":  "aa6125e6-ee3d-401a-962b-22bd9255892a",
+                        "name":  "Jules KoundÃ©",
+                        "shirtNumber":  23,
+                        "position":  "defender",
+                        "captain":  false,
+                        "birthDate":  "1998-11-12",
+                        "nationality":  "France",
+                        "preferredFoot":  "right",
+                        "portrait":  {
+                                         "present":  true,
+                                         "host":  "media.goal-api.com",
+                                         "url":  "https://media.goal-api.com/badges/players/65273_j-kounde.jpg"
+                                     },
+                        "mappings":  [
+                                         {
+                                             "source":  "big-balls-data",
+                                             "providerId":  "1e32675c-3e24-4628-a7e5-4d486d7bee9f"
+                                         },
+                                         {
+                                             "source":  "football-data-org",
+                                             "providerId":  "8499"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "cmr7m5av65g7brx06yjn2vf9p"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "2461586492"
+                                         },
+                                         {
+                                             "source":  "pitchapi-spatial",
+                                             "providerId":  "p_2CYabr"
+                                         },
+                                         {
+                                             "source":  "statshawk",
+                                             "providerId":  "per_06fhmv218sv574cbyxcf201yxr"
+                                         }
+                                     ]
+                    },
+                    {
+                        "id":  "1559fa1e-69c2-46e1-8d06-1a7cb6295be4",
+                        "name":  "Eric GarcÃ­a",
+                        "shirtNumber":  24,
+                        "position":  "defender",
+                        "captain":  true,
+                        "birthDate":  "2001-01-09",
+                        "nationality":  "Spain",
+                        "preferredFoot":  "right",
+                        "portrait":  {
+                                         "present":  true,
+                                         "host":  "media.goal-api.com",
+                                         "url":  "https://media.goal-api.com/badges/players/74849_e-garcia.jpg"
+                                     },
+                        "mappings":  [
+                                         {
+                                             "source":  "big-balls-data",
+                                             "providerId":  "81f7c020-2dd7-4ac7-ae7e-96c18ce14085"
+                                         },
+                                         {
+                                             "source":  "football-data-org",
+                                             "providerId":  "101345"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "cmr7fpswe2wr1rx0690i3toxy"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "2725548385"
+                                         },
+                                         {
+                                             "source":  "pitchapi-spatial",
+                                             "providerId":  "p_1oGhj2"
+                                         },
+                                         {
+                                             "source":  "statshawk",
+                                             "providerId":  "per_06fhmv20pxsv7dhsq9sangppt0"
+                                         }
+                                     ]
+                    },
+                    {
+                        "id":  "c48feda5-d5d7-4a0a-918d-b052833a4ad7",
+                        "name":  "Dominik LivakoviÄ",
+                        "shirtNumber":  25,
+                        "position":  "goalkeeper",
+                        "captain":  false,
+                        "birthDate":  "1995-01-09",
+                        "nationality":  "Croatia",
+                        "preferredFoot":  "right",
+                        "portrait":  {
+                                         "present":  true,
+                                         "host":  "media.goal-api.com",
+                                         "url":  "https://media.goal-api.com/badges/players/20920_d-livakovic.jpg"
+                                     },
+                        "mappings":  [
+                                         {
+                                             "source":  "football-data-org",
+                                             "providerId":  "3548"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "cmri0gwm2bvfklb07ya3z5iis"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "3743147585"
+                                         },
+                                         {
+                                             "source":  "pitchapi-spatial",
+                                             "providerId":  "p_0sL05n"
+                                         },
+                                         {
+                                             "source":  "statshawk",
+                                             "providerId":  "per_06fhmw61r5x03524h1a8ck9je4"
+                                         }
+                                     ]
+                    },
+                    {
+                        "id":  "e69f4aa4-2f8d-4dc4-91cb-0af409ea342b",
+                        "name":  "Jesse Bisiwu",
+                        "shirtNumber":  27,
+                        "position":  "forward",
+                        "captain":  false,
+                        "birthDate":  "2008-01-22",
+                        "nationality":  "Belgium",
+                        "preferredFoot":  "right",
+                        "portrait":  {
+                                         "present":  false,
+                                         "host":  null,
+                                         "url":  null
+                                     },
+                        "mappings":  [
+                                         {
+                                             "source":  "football-data-org",
+                                             "providerId":  "298634"
+                                         },
+                                         {
+                                             "source":  "statshawk",
+                                             "providerId":  "per_06fwcdt9ydzt32q93dprwnzzd0"
+                                         }
+                                     ]
+                    },
+                    {
+                        "id":  "83d0cb70-8e93-43c1-999b-73642424e0bb",
+                        "name":  "Hamza Abdelkarim",
+                        "shirtNumber":  29,
+                        "position":  "forward",
+                        "captain":  false,
+                        "birthDate":  "2008-01-01",
+                        "nationality":  "Egypt",
+                        "preferredFoot":  "both",
+                        "portrait":  {
+                                         "present":  false,
+                                         "host":  null,
+                                         "url":  null
+                                     },
+                        "mappings":  [
+                                         {
+                                             "source":  "big-balls-data",
+                                             "providerId":  "036d83fa-8be4-4a9d-a7da-5a4d2f5e53f6"
+                                         },
+                                         {
+                                             "source":  "football-data-org",
+                                             "providerId":  "274542"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "cmr7be5y30riorx06p7e3fbge"
+                                         },
+                                         {
+                                             "source":  "goal-api",
+                                             "providerId":  "2868581870"
+                                         },
+                                         {
+                                             "source":  "pitchapi-spatial",
+                                             "providerId":  "p_39OYrt"
+                                         },
+                                         {
+                                             "source":  "statshawk",
+                                             "providerId":  "per_06fhn1g059sw7c5saf4zf3n2q0"
+                                         }
+                                     ]
+                    }
+                ]
+}
