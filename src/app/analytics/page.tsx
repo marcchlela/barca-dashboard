@@ -1,11 +1,10 @@
-import SectionPlaceholder from "../../components/shell/SectionPlaceholder";
+import AnalyticsPageClient from "../../components/analytics/AnalyticsPageClient";
+import { getAnalyticsOverview } from "../../lib/analytics/get-analytics-overview";
 
-export default function AnalyticsPage() {
-  return (
-    <SectionPlaceholder
-      eyebrow="Performance Lab"
-      title="Analytics"
-      description="Advanced statistics, heatmaps, league race visualisations, match analysis and the prediction model will live here."
-    />
-  );
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+export default async function AnalyticsPage() {
+  const data = await getAnalyticsOverview();
+  return <AnalyticsPageClient data={data} />;
 }

@@ -6,6 +6,8 @@ import {
   syncBarcelonaMatches,
   syncLaLigaCurrentSeason,
 } from "../../../../lib/providers/football-data/sync";
+import { syncStandingsHistory } from "../../../../lib/analytics/standings-history";
+import { syncCompetitionFixtures } from "../../../../lib/analytics/competition-sync";
 
 import {
   syncRichMatch,
@@ -25,6 +27,10 @@ import {
 
 type SyncAction =
   | "fixture_sync"
+  | "standings_history_preview"
+  | "standings_history_sync"
+  | "competition_fixtures_preview"
+  | "competition_fixtures_sync"
   | "rich_match_preview"
   | "rich_match_sync"
   | "match_qa"
@@ -39,6 +45,7 @@ type RequestBody = {
 
   matchId?:
     unknown;
+  competitionCode?: unknown;
 };
 
 const MATCH_ACTIONS =
@@ -141,6 +148,23 @@ export async function POST(
           matches,
         };
 
+        break;
+      }
+
+      case "standings_history_preview":
+        result = await syncStandingsHistory(true);
+        break;
+
+      case "standings_history_sync":
+        result = await syncStandingsHistory(false);
+        break;
+
+      case "competition_fixtures_preview":
+      case "competition_fixtures_sync": {
+        if (body.competitionCode !== "CL" && body.competitionCode !== "CDR" && body.competitionCode !== "SSC") {
+          return badRequest("competitionCode must be CL, CDR or SSC.");
+        }
+        result = await syncCompetitionFixtures(body.competitionCode, action === "competition_fixtures_preview");
         break;
       }
 
@@ -282,6 +306,10 @@ function isSyncAction(
 ): value is SyncAction {
   return [
     "fixture_sync",
+    "standings_history_preview",
+    "standings_history_sync",
+    "competition_fixtures_preview",
+    "competition_fixtures_sync",
     "rich_match_preview",
     "rich_match_sync",
     "match_qa",

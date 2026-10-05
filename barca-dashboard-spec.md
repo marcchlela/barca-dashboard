@@ -1,11 +1,12 @@
 # FC Barcelona Dashboard — Canonical Product & Engineering Spec
 
-**Version:** 0.1.0  
+**Version:** 0.2.0  
 **Status:** Living source of truth  
-**Last updated:** 2026-10-03  
-**Audited branch:** `match-center-ui`  
-**Audited commit:** `26175a6c3c588a39c6ec673038a06b31b3c8af76`  
-**Commit:** `build match center diary and automatic match media`
+**Last updated:** 2026-10-04  
+**Audited branch:** `main`  
+**Audited commit:** `b658f0da5055ec19aa3b41cc4b6d5fe09b7a55df`  
+**Commit:** `finish squad page and official player data pipeline`  
+**Post-audit confirmed local state:** official FC Barcelona portraits enabled for the full verified 27-player 2026/27 first-team squad; lint/build validation passed.  
 
 ---
 
@@ -16,6 +17,10 @@ This file is the canonical living spec for the FC Barcelona Dashboard.
 Update it whenever a meaningful product, design, data, architecture, deployment, provider, or roadmap decision changes. The goal is to keep one reliable source of truth instead of reconstructing the project from old chats.
 
 The project is currently **one user + FC Barcelona first**. Barça-only multi-user support is a realistic later extension. A fully multi-club platform is a much larger future idea and is explicitly **not current scope**.
+
+Current implementation workflow is deliberately page-by-page. As of 2026-10-04, Overview, Match Center, Admin, Matches/Calendar and Squad are strong/functional; **Analytics and its current-season competition workflow are implemented, live database-verified, and browser-checked across desktop/mobile kit themes**.
+
+The spec records both pushed repository state and explicitly confirmed/tested local changes when they are newer than the latest pushed commit.
 
 ---
 
@@ -208,12 +213,13 @@ The entire screen should not be flooded with mint. The current dark petrol/teal 
 
 # 7. Current technology stack
 
-Current audited repository stack:
+Current repository stack:
 
 - Next.js 16.3.5
 - React 19.2.8
-- TypeScript
+- TypeScript 5
 - Tailwind CSS 4
+- ESLint 9 + `eslint-config-next`
 - Prisma 8 RC contract/ORM
 - PostgreSQL
 - `@prisma/orm-postgres`
@@ -228,6 +234,18 @@ Current audited repository stack:
 
 Local PostgreSQL has used host port `5434`.
 
+Current validation state as of 2026-10-04:
+
+- `npm run lint` passes with **0 errors**;
+- remaining lint output is non-blocking warnings in older UI files, mainly raw `<img>` optimization suggestions and one unused variable;
+- generated Prisma contract typings and migration snapshots are intentionally ignored by ESLint rather than edited;
+- `npm run build` passes successfully under Next.js 16.3.5;
+- TypeScript compilation, page-data collection and static generation all complete successfully.
+
+Development rule:
+
+> Never edit generated Prisma contract/snapshot output merely to satisfy application lint rules. Exclude generated artifacts from linting and fix application code instead.
+
 ---
 
 # 8. Repository structure
@@ -239,53 +257,117 @@ src/
   app/
     page.tsx
     matches/
+      page.tsx
       [id]/
+    squad/
+      page.tsx
     analytics/
     club/
     media/
     my-barca/
     settings/
-    squad/
+    admin/
+      page.tsx
+      providers/
+      issues/
+      sync/
+      media/
+        add/
+        review/
     api/
+      admin/
+        sync/
+        squad-audit/
+        squad-metadata/
+        squad-heatmaps/
+        pitch-heatmap-probe/
+        media/
       dev/
 
   components/
+    admin/
     dashboard/
     intro/
     match/
     match-center/
+    matches/
+      MatchesOverview.tsx
+      MatchesCalendarView.tsx
+      CurrentMatchWindow.tsx
+      CompetitionLogo.tsx
     season/
     shell/
+    squad/
+      SquadOverview.tsx
+      PlayerQuickView.tsx
+      CountryFlag.tsx
     theme/
     icons/
 
   lib/
+    admin/
     dashboard/
     data-lab/
     matches/
+      get-matches-overview.ts
+      get-match-center.ts
+      get-match-navigation.ts
+      get-match-media.ts
+    squad/
+      get-squad-overview.ts
+      official-squad.ts
+      sync-official-squad.ts
+      sync-squad-metadata.ts
+      sync-captains.ts
+      sync-player-heatmaps.ts
+      player-heatmap.ts
+      wikidata-player-metadata.ts
     providers/
       football-data/
       goal-api/
       big-balls/
       statshawk/
+      pitch-api/
+      sofascore-spatial/
       rich-match/
       youtube-fcbarcelona/
       shared/
 
   prisma/
     contract.prisma
+    contract.d.ts   # generated
     db.ts
+
+migrations/
+  snapshots/        # generated historical contract snapshots
 
 docs/
 assets/
 tools/
 ```
 
-Current branch notes:
+Canonical repository:
 
-- `match-center-ui` contains the newest Match Center / My Match / YouTube work;
-- `data-backbone-v2` contains earlier data-backbone history;
-- `main` should only be considered fully current after deliberate merge.
+```text
+https://github.com/marcchlela/barca-dashboard
+```
+
+Current source-of-truth branch is `main`.
+
+Latest audited pushed milestone:
+
+```text
+b658f0da5055ec19aa3b41cc4b6d5fe09b7a55df
+finish squad page and official player data pipeline
+```
+
+The spec may also record explicitly confirmed local changes made after that commit when the user has tested them successfully; those should be pushed at the next checkpoint.
+
+Shared-shell direction remains:
+
+- prefer a route-group layout such as `src/app/(dashboard)/layout.tsx` for persistent fan-facing shell state;
+- the Stadium Rail, theme/season context and common dashboard chrome should ultimately be shared rather than duplicated;
+- `/admin` remains deliberately separate from the fan-facing shell.
 
 ---
 
@@ -308,45 +390,75 @@ Current features:
 - themed scrollbars;
 - signature 3D intro.
 
+Desktop behavior rule:
+
+- Stadium Rail should remain persistent/sticky while the main content scrolls;
+- page content should not make the rail visually drift away with ordinary document scrolling.
+
 ## `/matches`
 
-**Placeholder.**
+**Implemented / functional.**
 
-Planned:
+Current features include:
 
-- complete schedule;
-- results;
-- calendar;
-- competition filtering;
-- match history;
-- watched/rated indicators;
-- Match Center links.
+- full season match list;
+- finished/upcoming/status filtering;
+- opponent/competition/venue search;
+- dynamic competition filters generated from canonical season data;
+- competition logos in filters and match rows;
+- special contrast treatment for dark UCL artwork on dark backgrounds;
+- themed match rows consistent with Home/Away/Third dashboard language;
+- more breathing room from viewport edges than the first iteration;
+- direct `Open Match` / Match Center navigation;
+- automatic current-match window so the page focuses around the latest finished and next upcoming fixture instead of forcing a long manual scroll later in the season;
+- FIFA Career Mode-inspired **Season Calendar** alternative view;
+- calendar month navigation and current-date/current-period focus;
+- match detail focus from calendar tiles.
+
+Competition behavior:
+
+- the page does not hard-code only La Liga/UCL;
+- it renders competitions that exist in canonical season data;
+- Copa del Rey, Spanish Super Cup and other Barça competitions should appear automatically once fixture ingestion contains them and their assets/mappings are available.
 
 ## `/squad`
 
-**Placeholder.**
+**Implemented / functional and data-complete for the verified current 2026/27 first-team roster.**
 
-Planned:
+Current features include:
 
-- squad browser;
-- player pages;
-- positions;
-- availability;
-- season stats;
-- favourite/pinned players.
+- position-grouped squad browser;
+- official FC Barcelona portraits for the full verified first-team squad;
+- smooth player-card hover behavior;
+- pointer cursor on interactive cards/controls;
+- favourite-player persistence/filtering;
+- captain treatment;
+- centered player quick-view profile;
+- previous/next player arrows;
+- season stats and advanced per-player context;
+- recent form;
+- rating history graph;
+- real match-derived heatmaps;
+- per-match and aggregate heatmap modes;
+- nationality flags, age/DOB, preferred foot and availability/profile metadata.
+
+The verified 2026/27 first-team roster currently contains **27 players** and **5 captains**.
 
 ## `/analytics`
 
-**Placeholder.**
+**Performance Lab implemented, live database-verified, and responsive browser-checked.** The page is a current-season editorial readout with a 20-club League Race, form/goals and observed team-stat trends, competition and venue splits, player leaders/comparison, and side-by-side stored heatmaps. It reads canonical data only and reports contributing-match coverage. Missing values remain gaps; the predictor remains future scope.
 
-Planned:
+2026-10-04 refinement: Analytics now uses squared Stadium Control Room surfaces, icon-led sticky section navigation, a current-season competition filter (All / La Liga / Champions League / Copa del Rey / Spanish Super Cup when fixtures are stored), 20 stored crests and stable club colors in League Race, inspected-round crest markers, in-row qualification/relegation bands, themed round controls, chart axes and keyboard inspection, competition/venue marks, portrait-led mutually exclusive player pickers, and shared Squad-style continuous heatmaps. The display-only lateral heatmap axis is inverted in both Analytics and Squad after checking known flank players; raw `acting_ltr` cells are unchanged. The competition filter applies to Barça trends, splits, player totals/rates, and heatmaps. The All view retains La Liga's League Race. Per-90 values require observed minutes.
 
-- advanced team stats;
-- player analytics;
-- league race;
-- heatmaps when trustworthy;
-- match analysis;
-- prediction model.
+2026-10-05 polish: every League Race rank has a dashed guide; the crest marker now follows its club's path at the inspected matchday instead of occupying a misleading fixed left axis. Standings keep only edge-color bands in rows and explain title, Champions League, provisional Europa/Conference League, and relegation below the table. European bands are illustrative because cup winners and UEFA allocations may shift places. Momentum and observed charts show five-match windows with arrow, swipe, and keyboard inspection, explicit zero baselines, integer points/goals ticks, and percent-scale possession/pass-accuracy values. Leader totals omit compact coverage suffixes; comparison includes appearances. Analytics now renders the same continuous canvas heatmap as Squad, retaining display-only Y inversion and stored cells unchanged.
+
+Further Analytics polish: Season Pulse omits provider fixture counts; League Race crest markers have more vertical room at the mobile minimum width. Zone dots are explicitly sized, with gold title, blue Champions League, orange Europa League, green Conference League and red relegation bands. Trend cards preserve exact match values while overlaying a three-match rolling average only across fully observed windows. Touch swipe and horizontal two-finger trackpad scroll advance the five-game window. Player comparison highlights only a strictly higher observed value; ties and missing values remain neutral.
+
+The additive `CompetitionFixtureSnapshot` migration stores full-competition fixtures separately from the canonical Barça match spine. The page reads stored rows only. Admin Sync Control deliberately previews or writes Champions League via football-data.org (full fixture list and official 36-team current table) and Copa/Super Cup via GOAL API (per-row season filtering of its mixed-season fixture feed). Writes use provider IDs idempotently and only promote Barça fixtures into canonical matches when both team identities are unambiguous. Overview's standing lookup is explicitly scoped to La Liga. Bracket paths are drawn only when a stored finished tie identifies a winner and the next fixture confirms the participant; two-legged ties require both legs and penalties are respected. The desktop bracket is scroll-contained; mobile focuses one stage at a time. Club World Cup remains absent until a relevant current-season edition has verified fixtures.
+
+Live validation on 2026-10-04: CL preview found 144 fixtures and a 36-club table; Copa preview filtered 20 current fixtures from 613 mixed-season rows; Super Cup preview found two current fixtures. Initial writes stored these rows, and repeat writes changed zero fixtures and zero CL standings rows. Eight complete La Liga rounds, 27 players and 27 stored heatmaps remain available. Overview retained Barça's La Liga matchday-8 standing (first, 21 points, +24). Headless desktop/mobile checks covered all three kits and all three competition-specific views with no page-level horizontal overflow. Browser interaction checks verified crest selection, keyboard round inspection, mutually exclusive player pickers, and Gordon/Adeyemi heatmap orientation. A hydration warning from an SVG title and tiny SVG opacity rounding differences was fixed and the subsequent browser log was clean.
+
+Admin Sync Control now has bounded preview/write actions for missing historical La Liga rounds (up to eight per run). Each provider response is checked for season, competition, 20 canonical teams, unique positions, and result arithmetic before writing. Filtered historical tables are labelled `results_compiled` and can omit point deductions; unfiltered current standings are labelled `official_current`. The additive standings-provenance migration was applied on 2026-10-04. Provider preview validated rounds 1–7 at 20 teams each; first write stored all seven, and repeat write made no changes. The development-only `/api/dev/qa/analytics` reported eight complete 20-team rounds, eight finished Barça matches with team/player-stat coverage, 27 current players, and 27 stored heatmaps. Overview and Analytics agreed on Barça at matchday 8: first place, 21 points, +24 goal difference.
 
 ## `/club`
 
@@ -361,9 +473,11 @@ Planned:
 
 ## `/media`
 
-**Placeholder.**
+**Fan-facing route still placeholder.**
 
-Planned:
+The underlying match-media system and admin media tooling already exist.
+
+Planned fan-facing route:
 
 - official highlights;
 - goal clips;
@@ -397,6 +511,22 @@ Planned:
 - dashboard behavior;
 - personal settings;
 - selected diagnostics where appropriate.
+
+## `/admin`
+
+**Implemented / functional private control room.**
+
+Current areas include:
+
+- Overview;
+- Media manager;
+- Media add flow;
+- Media review queue;
+- Providers;
+- Data Issues;
+- Sync Control.
+
+Admin remains separate from the fan-facing Stadium Rail.
 
 ---
 
@@ -508,6 +638,10 @@ Rules:
 
 # 15. Provider ownership
 
+Core rule:
+
+> Providers supply evidence. The canonical database and explicit ownership rules decide product truth.
+
 ## football-data.org
 
 Primary role:
@@ -515,7 +649,8 @@ Primary role:
 - fixture spine;
 - results;
 - standings;
-- base match identity.
+- competition/team identity;
+- base squad metadata fallback where useful.
 
 ## GOAL API
 
@@ -529,9 +664,13 @@ Where available:
 - coach;
 - goal events;
 - scorer/assist;
-- team statistics.
+- team statistics;
+- many player portraits used historically before the official-portrait switch.
 
-Not every fixture is available.
+Important ownership change:
+
+- match lineups **do not own `SquadMembership`**;
+- a youth/reserve player appearing in one first-team match must not become a permanent first-team squad member because of a lineup sync.
 
 ## Big Balls Data
 
@@ -552,14 +691,61 @@ Known limitation:
 Current role:
 
 - player-stat fallback/enrichment;
+- squad metadata evidence;
 - fill missing Big Balls fields;
-- provide strong fallback when Big Balls does not cover a match.
+- strong fallback when Big Balls does not cover a match.
 
 Canonical rule:
 
 - Big Balls stays primary when present;
 - StatsHawk fills only missing/null primary fields;
 - zero is preserved.
+
+## PitchAPI spatial
+
+Current production spatial source for player heatmaps.
+
+Used for:
+
+- per-match player heatmaps;
+- stored spatial samples;
+- season-average player heatmaps;
+- competition-average heatmaps;
+- activity-centre/centroid calculation.
+
+Current verified heatmap run:
+
+- all 8 targeted finished Barça matches resolved after the Santander alias fix;
+- zero unresolved players in the successful runs;
+- data is persisted and reused rather than fabricated client-side.
+
+## SofaScore spatial
+
+Experimental/probe-only.
+
+A server-side attempt returned HTTP `403 Forbidden`, so SofaScore is **not** the current production heatmap source. Keep the adapter/research path only if useful; do not rely on it for core functionality.
+
+## Wikidata
+
+Current role:
+
+- safe metadata fallback where exact identity/DOB evidence permits it;
+- nationality/footedness research/fallback.
+
+Coverage is incomplete and must never be treated as universal.
+
+## Official FC Barcelona website
+
+Current authoritative season-roster/profile layer for selected first-team metadata:
+
+- verified 2026/27 first-team roster manifest;
+- official player identity/display naming;
+- official first-team portrait URLs;
+- season squad-number verification where curated.
+
+Current portrait policy:
+
+> Official Barça portraits are preferred for the full verified first-team squad and should not be downgraded by later provider portrait syncs.
 
 ## OpenFootball
 
@@ -598,16 +784,59 @@ Provider fixture matching uses:
 - competition;
 - kickoff/date;
 - score for finished fixtures;
-- existing provider mapping when available.
+- existing provider mapping when available;
+- conservative explicit team aliases where provider naming differs.
+
+Example fixed edge case:
+
+- `Santander` / `Racing Santander` / `Real Racing Club de Santander` are deliberately normalized to one safe club identity for spatial matching.
+
+Avoid broad fuzzy club matching that could merge genuinely different teams.
 
 ## Player identity
 
 Resolution priority:
 
 1. existing provider mapping;
-2. exact normalized full name within correct match team;
-3. constrained safe evidence such as initial/surname + shirt + broad position;
-4. unresolved instead of guessed.
+2. exact normalized full name within the relevant team/squad;
+3. verified DOB/position or similarly strong constrained evidence;
+4. constrained safe alias/token evidence;
+5. unresolved instead of guessed.
+
+Mojibake repair is part of normalization and must handle repeated/double encoding where needed.
+
+## Official squad ownership
+
+`SquadMembership` is owned by the verified seasonal first-team roster, not by individual match lineups.
+
+Current files:
+
+```text
+src/lib/squad/official-squad.ts
+src/lib/squad/sync-official-squad.ts
+```
+
+Current 2026/27 rules:
+
+- official manifest expects 27 players;
+- missing canonical players may be safely created when the verified manifest supplies identity, DOB, nationality, position, shirt number and preferred foot;
+- official roster sync can reactivate/create current memberships;
+- stale first-team memberships are closed only when the full manifest resolves safely;
+- lineups remain match history and do not permanently promote a player to the first team.
+
+This fixed the earlier incorrect state in which one-off lineup participants polluted the current first-team squad.
+
+## Captain ownership
+
+Current verified 2026/27 captain group contains 5 players:
+
+- Raphinha;
+- Pedri;
+- Eric García;
+- Frenkie de Jong;
+- Lamine Yamal.
+
+The UI should present captain status as a compact armband-style `C Captain` treatment, not a generic “captain group” label.
 
 ## Pass accuracy
 
@@ -646,23 +875,35 @@ Correct goal counts were restored.
 
 ---
 
-# 17. Current rich-match coverage
+# 17. Current rich-match / current-season coverage
 
-Current tested 2026/27 La Liga state:
+Current canonical match-data foundation includes:
 
-- 7 finished La Liga matches processed;
-- all processed successfully;
-- canonical player stats ready for all;
+- football-data fixture spine;
+- GOAL rich match/team data where available;
+- Big Balls player data where available;
+- StatsHawk fallback/enrichment;
+- official YouTube match media;
+- PitchAPI player spatial data for stored heatmaps.
+
+Earlier verified rich-data coverage included:
+
+- 7 finished La Liga matches processed successfully;
+- canonical player stats ready for the tested matches;
 - blocking canonical conflicts reduced to zero;
 - 5 full-rich matches;
 - 2 partial Big Balls/fallback matches;
-- StatsHawk filled many missing fields.
+- StatsHawk filling many missing fields;
+- a Champions League match against Feyenoord successfully persisted with GOAL + StatsHawk fallback.
 
-A Champions League match against Feyenoord also passed with:
+Current spatial milestone is newer:
 
-- GOAL for rich match/team data;
-- StatsHawk for player stats where Big Balls had no fixture;
-- successful persistence and QA.
+- 8 finished Barça matches targeted for heatmap ingestion;
+- all 8 now resolve after the Santander team-alias fix;
+- player heatmaps are stored for canonical appearances;
+- no unresolved player identities in the successful batch.
+
+Do not interpret spatial coverage as proof that every provider/stat field is universal. Coverage remains provider- and match-dependent.
 
 ---
 
@@ -1038,104 +1279,172 @@ SEVILLA 1 vs 3 FC BARCELONA | LALIGA 2026/27 MD07
 
 # 22. Media automation requirement
 
-Manual per-match sync is **not** the intended production workflow.
+Manual per-match media sync is **not** the intended production workflow.
 
-Target flow:
+The project now has more than a target design: core automation pieces are implemented.
+
+Current components include:
+
+- trusted single-match matcher;
+- season/backfill helper;
+- automatic worker;
+- review-queue synchronization;
+- development worker endpoint;
+- internal job endpoint;
+- Admin Sync controls.
+
+Current intended flow:
 
 ```text
 match finishes
   ↓
-background worker notices
+automatic worker evaluates eligibility
   ↓
-wait/check for official upload
+query official Barça uploads efficiently
   ↓
-match video automatically
+score/classify candidates
   ↓
-high confidence → persist
+high confidence → persist canonical media
   ↓
-ambiguous → Admin Review
+ambiguous candidate → Media Review queue
   ↓
-Match Center updates
+no upload yet → remain retry-eligible
+  ↓
+Match Center updates once canonical media exists
 ```
 
-If no upload exists yet:
+Current worker direction:
 
-- do not permanently fail;
-- keep the match eligible for future retry.
+- inspect finished Barça matches;
+- prefer recent/missing-media eligibility rather than rescanning everything forever;
+- support force-all-finished/backfill modes for deliberate admin/dev use;
+- remain idempotent;
+- preserve human-reviewed queue decisions;
+- never automatically put an approved/rejected candidate back into `pending` merely because scorer evidence refreshes.
 
-The automatic worker should eventually revisit only:
+Remaining production gap:
 
-- recently finished matches;
-- matches missing official media;
-- matches still pending/review/retry.
+- schedule the internal job reliably on the home server;
+- add operational logging/retry visibility;
+- keep YouTube/API usage quota-aware.
 
-It should not rescan the whole historical season forever.
+The development endpoint is not the desired production scheduler.
 
 ---
 
 # 23. Admin Control Room
 
-Planned dedicated area:
+Dedicated private area:
 
 ```text
 /admin
 ```
 
-Separate from fan-facing navigation.
+It is **implemented** and remains separate from fan-facing navigation.
 
-Potential sections:
+Current sections:
 
-- Overview
-- Matches
-- Media
-- Players
-- Providers
-- Data Issues
-- Sync
-- Users later
+- Overview;
+- Media;
+- Media Add;
+- Media Review;
+- Providers;
+- Data Issues;
+- Sync Control.
 
-## Admin Media Review
+Future sections may include Players and Users when needed.
 
-Planned first admin module.
+## Admin Overview
 
-Should support:
+Implemented control-room summary of current canonical/database state.
 
-- discovered candidates;
-- accepted/review/rejected queues;
-- confidence score;
-- scoring reasons;
-- thumbnail/title/channel;
-- predicted match;
-- approve;
-- reject;
-- change match;
-- change media type;
-- mark featured;
-- unlink/remove;
-- manual URL fallback;
-- rescan one match;
-- rescan season;
-- see why a candidate was rejected.
+The admin visual language should match the product while remaining more diagnostic and operational than the fan-facing pages.
 
-## Provider/Data admin
+## Admin Media
 
-Later:
+Implemented tooling includes:
 
-- GOAL health;
-- Big Balls quota;
-- StatsHawk quota;
-- YouTube sync state;
-- unresolved identities;
-- mapping conflicts;
-- missing formations;
-- missing portraits;
-- missing media;
-- incomplete fixtures;
-- QA;
-- force resync;
-- manual overrides.
+- media manager;
+- manual add flow;
+- review queue;
+- candidate inspection/approval workflows;
+- match/media association controls.
 
-Existing `ManualOverride` model can support future correction workflows.
+The underlying automatic matcher remains responsible for safe auto-persistence when confidence is high.
+
+## Providers
+
+Implemented provider-health/architecture page.
+
+Current design requirements:
+
+- provider logo next to each provider for faster visual scanning;
+- live status;
+- capability/role summary;
+- coverage/counts;
+- configured/registered state;
+- last activity;
+- priority/ownership context;
+- quota/health information where available;
+- direct link to Media Manager for the media provider.
+
+Provider logos are stored under the app's provider assets and must remain readable on dark surfaces.
+
+## Data Issues
+
+Implemented issue browser.
+
+Current interaction requirements:
+
+- filter controls;
+- severity controls;
+- clear high/medium/low visual language;
+- open/current issue browsing;
+- `cursor-pointer` on interactive controls and rows/actions;
+- preserve the compact control-room layout rather than generic admin-table styling.
+
+## Sync Control
+
+Implemented and manually tested.
+
+Current supported actions include:
+
+- fixture sync;
+- incremental official Barça YouTube media worker;
+- per-match rich-data preview/write;
+- per-match media preview/write;
+- selected canonical sync operations.
+
+Write actions use confirmation/preview patterns where appropriate.
+
+## Squad admin/debug endpoints
+
+Current development/admin endpoints include:
+
+```text
+/api/admin/squad-audit
+/api/admin/squad-metadata
+/api/admin/squad-heatmaps
+/api/admin/pitch-heatmap-probe
+```
+
+The squad audit became the final source for checking missing DOB, nationality, preferred foot, portrait, position and captain counts.
+
+Current verified squad audit target is fully green:
+
+- 27 current players;
+- 5 captains;
+- 0 missing birth dates;
+- 0 missing nationalities;
+- 0 missing preferred feet;
+- 0 missing portraits;
+- 0 unknown positions.
+
+## Security direction
+
+Admin write/debug endpoints remain development/private until proper admin authentication exists.
+
+Existing `ManualOverride` foundations remain useful for future correction workflows.
 
 ---
 
@@ -1251,38 +1560,151 @@ Desired:
 
 # 27. Analytics roadmap
 
-Planned:
+**This is the next main fan-facing page to build.**
+
+Development process rule from the current page-by-page workflow:
+
+> Finish each major page deeply before moving to the next. Current completed sequence is Overview → Matches/Calendar → Squad → Analytics next.
+
+Desired Analytics identity:
+
+- still Stadium Control Room, not a generic chart dashboard;
+- editorial/broadcast composition;
+- kit-theme aware;
+- use real canonical data only;
+- charts/visuals should answer football questions, not exist as decoration.
+
+Planned first-class analytics areas:
 
 - team season stats;
-- player season stats;
-- advanced match analytics;
-- league race;
 - form trends;
-- player comparison;
 - competition splits;
 - home/away splits;
-- heatmaps when trustworthy;
-- shot maps when trustworthy;
-- passing/creation views;
-- possession/territory visualizations when supported.
+- player season stats;
+- player comparisons;
+- League Race;
+- attacking/defensive profile;
+- match-to-match trend lines;
+- rating trends;
+- passing/creation views where supported;
+- possession/territory views where supported;
+- heatmaps using the now-working spatial pipeline;
+- shot maps only when trustworthy shot coordinates exist;
+- standings/title-race context;
+- future model/predictor.
+
+Specific requested signature visual:
+
+## League Race
+
+- all 20 La Liga teams;
+- horizontal/line-style position evolution across rounds;
+- Barça strongly emphasized;
+- interactive round inspection;
+- title/top-four/relegation context;
+- readable team identity without turning into a spaghetti chart.
+
+Potential Analytics page structure to explore next:
+
+1. Season pulse / KPI strip;
+2. form + results trend;
+3. League Race;
+4. team attacking/defensive profile;
+5. player leaders;
+6. player comparison lab;
+7. competition split tabs;
+8. spatial section using real heatmap data;
+9. predictor later, clearly separated as a model rather than observed truth.
 
 Rule:
 
 > Never create a sophisticated visualization from data the project does not actually possess.
 
+If a requested metric such as xG, shot coordinates, passing network coordinates or territory data is unavailable, the UI should say so or omit the visualization rather than inventing it.
+
 ---
 
 # 28. Heatmaps / spatial data
 
-Desired, but current providers do not provide universal trustworthy tracking/event coordinates.
+**Implemented for player heatmaps using real provider spatial data.**
 
-Do not fake heatmaps from formation positions.
+Current production source:
 
-Potential later sources:
+```text
+PitchAPI spatial
+```
 
-- legitimate event-coordinate provider;
-- suitable open historical event datasets;
-- carefully derived visuals with explicit semantics.
+Current pipeline:
+
+1. resolve canonical Barça match;
+2. resolve provider match identity conservatively;
+3. fetch provider player heatmaps;
+4. map provider players to canonical match appearances;
+5. persist match heatmaps;
+6. reuse stored data in player profiles;
+7. derive aggregate season/competition heatmaps from real stored match heatmaps.
+
+Current verified state:
+
+- 8 finished matches targeted;
+- all 8 resolved after adding the Santander/Racing alias handling;
+- no unresolved players in the successful batch;
+- sync is idempotent and can distinguish written vs existing samples.
+
+## Player Quick View heatmap modes
+
+Current requested/implemented modes:
+
+- **Season Avg**;
+- **La Liga Avg** when matches exist;
+- **UCL Avg** when matches exist;
+- individual match heatmaps in a horizontally scrollable match selector.
+
+Per-match selector should include:
+
+- opponent crest/logo;
+- competition logo;
+- fixture context;
+- only real matches with stored heatmap data.
+
+## Rendering
+
+The first discrete/blocky renders were rejected visually.
+
+Current target is a TV/broadcast-style **continuous density field**:
+
+- smooth connected gradients;
+- multiple intensity bands rather than only “hot” vs “cold”;
+- readable over a football pitch;
+- restrained enough not to overpower line markings;
+- direction normalized so Barça attack reads consistently left → right;
+- `Activity Center`/centroid marker represents the weighted centre of the displayed heatmap, not a guessed nominal formation position.
+
+Do not over-penalize lower-density areas; the visualization should preserve intermediate intensity rather than collapsing most of the pitch to one cold color.
+
+## Aggregate semantics
+
+Season/competition averages are derived from stored per-match heatmaps.
+
+They are not an average of formation positions and are not fabricated tracking.
+
+Recent-form match cards and heatmap match choices should only represent matches where that player actually has appearance/data context.
+
+## SofaScore note
+
+A SofaScore spatial experiment returned `403 Forbidden` and is not used for production heatmaps.
+
+## Future spatial work
+
+Potential later additions:
+
+- team-average heatmaps;
+- role/zone comparisons;
+- shot maps if real coordinates become available;
+- passing/creation maps if real event coordinates become available;
+- goal-path replay when sequence coordinates are trustworthy.
+
+Formation UI coordinates must never be reused as tracking data.
 
 ---
 
@@ -1325,55 +1747,187 @@ This is analytical/fun, not betting-oriented.
 
 ---
 
-# 31. Squad and player pages
+# 31. Squad and player profiles
 
-Planned after current core route work.
+**Implemented / current major milestone complete.**
 
-Player page direction:
+## Verified first-team roster
 
-- portrait;
+The 2026/27 squad is maintained through an explicit verified roster manifest.
+
+Current verified state:
+
+- **27 current first-team players**;
+- **5 captains**;
+- stale one-off lineup memberships removed from current-squad state;
+- Brian Fariñas is intentionally included as a current first-team player;
+- Frenkie de Jong, Roony Bardghji and Jesse Bisiwu were restored correctly after fixing canonical membership ownership.
+
+`SquadMembership` must represent verified season membership, not “appeared in one match”.
+
+## Official portraits
+
+Current product decision:
+
+> Use official FC Barcelona player portraits as the preferred portrait source for the entire verified first-team squad.
+
+Reasons:
+
+- consistent framing;
+- consistent kit/pose treatment;
+- higher perceived quality;
+- visually coherent cards and profile popup.
+
+Provider portraits remain fallback evidence only. Later metadata sync must not downgrade an already stored official Barça portrait.
+
+Current audit target: 0 missing portraits.
+
+## Squad browser
+
+Current features:
+
+- grouped by position;
+- polished player cards;
+- smooth portrait hover transitions rather than sudden image jumps;
+- pointer cursor for clickable cards/actions;
+- favourite toggle/filter;
+- captain marker;
+- preferred foot;
+- nationality/flag;
+- availability/profile context;
+- theme-aware presentation.
+
+## Player Quick View
+
+The chosen final concept is **Profile**.
+
+Rejected direction:
+
+- do not keep a permanent Broadcast/Profile/Hero design toggle in the product;
+- the experiments were useful for choosing the final structure, not intended as a feature.
+
+Final popup requirements:
+
+- centered modal;
+- **not fullscreen**;
+- visible breathing room around it;
+- rich enough to act as the current player-profile experience;
+- internal modal scrolling when needed;
+- background document/body must not scroll while modal is open;
+- sticky left identity panel;
+- right-side content scrolls;
+- previous/next player arrows;
+- close control;
+- keyboard-safe interaction.
+
+### Sticky left identity panel
+
+Keep:
+
 - position;
-- nationality;
-- age/basic profile;
-- shirt;
-- season minutes;
-- goals;
-- assists;
-- shooting/passing/defensive stats;
-- form;
-- competition splits;
-- match log;
-- availability/injury when reliable;
-- favourite/pin;
-- player media.
+- large official portrait;
+- shirt number integrated without awkward overlap;
+- name;
+- nationality with real flag;
+- availability;
+- captain state when applicable.
 
-Match Center click remains a match-specific modal. Full page is for broader player context.
+Nationality presentation should be visually compact and consistent, e.g. flag + country name.
+
+Age format:
+
+```text
+29 (DD/MM/YYYY)
+```
+
+### Right-side profile content
+
+Current/desired order:
+
+1. profile/basic information and stat boxes;
+2. season performance data;
+3. recent form;
+4. rating-over-time graph;
+5. heatmap/spatial section.
+
+Avoid duplicate availability information on both sides of the modal.
+
+### Recent form
+
+- only matches in which the player actually played/has appearance data;
+- display roughly five useful recent matches when space permits;
+- horizontal carousel is acceptable when required;
+- opponent/competition context should remain visual.
+
+### Rating history
+
+Implemented graph using canonical rating history.
+
+### Heatmap
+
+Implemented with real stored PitchAPI heatmaps.
+
+See section 28 for rendering and aggregate behavior.
+
+## Captain treatment
+
+Use an armband-style icon with `C Captain` semantics rather than plain text such as “Captain Group”.
+
+## Favourite players
+
+`FavouritePlayer` is active in the Squad UI:
+
+- add/remove favourite;
+- favourites filter;
+- favourites can later feed My Barça/personal recap.
+
+## Final metadata audit
+
+Current green target achieved:
+
+- missing DOB: 0;
+- missing nationality: 0;
+- missing preferred foot: 0;
+- missing portrait: 0;
+- unknown position: 0;
+- captains: 5.
+
+The full dedicated `/players/[id]` route is no longer required immediately because Quick View is now intentionally rich. A future dedicated career/history page can still be added if the profile scope grows beyond what belongs in the centered modal.
 
 ---
 
 # 32. Favourites
 
-Schema includes `FavouritePlayer`.
+Schema includes `FavouritePlayer` and the Squad UI now actively uses it.
+
+Current behavior:
+
+- toggle favourite from player UI;
+- persist through `/api/favourites/player`;
+- filter Squad to favourites;
+- preserve favourite state inside player Quick View.
 
 Future behavior:
 
-- pin favourite players;
-- prioritize them in Squad/My Barça;
-- use favourites in personal recap.
+- prioritize favourite players in My Barça;
+- surface favourite-player season summaries;
+- use favourites in end-of-season personal recap;
+- optional favourite-player notifications later if notifications are introduced.
 
 ---
 
 # 33. Core schema foundations
 
-Current schema already includes foundations for:
+Current schema includes foundations for:
 
 - Season
 - Competition
 - Team
 - Player
-- Match
+- SquadMembership
 - Lineup
 - LineupPlayer
+- Match
 - MatchEvent
 - MatchStatistic
 - PlayerMatchStatistic
@@ -1391,6 +1945,18 @@ Current schema already includes foundations for:
 - SeasonMoment
 - PlayerAbsence
 - ManualOverride
+
+Additional product-level data now built around these foundations includes:
+
+- verified official first-team roster manifest;
+- captain reconciliation;
+- squad metadata audit;
+- stored player heatmap/spatial provider mappings;
+- competition-average and season-average heatmap derivation.
+
+Schema/model ownership rule:
+
+> Do not create a new permanent relation from temporary provider evidence when an authoritative season-level concept already exists. The lineup → squad-membership bug is the canonical example.
 
 ---
 
@@ -1412,6 +1978,12 @@ Every future feature should obey:
 12. Repair scripts should be narrow and auditable.
 13. QA should verify invariants after repair.
 14. Secrets remain server-side.
+15. Official season roster owns `SquadMembership`; match lineups do not.
+16. Official Barça portraits outrank provider portraits for current first-team profile display.
+17. Spatial visualizations must be based on actual spatial samples/events, never formation coordinates.
+18. Explicit alias tables are preferred to unsafe broad fuzzy matching for clubs/identities.
+19. A failed/blocked external source does not justify scraping/fabricating equivalent data; use another legitimate source or show missing data.
+20. A sync that cannot safely resolve the complete authoritative roster must avoid destructive membership closure.
 
 ---
 
@@ -1426,6 +1998,7 @@ GOAL_API_KEY
 BBS_API_KEY
 STATSHAWK_API_KEY
 STATSHAWK_BASE_URL
+PITCH_API_KEY
 YOUTUBE_API_KEY
 ```
 
@@ -1434,7 +2007,10 @@ Rules:
 - `.env` is not committed;
 - secrets are never returned to client UI;
 - secrets are never logged;
-- provider errors should be sanitized.
+- provider errors should be sanitized;
+- keys stay server-side;
+- client components consume canonical/API output rather than provider credentials;
+- adding a new provider key must not make the entire app fail when that provider is optional.
 
 ---
 
@@ -1456,48 +2032,79 @@ Desired production architecture:
 
 ---
 
-# 37. Automatic media worker target
+# 37. Automatic media worker
 
-Future production behavior:
+**Core worker logic is implemented. Production scheduling remains to be finalized.**
+
+Current code includes:
 
 ```text
-every ~2–3 hours
-  ↓
-find finished Barça matches that:
-  - have no official highlight
-  - are recent enough to still receive an upload
-  - or are pending/retry
-  ↓
-query official uploads efficiently
-  ↓
-score candidates
-  ↓
-high confidence → persist
-  ↓
-ambiguous → review
+src/lib/providers/youtube-fcbarcelona/automatic-worker.ts
+src/lib/providers/youtube-fcbarcelona/backfill.ts
+src/app/api/dev/run-match-media-worker/route.ts
+src/app/api/internal/jobs/match-media/route.ts
 ```
 
-Exact cadence should be tuned after testing.
+Current behavior direction:
+
+```text
+finished Barça matches
+  ↓
+eligibility decision
+  ↓
+recent / missing-media / retry candidates
+  ↓
+batched official-YouTube matching
+  ↓
+auto-persist safe result
+  ↓
+review ambiguous candidate
+```
+
+Admin/dev modes can deliberately force broader finished-match scans or backfill behavior.
+
+Production target:
+
+```text
+scheduled home-server job
+  ↓
+run incremental worker every few hours
+  ↓
+retry only useful unfinished media cases
+  ↓
+stop wasting quota on complete matches
+```
+
+Exact cadence should remain quota-aware and can be tuned after real-season observation.
 
 Do not use the development endpoint as the normal production workflow.
 
 ---
 
-# 38. Planned media review states
+# 38. Media review state / queue direction
 
-Recommended future states:
+Media review tooling is now implemented rather than purely planned.
+
+Current review-queue behavior includes:
+
+- create `pending` candidates for ambiguous/high-enough-scoring cases that should reach a human;
+- remove a stale pending review candidate if a refreshed score becomes safely auto-persistable;
+- preserve human-reviewed outcomes instead of automatically resetting them to pending;
+- refresh scorer evidence while respecting previous approval/rejection decisions;
+- expose candidates through Admin Media Review.
+
+The broader product-level state vocabulary may still evolve as real cases accumulate. Useful conceptual states remain:
 
 ```text
-pending
 waiting_for_upload
-auto_matched
-needs_review
+pending
 approved
+auto_matched
 rejected
 complete
 ```
 
-Do not rush a schema change until the season-wide backfill shows what real review cases look like.
+Do not add schema/state complexity solely for theoretical cases. Let real review/backfill behavior drive future changes.
 
 ---
 
@@ -1508,154 +2115,196 @@ Keep these consistent:
 - Barça events stand out more than opponent events.
 - Use a proper football icon, not emoji.
 - Use custom dropdowns/pickers where native controls break the design.
-- Use real player portraits when trustworthy.
+- Use real player portraits when trustworthy; current Squad preference is official Barça portraits.
 - Rating colors should communicate quality.
 - Team-comparison bars never overlap numeric labels.
 - Goals and assists stay separate.
 - Match-specific player detail is a centered modal.
+- Squad player Quick View is also centered, not fullscreen, with visible breathing room around it.
+- Modal content may scroll internally; opening a modal must lock background scrolling.
+- Clickable controls/cards/rows/actions use `cursor-pointer`/hand cursor consistently.
+- Player-card portrait hover transitions must animate smoothly rather than pop instantly.
 - My Match stays inside Match Center.
 - Future-match diary is visible but locked.
 - Highlights receive gold/accent emphasis.
 - Themed scrolling is global.
 - Use icon libraries/SVGs for controls.
+- Competition logos should appear where they speed recognition (Matches filters, rows, calendar/heatmap match selectors).
+- Dark competition artwork such as the UCL mark needs contrast treatment on dark themes.
+- Pages need deliberate outer breathing room; avoid content feeling glued to screen edges.
+- Matches and Squad must visually inherit the active Home/Away/Third theme rather than feel like separate products.
+- Desktop Stadium Rail should remain persistent while primary page content scrolls.
+- Fan-facing times use 12-hour AM/PM.
+- Avoid heavy rounded cards, floating SaaS panels and excessive glow.
 
 ---
 
 # 40. Accessibility / interaction
 
-Rules:
+Required direction:
 
-- Escape closes modals/intros where appropriate;
-- backdrop click closes centered modal;
-- reduced-motion fallback;
-- controls remain keyboard accessible;
-- loading/failure should fail gracefully;
-- intro must never trap the user;
-- desktop richness degrades safely on smaller screens.
+- keyboard-accessible controls;
+- visible focus states;
+- semantic buttons/links;
+- Escape closes dismissible modals/intro where appropriate;
+- reduced-motion fallback for the 3D intro;
+- modal background inert/scroll-locked while open;
+- interactive rows/cards visibly communicate clickability with pointer cursor and hover/focus states;
+- previous/next player navigation should be operable without precise pointer use;
+- image fallbacks must not collapse layout;
+- dark logos/crests must remain legible against theme surfaces;
+- do not rely on color alone for captain/status/severity meaning;
+- horizontal carousels and calendar panels need usable mouse/trackpad/keyboard behavior;
+- user-facing timestamps remain consistent in 12-hour format.
 
 ---
 
 # 41. Development safety
 
-`/api/dev/*` routes are deliberately disabled in production.
+Rules:
 
-Use dev routes for:
+- make changes page-by-page and finish each page before moving to the next;
+- prefer full-file replacements when a requested change touches many scattered regions and repeated piecemeal edits would be error-prone;
+- use the current `main` branch as code source of truth after the user pushes;
+- do not overwrite long current files from stale pasted snippets;
+- re-run lint/build after major milestones;
+- generated Prisma files are not hand-edited for lint compliance;
+- provider writes should be previewable/confirmable where destructive or quota-consuming;
+- syncs must be idempotent;
+- destructive cleanup must have resolution safety guards;
+- do not burn provider quota by repeatedly re-fetching already persisted data without a reason;
+- preserve canonical IDs/mappings during repair;
+- normalize provider encoding/mojibake at ingestion/canonicalization boundaries rather than hiding every problem in UI formatting.
 
-- provider testing;
-- backfill;
-- QA;
-- repair;
-- Data Lab experimentation.
-
-Production jobs should later use authenticated/internal worker entry points rather than exposing dev tooling.
+When a file is very large and the latest version matters, push it and inspect the repository rather than relying on an older chat copy.
 
 ---
 
-# 42. Known limitations
+# 42. Known limitations / remaining cross-cutting work
 
-Current major limitations:
+Major current limitations are no longer Matches or Squad; both are functional.
 
-- `/matches` still placeholder;
-- `/squad` still placeholder;
-- `/analytics` still placeholder;
+Remaining major product gaps:
+
+- `/analytics` still placeholder and is the immediate next fan-facing page;
 - `/club` still placeholder;
-- global `/media` still placeholder;
+- global `/media` still placeholder despite strong match-media/admin infrastructure;
 - `/my-barca` still placeholder;
 - `/settings` still placeholder;
-- `/admin` not built;
-- authentication/users not built;
-- diary is single-user;
-- automatic scheduled media sync not built;
-- season-wide media backfill is the immediate next task;
-- full card/substitution timeline depends on provider coverage;
-- xG/xA not universal;
-- heatmaps/spatial replay await trustworthy coordinates;
-- deep Camp Nou explorer is future work.
+- authentication/users are not built;
+- diary is still one-user-first;
+- production-grade scheduled provider/background sync still needs finalization;
+- overview match-state engine ultimately needs recurring provider refresh rather than relying on stale local DB/manual refresh;
+- pre-match/live/half-time Match Center depth remains future work;
+- xG/xA are not universal;
+- shot maps/passing maps require trustworthy coordinates before implementation;
+- goal-path replay is still future work;
+- deep Camp Nou explorer is future work;
+- some older files still produce non-blocking Next `<img>`/cleanup lint warnings;
+- shared fan-facing route-group shell refactor is still desirable;
+- admin authentication must exist before exposing write/debug controls publicly.
+
+Spatial note:
+
+- player heatmaps are no longer a limitation; they are implemented through PitchAPI;
+- SofaScore spatial remains unusable in the current server flow due `403 Forbidden` and should not be considered a dependency.
 
 ---
 
 # 43. Immediate roadmap
 
-## Phase A — media automation
+Current page-development state:
 
-### A1. Season-wide Match Media backfill — NEXT
+```text
+Overview        DONE / strong
+Match Center    DONE / strong core
+Admin           DONE / functional core
+Matches         DONE
+Calendar        DONE
+Squad           DONE
+Analytics       IMPLEMENTED / COMPETITION SYNC, DATA QA AND RESPONSIVE VISUAL QA PASSED
+```
 
-Requirements:
+## Phase F — Analytics — IMPLEMENTED / VERIFIED
 
-- load current season;
-- finished Barça matches only;
-- optional competition filtering;
-- reuse trusted single-match matcher;
-- dry-run/write modes;
-- isolate errors per match;
-- report accepted candidates;
-- report created/updated/unchanged;
-- skip already-covered matches when requested;
-- no duplicate writes.
+Build deeply before moving on.
 
-### A2. Incremental automatic media worker
+### F1. Analytics foundation
 
-Reuse/refactor the same core:
+- define canonical analytics data loader;
+- determine exactly which current-season metrics are trustworthy;
+- establish competition/home-away split helpers;
+- keep active Home/Away/Third theme language;
+- avoid generic BI-dashboard styling.
 
-- recent finished matches;
-- missing/pending media only;
-- retry until upload found;
-- stop checking once complete.
+### F2. Team season dashboard
 
-### A3. Home-server scheduler
+Potential first visuals:
 
-- automatic execution;
-- no manual match IDs;
-- quota aware;
-- logs;
-- retry policy.
+- form/results trend;
+- goals for/against trend;
+- possession/passing/shooting trends where canonical data exists;
+- competition splits;
+- home/away splits;
+- season leaders.
 
-## Phase B — Admin
+### F3. League Race
 
-### B1. `/admin` shell
+- all 20 La Liga teams;
+- position vs round;
+- Barça emphasis;
+- interactive round inspection;
+- title/top-four/relegation zones/context.
 
-Separate layout/navigation.
+### F4. Player analytics / comparison
 
-### B2. Media Review
+- compare two or more current players;
+- season totals/rates;
+- rating history;
+- role-aware metric selection;
+- competition splits;
+- existing heatmap data where useful.
 
-First real module.
+### F5. Advanced spatial views
 
-### B3. Provider/Data health
+Use only data already proven trustworthy:
 
-Quotas, unresolved mappings, missing fields, QA and manual resync.
+- player heatmap comparisons;
+- team/role aggregates if derivable correctly;
+- shot maps only after real shot coordinates exist;
+- passing/creation maps only after real event coordinates exist.
 
-## Phase C — finish Match Center depth
+### F6. Predictor later
 
-Potential next work:
+- win/draw/loss probability;
+- score distribution;
+- model version and feature snapshot;
+- calibration tracking;
+- explicitly analytical/fun, not betting-oriented.
 
-- richer trusted event timeline;
-- opponent performance view;
-- more media types;
-- pre-match Match Center;
-- live Match Center;
-- half-time/full-time transitions;
-- goal path when spatial data exists;
-- link modal → player page.
+## Cross-cutting production work
 
-## Phase D — real Matches route
+Continue after/alongside page work where appropriate:
 
-Calendar, filters, results, history, watched/rated state.
+- recurring background fixture/provider refresh for automatic match-state transitions;
+- scheduled media ingestion/retry worker on home server;
+- route-group shared fan-facing shell;
+- quota-aware logging/health;
+- backups/deploy integration;
+- admin authentication before remote/public exposure.
 
-## Phase E — Squad
+## After Analytics
 
-Real squad and player profiles.
+Current broad order:
 
-## Phase F — Analytics
+1. **My Barça** — personal archive/season recap;
+2. **Club** — trophies/history/deep Camp Nou;
+3. **global Media** — browse official Barça media beyond one match;
+4. **Settings** — preferences/diagnostics;
+5. deeper live/pre-match Match Center features;
+6. AI predictor and goal replay when data foundations are ready.
 
-League Race, charts, model/predictor, future spatial analytics.
-
-## Phase G — My Barça
-
-Global personal archive and end-of-season recap.
-
-## Phase H — Club
-
-Trophies, history and deep Camp Nou.
+Roadmap may shift if a prerequisite/data-source issue appears, but avoid reopening finished pages for cosmetic churn unless a real issue is found.
 
 ---
 
@@ -1671,9 +2320,22 @@ Possible later:
 - historical kit themes;
 - season comparison;
 - player career arcs;
+- richer dedicated player career pages if Quick View eventually becomes too dense;
+- team/role spatial profiles built from real heatmaps;
+- goal replay / 2D path animation from trustworthy event coordinates;
 - private friend sharing;
 - Barça-only multi-user accounts;
+- end-of-season Barça Wrapped-style personal recap;
+- trophy cabinet with image/3D presentation;
+- deep interactive Camp Nou exploration;
 - eventually a multi-club platform only after Barça is mature.
+
+Potential notification automation should be useful rather than noisy:
+
+- match starting soon;
+- final score/post-match diary prompt;
+- official highlight discovered;
+- significant provider/data issue requiring admin attention.
 
 ---
 
@@ -1714,75 +2376,127 @@ Can:
 
 The project should feel like something a Barça supporter would genuinely keep open throughout a season.
 
-The current strongest example is Match Center:
+Current strongest product areas are now:
 
-- tactical formation;
-- real player portraits;
-- deep stats;
-- official embedded highlight;
-- personal diary;
-- themed UI.
+- Overview / Stadium Control Room;
+- Match Center;
+- Matches + FIFA-style Season Calendar;
+- Squad + rich Player Quick View;
+- real player heatmaps;
+- Admin Control Room.
 
-Future sections should aim for that same depth rather than remain shallow placeholders.
+The quality bar is:
+
+- meaningful football context;
+- real data and provenance;
+- editorial/broadcast visual identity;
+- rich interactions without clutter;
+- strong Barça-specific personality;
+- personal fandom features that normal score sites do not provide.
+
+Future sections should aim for the same depth rather than remain shallow placeholders.
+
+This is intentionally **not** a generic SofaScore clone. The differentiators are the Barça-only depth, personal history, theme system, cinematic entry, canonical data tooling, spatial/player profile presentation and future Club/My Barça experiences.
 
 ---
 
 # 47. Current milestone snapshot
 
-As of 2026-10-03:
+As of **2026-10-04**:
 
 ## Strong / functional
 
-- database foundation;
-- provider mappings;
+### Data / engineering
+
+- PostgreSQL + Prisma contract/ORM foundation;
+- provider mappings/provenance;
 - football-data fixture spine;
 - GOAL rich data;
-- Big Balls data;
+- Big Balls player data;
 - StatsHawk fallback;
-- canonical player merge;
-- rich-season backfill;
+- canonical merge rules;
+- rich-season tooling;
 - QA/repair tooling;
+- conservative identity matching;
+- repeated mojibake repair;
+- verified official-squad ownership model;
+- 27-player current first-team manifest;
+- 5-captain reconciliation;
+- green squad metadata audit;
+- official Barça portraits for the full current first-team squad;
+- PitchAPI spatial ingestion;
+- all 8 targeted finished matches heatmap-resolved;
+- season/competition heatmap aggregation;
+- lint: 0 errors;
+- production build passes.
+
+### Fan-facing
+
 - Overview shell;
+- Stadium Rail;
 - Match Stage;
 - Barça Pulse;
 - Season Story;
-- kit themes;
+- Home/Away/Third kit themes;
 - themed scrollbars;
 - 3D Threshold intro;
 - Match Center;
 - formation/bench;
 - Match Timeline;
 - team comparison;
-- player table;
-- centered player-performance modal;
-- previous/next navigation;
+- player-performance table/modal;
+- previous/next match navigation;
 - My Match diary;
 - official Match Media UI;
-- official Barça YouTube single-match matcher;
-- Racing and Sevilla highlight persistence.
+- automatic official Barça YouTube matcher;
+- Matches season browser;
+- dynamic competition filters + logos;
+- current-match focus/window;
+- FIFA Career Mode-inspired Season Calendar;
+- Squad browser;
+- favourites;
+- rich centered Player Quick View;
+- official portraits;
+- real flags/nationalities/DOB/age/preferred foot;
+- recent form;
+- rating history;
+- Season/La Liga/UCL average heatmaps;
+- per-match heatmap selector with opponent/competition visuals.
 
-## Immediate WIP
+### Admin
 
-- season-wide media backfill;
-- reusable automatic media worker.
+- Admin shell/overview;
+- Media Manager;
+- Media Add;
+- Media Review;
+- Providers with logos/health/context;
+- Data Issues with filters/severity;
+- Sync Control with tested actions;
+- Squad metadata/heatmap/audit endpoints.
 
-## Planned next
+## Immediate WIP / next
 
-- scheduled media ingestion;
-- Admin shell;
-- Media Review.
+- **Analytics, League Race history, and current-season competition fixture snapshots are implemented and live data QA passed.**
+- Further polish: linked match inspection across charts and a compact visible "data through matchday" badge.
+
+## Cross-cutting remaining
+
+- recurring background provider refresh for automatic match-state accuracy;
+- production scheduler/media retry integration;
+- shared route-group fan shell refactor;
+- admin authentication;
+- clean remaining non-blocking `<img>`/legacy lint warnings when convenient.
 
 ## Major future modules
 
-- Matches;
-- Squad;
-- Analytics;
-- League Race;
+- Analytics / League Race;
 - My Barça;
 - Club/Trophies;
 - deep Camp Nou;
+- global Media;
+- Settings;
 - predictor;
-- goal replay/spatial analytics.
+- goal replay / richer spatial analytics.
 
 ---
 
@@ -1806,6 +2520,55 @@ Prefer editing the relevant canonical section rather than appending contradictor
 ---
 
 # 49. Changelog
+
+## v0.2.0 — 2026-10-04
+
+Major milestone update after Admin, Matches/Calendar and Squad work.
+
+Added/updated:
+
+- canonical branch moved to `main`;
+- audited pushed milestone `b658f0da5055ec19aa3b41cc4b6d5fe09b7a55df`;
+- Admin Control Room now implemented rather than planned;
+- Providers page with provider logos and health/context;
+- Data Issues page with filters/severity and pointer interaction rules;
+- Sync Control implemented/tested;
+- `/matches` implemented;
+- competition logos in filters/rows;
+- UCL logo contrast handling;
+- current-match auto-focus/window;
+- dynamic competition support;
+- FIFA Career Mode-inspired Season Calendar;
+- `/squad` implemented;
+- smooth card hover/pointer interaction;
+- centred non-fullscreen Profile Quick View;
+- sticky left identity panel + scrollable right content;
+- previous/next player navigation;
+- captain armband `C Captain` treatment;
+- nationality flags + age/DOB + preferred foot;
+- favourites integrated;
+- recent-form and rating-history visuals;
+- verified 27-player official 2026/27 first-team manifest;
+- fixed lineup-created stale squad memberships;
+- restored Frenkie de Jong, Roony Bardghji and Jesse Bisiwu to canonical current squad state;
+- 5 verified captains;
+- green squad audit with no missing core metadata;
+- official FC Barcelona portraits preferred for all 27 current first-team players;
+- PitchAPI spatial provider integrated;
+- SofaScore spatial experiment documented as blocked by 403;
+- real per-match player heatmaps persisted;
+- season / La Liga / UCL heatmap averages;
+- continuous broadcast-style heatmap renderer;
+- normalized attacking direction;
+- activity-centre centroid;
+- opponent + competition logos in heatmap match selector;
+- Santander/Racing alias resolution for spatial sync;
+- generated Prisma contract/snapshots excluded from ESLint;
+- current lint milestone: 0 errors;
+- production build confirmed successful;
+- Analytics promoted to immediate next page;
+- page-by-page completion workflow recorded;
+- cross-cutting background-sync/shared-shell/auth work retained on roadmap.
 
 ## v0.1.0 — 2026-10-03
 
@@ -1831,3 +2594,5 @@ Includes:
 - deferred multi-club idea;
 - deep Camp Nou roadmap;
 - immediate season media automation roadmap.
+
+---

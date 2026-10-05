@@ -173,6 +173,7 @@ model Season {
   matches          Match[]
   standings        StandingSnapshot[]
   kitThemes        KitTheme[]
+  competitionFixtures CompetitionFixtureSnapshot[]
   trophyWins       TrophyWin[]
   mediaItems       MediaItem[]
   mediaReviewCandidates MediaReviewCandidate[]
@@ -198,6 +199,7 @@ model Competition {
   matches    Match[]
   standings  StandingSnapshot[]
   trophyWins TrophyWin[]
+  competitionFixtures CompetitionFixtureSnapshot[]
 
   @@map("competition")
 }
@@ -508,6 +510,8 @@ model StandingSnapshot {
   seasonId       Uuid
   competitionId  Uuid
   teamId         Uuid
+  dataSourceId   Uuid?
+  basis          String?
   matchday       Int
   position       Int
   played         Int
@@ -525,11 +529,46 @@ model StandingSnapshot {
   season         Season               @relation(fields:[seasonId], references:[id])
   competition    Competition          @relation(fields:[competitionId], references:[id])
   team           Team                 @relation(fields:[teamId], references:[id])
+  dataSource     DataSource?          @relation(fields:[dataSourceId], references:[id])
 
   @@unique([seasonId, competitionId, matchday, teamId])
   @@index([seasonId, competitionId, matchday])
   @@index([teamId])
   @@map("standing_snapshot")
+}
+
+model CompetitionFixtureSnapshot {
+  id               Uuid        @id @default(uuid())
+  seasonId         Uuid
+  competitionId    Uuid
+  sourceCode       String
+  providerId       String
+  stage            String?
+  round            String?
+  matchday         Int?
+  leg              Int?
+  kickoff          DateTime?
+  status           String
+  homeProviderId   String?
+  awayProviderId   String?
+  homeName         String
+  awayName         String
+  homeCrestUrl     String?
+  awayCrestUrl     String?
+  homeScore        Int?
+  awayScore        Int?
+  homePenaltyScore Int?
+  awayPenaltyScore Int?
+  canonicalMatchId Uuid?
+  createdAt        temporal.createdAt()
+  updatedAt        temporal.updatedAt()
+
+  season           Season      @relation(fields:[seasonId], references:[id])
+  competition      Competition @relation(fields:[competitionId], references:[id])
+
+  @@unique([sourceCode, providerId])
+  @@index([seasonId, competitionId, kickoff], name: "cfs_season_comp_kickoff")
+  @@map("competition_fixture_snapshot")
 }
 
 model MediaItem {
@@ -738,6 +777,7 @@ model DataSource {
   mappings         ProviderMapping[]
   matchEvents      MatchEvent[]
   matchStats       MatchStatistic[]
+  standings        StandingSnapshot[]
   playerMatchStats PlayerMatchStatistic[]
   mediaItems       MediaItem[]
   mediaReviewCandidates MediaReviewCandidate[]

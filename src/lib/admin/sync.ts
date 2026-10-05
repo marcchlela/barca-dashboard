@@ -136,6 +136,8 @@ export async function getAdminSyncData() {
             .FOOTBALL_DATA_API_KEY,
         ),
 
+      goalApiConfigured: Boolean(process.env.GOAL_API_KEY),
+
       richMatchConfigured:
         Boolean(
           process.env

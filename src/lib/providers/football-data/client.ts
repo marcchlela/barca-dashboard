@@ -60,9 +60,15 @@ export function getLaLigaCompetition() {
   );
 }
 
-export function getLaLigaStandings() {
+export function getLaLigaStandings(options?: {
+  season?: number;
+  matchday?: number;
+}) {
+  const query = new URLSearchParams();
+  if (options?.season !== undefined) query.set("season", String(options.season));
+  if (options?.matchday !== undefined) query.set("matchday", String(options.matchday));
   return footballDataRequest<FootballDataStandingsResponse>(
-    `/competitions/${FOOTBALL_DATA_IDS.competitions.laLiga}/standings`,
+    `/competitions/${FOOTBALL_DATA_IDS.competitions.laLiga}/standings${query.size ? `?${query}` : ""}`,
   );
 }
 
@@ -75,5 +81,17 @@ export function getLaLigaMatches() {
 export function getBarcelonaMatches() {
   return footballDataRequest<FootballDataMatchesResponse>(
     `/teams/${FOOTBALL_DATA_IDS.teams.barcelona}/matches`,
+  );
+}
+
+export function getChampionsLeagueMatches(season: number) {
+  return footballDataRequest<FootballDataMatchesResponse>(
+    `/competitions/CL/matches?season=${season}`,
+  );
+}
+
+export function getChampionsLeagueStandings(season: number) {
+  return footballDataRequest<FootballDataStandingsResponse>(
+    `/competitions/CL/standings?season=${season}`,
   );
 }

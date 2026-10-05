@@ -1,0 +1,167 @@
+[
+  {
+    "id": "column.public.standing_snapshot.basis",
+    "label": "Add column \"basis\" to \"standing_snapshot\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "basis",
+        "table": "standing_snapshot"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"basis\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "standing_snapshot",
+          "basis"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"basis\"",
+        "sql": "ALTER TABLE \"public\".\"standing_snapshot\" ADD COLUMN \"basis\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"basis\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "standing_snapshot",
+          "basis"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.standing_snapshot.dataSourceId",
+    "label": "Add column \"dataSourceId\" to \"standing_snapshot\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "dataSourceId",
+        "table": "standing_snapshot"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"dataSourceId\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "standing_snapshot",
+          "dataSourceId"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"dataSourceId\"",
+        "sql": "ALTER TABLE \"public\".\"standing_snapshot\" ADD COLUMN \"dataSourceId\" uuid"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"dataSourceId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "standing_snapshot",
+          "dataSourceId"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.standing_snapshot.standing_snapshot_dataSourceId_idx_536a4d74",
+    "label": "Create index \"standing_snapshot_dataSourceId_idx_536a4d74\" on \"standing_snapshot\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "standing_snapshot_dataSourceId_idx_536a4d74",
+        "table": "standing_snapshot"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"standing_snapshot_dataSourceId_idx_536a4d74\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"standing_snapshot_dataSourceId_idx_536a4d74\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"standing_snapshot_dataSourceId_idx_536a4d74\"",
+        "sql": "CREATE INDEX \"standing_snapshot_dataSourceId_idx_536a4d74\" ON \"public\".\"standing_snapshot\" (\"dataSourceId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"standing_snapshot_dataSourceId_idx_536a4d74\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"standing_snapshot_dataSourceId_idx_536a4d74\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.standing_snapshot.standing_snapshot_dataSourceId_fkey",
+    "label": "Add foreign key \"standing_snapshot_dataSourceId_fkey\" on \"standing_snapshot\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "standing_snapshot_dataSourceId_fkey",
+        "table": "standing_snapshot"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"standing_snapshot_dataSourceId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "standing_snapshot_dataSourceId_fkey",
+          "public",
+          "\"public\".\"standing_snapshot\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"standing_snapshot_dataSourceId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"standing_snapshot\"\nADD CONSTRAINT \"standing_snapshot_dataSourceId_fkey\"\nFOREIGN KEY (\"dataSourceId\")\nREFERENCES \"public\".\"data_source\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"standing_snapshot_dataSourceId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "standing_snapshot_dataSourceId_fkey",
+          "public",
+          "\"public\".\"standing_snapshot\""
+        ]
+      }
+    ]
+  }
+]

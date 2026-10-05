@@ -36,6 +36,10 @@ import type {
 
 type SyncAction =
   | "fixture_sync"
+  | "standings_history_preview"
+  | "standings_history_sync"
+  | "competition_fixtures_preview"
+  | "competition_fixtures_sync"
   | "rich_match_preview"
   | "rich_match_sync"
   | "match_qa"
@@ -131,6 +135,8 @@ export default function AdminSyncControl({
       null,
     );
 
+  const [competitionCode, setCompetitionCode] = useState<"CL" | "CDR" | "SSC">("CL");
+
   const [
     pendingWrite,
     setPendingWrite,
@@ -222,6 +228,8 @@ export default function AdminSyncControl({
             body:
               JSON.stringify({
                 action,
+
+                competitionCode,
 
                 matchId:
                   requiresMatch
@@ -956,6 +964,60 @@ export default function AdminSyncControl({
                   }
                 />
               </div>
+            </div>
+          </OperationCard>
+
+          {/* MEDIA WORKER */}
+
+          <OperationCard
+            eyebrow="Analytics / League Race"
+            title="Standings History"
+            icon={Gauge}
+            description="Validate and store up to eight missing 20-team La Liga rounds per run. Historical filtered tables are results-compiled; the current unfiltered table remains official."
+          >
+            <div className="mt-5 flex flex-wrap gap-2">
+              <ActionButton
+                label="Preview rounds"
+                icon={FileSearch}
+                busy={busyAction === "standings_history_preview"}
+                disabled={isBusy || !data.executionEnabled || !data.automation.footballDataConfigured}
+                onClick={() => execute("standings_history_preview", "Preview standings history", "preview")}
+              />
+              <ActionButton
+                label="Write rounds"
+                icon={RefreshCw}
+                tone="warning"
+                busy={busyAction === "standings_history_sync"}
+                disabled={isBusy || !data.executionEnabled || !data.automation.footballDataConfigured}
+                onClick={() => requestWrite("standings_history_sync", "Write standings history", "This fetches and validates up to eight missing La Liga matchdays, then persists their 20-team tables. Repeat until no rounds remain.")}
+              />
+            </div>
+          </OperationCard>
+
+          {/* MEDIA WORKER */}
+
+          <OperationCard
+            eyebrow="Analytics / Competitions"
+            title="Full-competition fixtures"
+            icon={Database}
+            description="Preview and persist the 2026/27 Champions League, Copa del Rey or Spanish Super Cup. The page never fetches providers while rendering."
+          >
+            <label className="mt-4 block text-xs">Competition
+              <select value={competitionCode} onChange={(event) => setCompetitionCode(event.target.value as "CL" | "CDR" | "SSC")}
+                disabled={isBusy || pendingWrite !== null}
+                className="mt-2 block w-full border p-3 text-sm" style={{ background: theme.colors.backgroundElevated, borderColor: theme.colors.border }}>
+                <option value="CL">Champions League · football-data.org</option>
+                <option value="CDR">Copa del Rey · GOAL API</option>
+                <option value="SSC">Spanish Super Cup · GOAL API</option>
+              </select>
+            </label>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <ActionButton label="Preview fixtures" icon={FileSearch} busy={busyAction === "competition_fixtures_preview"}
+                disabled={isBusy || !data.executionEnabled || (competitionCode === "CL" ? !data.automation.footballDataConfigured : !data.automation.goalApiConfigured)}
+                onClick={() => execute("competition_fixtures_preview", `Preview ${competitionCode} fixtures`, "preview")} />
+              <ActionButton label="Write fixtures" icon={RefreshCw} tone="warning" busy={busyAction === "competition_fixtures_sync"}
+                disabled={isBusy || !data.executionEnabled || (competitionCode === "CL" ? !data.automation.footballDataConfigured : !data.automation.goalApiConfigured)}
+                onClick={() => requestWrite("competition_fixtures_sync", `Write ${competitionCode} fixtures`, `Persist verified current-season ${competitionCode} fixtures and standings where available. Repeat writes are idempotent.`)} />
             </div>
           </OperationCard>
 

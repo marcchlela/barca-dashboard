@@ -8,6 +8,10 @@
       "model": "Competition",
       "namespace": "public"
     },
+    "competition_fixture_snapshot": {
+      "model": "CompetitionFixtureSnapshot",
+      "namespace": "public"
+    },
     "data_source": {
       "model": "DataSource",
       "namespace": "public"
@@ -647,6 +651,21 @@
               }
             },
             "relations": {
+              "competitionFixtures": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "competitionId"
+                  ]
+                },
+                "to": {
+                  "model": "CompetitionFixtureSnapshot",
+                  "namespace": "public"
+                }
+              },
               "matches": {
                 "cardinality": "1:N",
                 "on": {
@@ -725,6 +744,290 @@
               },
               "namespaceId": "public",
               "table": "competition"
+            }
+          },
+          "CompetitionFixtureSnapshot": {
+            "fields": {
+              "awayCrestUrl": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "awayName": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "awayPenaltyScore": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "awayProviderId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "awayScore": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "canonicalMatchId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "competitionId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "homeCrestUrl": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "homeName": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "homePenaltyScore": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "homeProviderId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "homeScore": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "kickoff": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "leg": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "matchday": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "providerId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "round": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "seasonId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "sourceCode": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "stage": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "competition": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "competitionId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Competition",
+                  "namespace": "public"
+                }
+              },
+              "season": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "seasonId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Season",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "awayCrestUrl": {
+                  "column": "awayCrestUrl"
+                },
+                "awayName": {
+                  "column": "awayName"
+                },
+                "awayPenaltyScore": {
+                  "column": "awayPenaltyScore"
+                },
+                "awayProviderId": {
+                  "column": "awayProviderId"
+                },
+                "awayScore": {
+                  "column": "awayScore"
+                },
+                "canonicalMatchId": {
+                  "column": "canonicalMatchId"
+                },
+                "competitionId": {
+                  "column": "competitionId"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "homeCrestUrl": {
+                  "column": "homeCrestUrl"
+                },
+                "homeName": {
+                  "column": "homeName"
+                },
+                "homePenaltyScore": {
+                  "column": "homePenaltyScore"
+                },
+                "homeProviderId": {
+                  "column": "homeProviderId"
+                },
+                "homeScore": {
+                  "column": "homeScore"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "kickoff": {
+                  "column": "kickoff"
+                },
+                "leg": {
+                  "column": "leg"
+                },
+                "matchday": {
+                  "column": "matchday"
+                },
+                "providerId": {
+                  "column": "providerId"
+                },
+                "round": {
+                  "column": "round"
+                },
+                "seasonId": {
+                  "column": "seasonId"
+                },
+                "sourceCode": {
+                  "column": "sourceCode"
+                },
+                "stage": {
+                  "column": "stage"
+                },
+                "status": {
+                  "column": "status"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                }
+              },
+              "namespaceId": "public",
+              "table": "competition_fixture_snapshot"
             }
           },
           "DataSource": {
@@ -911,6 +1214,21 @@
                 },
                 "to": {
                   "model": "SeasonMoment",
+                  "namespace": "public"
+                }
+              },
+              "standings": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "dataSourceId"
+                  ]
+                },
+                "to": {
+                  "model": "StandingSnapshot",
                   "namespace": "public"
                 }
               }
@@ -4978,6 +5296,21 @@
                   "namespace": "public"
                 }
               },
+              "competitionFixtures": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "seasonId"
+                  ]
+                },
+                "to": {
+                  "model": "CompetitionFixtureSnapshot",
+                  "namespace": "public"
+                }
+              },
               "kitThemes": {
                 "cardinality": "1:N",
                 "on": {
@@ -5539,6 +5872,13 @@
           },
           "StandingSnapshot": {
             "fields": {
+              "basis": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "competitionId": {
                 "nullable": false,
                 "type": {
@@ -5550,6 +5890,13 @@
                 "nullable": false,
                 "type": {
                   "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "dataSourceId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/uuid@1",
                   "kind": "scalar"
                 }
               },
@@ -5676,6 +6023,22 @@
                   "namespace": "public"
                 }
               },
+              "dataSource": {
+                "cardinality": "N:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "dataSourceId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "DataSource",
+                  "namespace": "public"
+                }
+              },
               "season": {
                 "cardinality": "N:1",
                 "nullable": false,
@@ -5711,11 +6074,17 @@
             },
             "storage": {
               "fields": {
+                "basis": {
+                  "column": "basis"
+                },
                 "competitionId": {
                   "column": "competitionId"
                 },
                 "createdAt": {
                   "column": "createdAt"
+                },
+                "dataSourceId": {
+                  "column": "dataSourceId"
                 },
                 "drawn": {
                   "column": "drawn"
@@ -6321,6 +6690,209 @@
                 {
                   "columns": [
                     "code"
+                  ]
+                }
+              ]
+            },
+            "competition_fixture_snapshot": {
+              "columns": {
+                "awayCrestUrl": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "awayName": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "awayPenaltyScore": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "awayProviderId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "awayScore": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "canonicalMatchId": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": true
+                },
+                "competitionId": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "homeCrestUrl": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "homeName": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "homePenaltyScore": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "homeProviderId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "homeScore": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "kickoff": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "leg": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "matchday": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "providerId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "round": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "seasonId": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "sourceCode": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "stage": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "status": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "source": {
+                    "columns": [
+                      "seasonId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "competition_fixture_snapshot"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "season"
+                  }
+                },
+                {
+                  "source": {
+                    "columns": [
+                      "competitionId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "competition_fixture_snapshot"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "competition"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "seasonId",
+                    "competitionId",
+                    "kickoff"
+                  ],
+                  "name": "cfs_season_comp_kickoff_be0b801c",
+                  "prefix": "cfs_season_comp_kickoff",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "competitionId"
+                  ],
+                  "name": "competition_fixture_snapshot_competitionId_idx_53fccd3b",
+                  "prefix": "competition_fixture_snapshot_competitionId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "seasonId"
+                  ],
+                  "name": "competition_fixture_snapshot_seasonId_idx_aa50cbae",
+                  "prefix": "competition_fixture_snapshot_seasonId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "sourceCode",
+                    "providerId"
                   ]
                 }
               ]
@@ -9895,6 +10467,11 @@
             },
             "standing_snapshot": {
               "columns": {
+                "basis": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "competitionId": {
                   "codecId": "pg/uuid@1",
                   "nativeType": "uuid",
@@ -9908,6 +10485,11 @@
                   },
                   "nativeType": "timestamptz",
                   "nullable": false
+                },
+                "dataSourceId": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": true
                 },
                 "drawn": {
                   "codecId": "pg/int4@1",
@@ -10033,6 +10615,22 @@
                     "namespaceId": "public",
                     "tableName": "team"
                   }
+                },
+                {
+                  "source": {
+                    "columns": [
+                      "dataSourceId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "standing_snapshot"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "data_source"
+                  }
                 }
               ],
               "indexes": [
@@ -10042,6 +10640,14 @@
                   ],
                   "name": "standing_snapshot_competitionId_idx_53fccd3b",
                   "prefix": "standing_snapshot_competitionId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "dataSourceId"
+                  ],
+                  "name": "standing_snapshot_dataSourceId_idx_536a4d74",
+                  "prefix": "standing_snapshot_dataSourceId_idx",
                   "unique": false
                 },
                 {
@@ -10532,10 +11138,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "f64562ada54d6648dbe850b4390eeeecf0279a74d9d50886a664aad1cae62da1"
+    "storageHash": "3b7f071e51ccdd54466d3581e59ebbf3a8c5aea5e21bbb29823dbb97a32a08ab"
   },
   "execution": {
-    "executionHash": "18708be17734550a7ebd0fe0b923287a5725c760e3eb280920ca01380fdc51a5",
+    "executionHash": "ab717b6632d326619df0798673a98c60b8e94b1cb84f0755ab5c26fc36b2a116",
     "mutations": {
       "defaults": [
         {
@@ -10562,6 +11168,32 @@
             "column": "updatedAt",
             "namespace": "public",
             "table": "competition"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "competition_fixture_snapshot"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updatedAt",
+            "namespace": "public",
+            "table": "competition_fixture_snapshot"
           }
         },
         {

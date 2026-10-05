@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 
 import CountryFlag from "./CountryFlag";
+import { displayHeatmapRow, displayHeatmapY, heatmapColor, heatmapStrength } from "../../lib/squad/heatmap-display";
 
 import type {
   KitTheme,
@@ -3051,7 +3052,7 @@ function HeatmapCompetitionLogo({
 |--------------------------------------------------------------------------
 */
 
-function PitchHeatmap({
+export function PitchHeatmap({
   heatmap,
   theme,
 }: {
@@ -3253,7 +3254,7 @@ function PitchHeatmap({
                   centroid.x
                 }
                 cy={
-                  centroid.y
+                  1.5 + displayHeatmapY((centroid.y - 1.5) / 65) * 65
                 }
                 r="1.38"
                 fill={
@@ -3271,7 +3272,7 @@ function PitchHeatmap({
                   centroid.x
                 }
                 cy={
-                  centroid.y
+                  1.5 + displayHeatmapY((centroid.y - 1.5) / 65) * 65
                 }
                 r="0.33"
                 fill={
@@ -3617,7 +3618,7 @@ function drawBroadcastHeatmap(
       fieldTop +
       (
         (
-          cell.row +
+          displayHeatmapRow(cell.row, heatmap.rows) +
           0.5
         ) /
         heatmap.rows
@@ -3767,17 +3768,6 @@ function drawBroadcastHeatmap(
   const pixels =
     image.data;
 
-  /*
-   * Previous value was intentionally
-   * aggressive.
-   *
-   * 0.045 keeps weak meaningful zones
-   * while still removing visual noise.
-   */
-
-  const cutoff =
-    0.045;
-
   for (
     let y =
       0;
@@ -3809,9 +3799,12 @@ function drawBroadcastHeatmap(
         ] /
         maximum;
 
+      const strength =
+        heatmapStrength(raw);
+
       if (
-        raw <=
-        cutoff
+        strength ===
+        null
       ) {
         pixels[
           pixelIndex +
@@ -3822,42 +3815,12 @@ function drawBroadcastHeatmap(
         continue;
       }
 
-      /*
-       * Near-linear mapping is deliberate.
-       *
-       * The previous smoothstep pushed
-       * values toward either extreme,
-       * which is why you mainly saw
-       * teal/red with too little middle.
-       */
-
-      let strength =
-        (
-          raw -
-          cutoff
-        ) /
-        (
-          1 -
-          cutoff
-        );
-
-      strength =
-        clamp01(
-          strength,
-        );
-
-      strength =
-        Math.pow(
-          strength,
-          0.96,
-        );
-
       const [
         red,
         green,
         blue,
       ] =
-        interpolateHeatColor(
+        heatmapColor(
           strength,
         );
 
@@ -3901,182 +3864,6 @@ function drawBroadcastHeatmap(
     image,
     0,
     0,
-  );
-}
-
-/*
-|--------------------------------------------------------------------------
-| Heat palette
-|--------------------------------------------------------------------------
-*/
-
-type HeatColorStop = {
-  at:
-    number;
-
-  color:
-    [
-      number,
-      number,
-      number,
-    ];
-};
-
-const HEAT_COLORS:
-  HeatColorStop[] = [
-    {
-      at:
-        0,
-
-      color: [
-        15,
-        118,
-        110,
-      ],
-    },
-
-    {
-      at:
-        0.24,
-
-      color: [
-        34,
-        166,
-        153,
-      ],
-    },
-
-    {
-      at:
-        0.48,
-
-      color: [
-        211,
-        156,
-        67,
-      ],
-    },
-
-    {
-      at:
-        0.66,
-
-      color: [
-        240,
-        138,
-        36,
-      ],
-    },
-
-    {
-      at:
-        0.82,
-
-      color: [
-        225,
-        79,
-        57,
-      ],
-    },
-
-    {
-      at:
-        1,
-
-      color: [
-        199,
-        44,
-        72,
-      ],
-    },
-  ];
-
-function interpolateHeatColor(
-  value:
-    number,
-): [
-  number,
-  number,
-  number,
-] {
-  const safe =
-    clamp01(
-      value,
-    );
-
-  for (
-    let index =
-      0;
-    index <
-    HEAT_COLORS.length -
-      1;
-    index +=
-      1
-  ) {
-    const left =
-      HEAT_COLORS[
-        index
-      ];
-
-    const right =
-      HEAT_COLORS[
-        index +
-          1
-      ];
-
-    if (
-      safe >
-      right.at
-    ) {
-      continue;
-    }
-
-    const span =
-      right.at -
-      left.at;
-
-    const amount =
-      span >
-      0
-        ? (
-            safe -
-            left.at
-          ) /
-          span
-        : 0;
-
-    return [
-      Math.round(
-        lerp(
-          left.color[0],
-          right.color[0],
-          amount,
-        ),
-      ),
-
-      Math.round(
-        lerp(
-          left.color[1],
-          right.color[1],
-          amount,
-        ),
-      ),
-
-      Math.round(
-        lerp(
-          left.color[2],
-          right.color[2],
-          amount,
-        ),
-      ),
-    ];
-  }
-
-  return (
-    HEAT_COLORS[
-      HEAT_COLORS.length -
-        1
-    ].color
   );
 }
 
@@ -5434,22 +5221,3 @@ function clamp01(
   );
 }
 
-function lerp(
-  start:
-    number,
-
-  end:
-    number,
-
-  amount:
-    number,
-) {
-  return (
-    start +
-    (
-      end -
-      start
-    ) *
-      amount
-  );
-}

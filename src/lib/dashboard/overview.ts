@@ -183,6 +183,9 @@ export async function getDashboardOverview() {
 
         teamId:
           barcelonaId,
+
+        competitionId:
+          (await db.orm.public.Competition.where({ code: "PD" }).first())?.id ?? "00000000-0000-0000-0000-000000000000",
       })
       .orderBy((standing) =>
         standing.matchday.desc(),

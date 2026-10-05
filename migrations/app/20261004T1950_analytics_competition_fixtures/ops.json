@@ -1,0 +1,284 @@
+[
+  {
+    "id": "table.competition_fixture_snapshot",
+    "label": "Create table \"competition_fixture_snapshot\"",
+    "summary": "Creates table \"competition_fixture_snapshot\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "competition_fixture_snapshot"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"competition_fixture_snapshot\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"competition_fixture_snapshot\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"competition_fixture_snapshot\"",
+        "sql": "CREATE TABLE \"public\".\"competition_fixture_snapshot\" (\n  \"awayCrestUrl\" text,\n  \"awayName\" text NOT NULL,\n  \"awayPenaltyScore\" int4,\n  \"awayProviderId\" text,\n  \"awayScore\" int4,\n  \"canonicalMatchId\" uuid,\n  \"competitionId\" uuid NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"homeCrestUrl\" text,\n  \"homeName\" text NOT NULL,\n  \"homePenaltyScore\" int4,\n  \"homeProviderId\" text,\n  \"homeScore\" int4,\n  \"id\" uuid NOT NULL,\n  \"kickoff\" timestamptz,\n  \"leg\" int4,\n  \"matchday\" int4,\n  \"providerId\" text NOT NULL,\n  \"round\" text,\n  \"seasonId\" uuid NOT NULL,\n  \"sourceCode\" text NOT NULL,\n  \"stage\" text,\n  \"status\" text NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"competition_fixture_snapshot\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"competition_fixture_snapshot\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.competition_fixture_snapshot.competition_fixture_snapshot_sourceCode_providerId_key",
+    "label": "Add unique constraint on \"competition_fixture_snapshot\" (sourceCode, providerId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "competition_fixture_snapshot_sourceCode_providerId_key",
+        "table": "competition_fixture_snapshot"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"competition_fixture_snapshot_sourceCode_providerId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "competition_fixture_snapshot_sourceCode_providerId_key",
+          "public",
+          "\"public\".\"competition_fixture_snapshot\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"competition_fixture_snapshot_sourceCode_providerId_key\"",
+        "sql": "ALTER TABLE \"public\".\"competition_fixture_snapshot\" ADD CONSTRAINT \"competition_fixture_snapshot_sourceCode_providerId_key\" UNIQUE (\"sourceCode\", \"providerId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"competition_fixture_snapshot_sourceCode_providerId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "competition_fixture_snapshot_sourceCode_providerId_key",
+          "public",
+          "\"public\".\"competition_fixture_snapshot\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.competition_fixture_snapshot.cfs_season_comp_kickoff_be0b801c",
+    "label": "Create index \"cfs_season_comp_kickoff_be0b801c\" on \"competition_fixture_snapshot\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "cfs_season_comp_kickoff_be0b801c",
+        "table": "competition_fixture_snapshot"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"cfs_season_comp_kickoff_be0b801c\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"cfs_season_comp_kickoff_be0b801c\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"cfs_season_comp_kickoff_be0b801c\"",
+        "sql": "CREATE INDEX \"cfs_season_comp_kickoff_be0b801c\" ON \"public\".\"competition_fixture_snapshot\" (\"seasonId\", \"competitionId\", \"kickoff\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"cfs_season_comp_kickoff_be0b801c\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"cfs_season_comp_kickoff_be0b801c\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.competition_fixture_snapshot.competition_fixture_snapshot_competitionId_idx_53fccd3b",
+    "label": "Create index \"competition_fixture_snapshot_competitionId_idx_53fccd3b\" on \"competition_fixture_snapshot\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "competition_fixture_snapshot_competitionId_idx_53fccd3b",
+        "table": "competition_fixture_snapshot"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"competition_fixture_snapshot_competitionId_idx_53fccd3b\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"competition_fixture_snapshot_competitionId_idx_53fccd3b\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"competition_fixture_snapshot_competitionId_idx_53fccd3b\"",
+        "sql": "CREATE INDEX \"competition_fixture_snapshot_competitionId_idx_53fccd3b\" ON \"public\".\"competition_fixture_snapshot\" (\"competitionId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"competition_fixture_snapshot_competitionId_idx_53fccd3b\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"competition_fixture_snapshot_competitionId_idx_53fccd3b\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.competition_fixture_snapshot.competition_fixture_snapshot_seasonId_idx_aa50cbae",
+    "label": "Create index \"competition_fixture_snapshot_seasonId_idx_aa50cbae\" on \"competition_fixture_snapshot\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "competition_fixture_snapshot_seasonId_idx_aa50cbae",
+        "table": "competition_fixture_snapshot"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"competition_fixture_snapshot_seasonId_idx_aa50cbae\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"competition_fixture_snapshot_seasonId_idx_aa50cbae\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"competition_fixture_snapshot_seasonId_idx_aa50cbae\"",
+        "sql": "CREATE INDEX \"competition_fixture_snapshot_seasonId_idx_aa50cbae\" ON \"public\".\"competition_fixture_snapshot\" (\"seasonId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"competition_fixture_snapshot_seasonId_idx_aa50cbae\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"competition_fixture_snapshot_seasonId_idx_aa50cbae\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.competition_fixture_snapshot.competition_fixture_snapshot_seasonId_fkey",
+    "label": "Add foreign key \"competition_fixture_snapshot_seasonId_fkey\" on \"competition_fixture_snapshot\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "competition_fixture_snapshot_seasonId_fkey",
+        "table": "competition_fixture_snapshot"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"competition_fixture_snapshot_seasonId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "competition_fixture_snapshot_seasonId_fkey",
+          "public",
+          "\"public\".\"competition_fixture_snapshot\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"competition_fixture_snapshot_seasonId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"competition_fixture_snapshot\"\nADD CONSTRAINT \"competition_fixture_snapshot_seasonId_fkey\"\nFOREIGN KEY (\"seasonId\")\nREFERENCES \"public\".\"season\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"competition_fixture_snapshot_seasonId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "competition_fixture_snapshot_seasonId_fkey",
+          "public",
+          "\"public\".\"competition_fixture_snapshot\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.competition_fixture_snapshot.competition_fixture_snapshot_competitionId_fkey",
+    "label": "Add foreign key \"competition_fixture_snapshot_competitionId_fkey\" on \"competition_fixture_snapshot\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "competition_fixture_snapshot_competitionId_fkey",
+        "table": "competition_fixture_snapshot"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"competition_fixture_snapshot_competitionId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "competition_fixture_snapshot_competitionId_fkey",
+          "public",
+          "\"public\".\"competition_fixture_snapshot\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"competition_fixture_snapshot_competitionId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"competition_fixture_snapshot\"\nADD CONSTRAINT \"competition_fixture_snapshot_competitionId_fkey\"\nFOREIGN KEY (\"competitionId\")\nREFERENCES \"public\".\"competition\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"competition_fixture_snapshot_competitionId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "competition_fixture_snapshot_competitionId_fkey",
+          "public",
+          "\"public\".\"competition_fixture_snapshot\""
+        ]
+      }
+    ]
+  }
+]

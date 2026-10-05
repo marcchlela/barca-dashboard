@@ -34,9 +34,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'3b7f071e51ccdd54466d3581e59ebbf3a8c5aea5e21bbb29823dbb97a32a08ab'>;
+  StorageHashBase<'945c48602bffa02866c6b8d90d20e109d62b11f762eeb4c5d72db82177c029a0'>;
 export type ExecutionHash =
-  ExecutionHashBase<'ab717b6632d326619df0798673a98c60b8e94b1cb84f0755ab5c26fc36b2a116'>;
+  ExecutionHashBase<'18708be17734550a7ebd0fe0b923287a5725c760e3eb280920ca01380fdc51a5'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -250,32 +250,6 @@ export type FieldOutputTypes = {
       readonly type: 'league' | 'cup' | 'super_cup' | 'continental' | 'friendly' | 'other';
       readonly country: CodecTypes['pg/text@1']['output'] | null;
       readonly logoUrl: CodecTypes['pg/text@1']['output'] | null;
-      readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
-      readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
-    };
-    readonly CompetitionFixtureSnapshot: {
-      readonly id: CodecTypes['pg/uuid@1']['output'];
-      readonly seasonId: CodecTypes['pg/uuid@1']['output'];
-      readonly competitionId: CodecTypes['pg/uuid@1']['output'];
-      readonly sourceCode: CodecTypes['pg/text@1']['output'];
-      readonly providerId: CodecTypes['pg/text@1']['output'];
-      readonly stage: CodecTypes['pg/text@1']['output'] | null;
-      readonly round: CodecTypes['pg/text@1']['output'] | null;
-      readonly matchday: CodecTypes['pg/int4@1']['output'] | null;
-      readonly leg: CodecTypes['pg/int4@1']['output'] | null;
-      readonly kickoff: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
-      readonly status: CodecTypes['pg/text@1']['output'];
-      readonly homeProviderId: CodecTypes['pg/text@1']['output'] | null;
-      readonly awayProviderId: CodecTypes['pg/text@1']['output'] | null;
-      readonly homeName: CodecTypes['pg/text@1']['output'];
-      readonly awayName: CodecTypes['pg/text@1']['output'];
-      readonly homeCrestUrl: CodecTypes['pg/text@1']['output'] | null;
-      readonly awayCrestUrl: CodecTypes['pg/text@1']['output'] | null;
-      readonly homeScore: CodecTypes['pg/int4@1']['output'] | null;
-      readonly awayScore: CodecTypes['pg/int4@1']['output'] | null;
-      readonly homePenaltyScore: CodecTypes['pg/int4@1']['output'] | null;
-      readonly awayPenaltyScore: CodecTypes['pg/int4@1']['output'] | null;
-      readonly canonicalMatchId: CodecTypes['pg/uuid@1']['output'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
     };
@@ -772,32 +746,6 @@ export type FieldInputTypes = {
       readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
     };
-    readonly CompetitionFixtureSnapshot: {
-      readonly id: CodecTypes['pg/uuid@1']['input'];
-      readonly seasonId: CodecTypes['pg/uuid@1']['input'];
-      readonly competitionId: CodecTypes['pg/uuid@1']['input'];
-      readonly sourceCode: CodecTypes['pg/text@1']['input'];
-      readonly providerId: CodecTypes['pg/text@1']['input'];
-      readonly stage: CodecTypes['pg/text@1']['input'] | null;
-      readonly round: CodecTypes['pg/text@1']['input'] | null;
-      readonly matchday: CodecTypes['pg/int4@1']['input'] | null;
-      readonly leg: CodecTypes['pg/int4@1']['input'] | null;
-      readonly kickoff: CodecTypes['pg/timestamptz-temporal@1']['input'] | null;
-      readonly status: CodecTypes['pg/text@1']['input'];
-      readonly homeProviderId: CodecTypes['pg/text@1']['input'] | null;
-      readonly awayProviderId: CodecTypes['pg/text@1']['input'] | null;
-      readonly homeName: CodecTypes['pg/text@1']['input'];
-      readonly awayName: CodecTypes['pg/text@1']['input'];
-      readonly homeCrestUrl: CodecTypes['pg/text@1']['input'] | null;
-      readonly awayCrestUrl: CodecTypes['pg/text@1']['input'] | null;
-      readonly homeScore: CodecTypes['pg/int4@1']['input'] | null;
-      readonly awayScore: CodecTypes['pg/int4@1']['input'] | null;
-      readonly homePenaltyScore: CodecTypes['pg/int4@1']['input'] | null;
-      readonly awayPenaltyScore: CodecTypes['pg/int4@1']['input'] | null;
-      readonly canonicalMatchId: CodecTypes['pg/uuid@1']['input'] | null;
-      readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
-      readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
-    };
     readonly DataSource: {
       readonly id: CodecTypes['pg/uuid@1']['input'];
       readonly code: CodecTypes['pg/text@1']['input'];
@@ -1291,32 +1239,6 @@ export type StorageColumnTypes = {
       readonly type: 'league' | 'cup' | 'super_cup' | 'continental' | 'friendly' | 'other';
       readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
     };
-    readonly competition_fixture_snapshot: {
-      readonly awayCrestUrl: CodecTypes['pg/text@1']['output'] | null;
-      readonly awayName: CodecTypes['pg/text@1']['output'];
-      readonly awayPenaltyScore: CodecTypes['pg/int4@1']['output'] | null;
-      readonly awayProviderId: CodecTypes['pg/text@1']['output'] | null;
-      readonly awayScore: CodecTypes['pg/int4@1']['output'] | null;
-      readonly canonicalMatchId: CodecTypes['pg/uuid@1']['output'] | null;
-      readonly competitionId: CodecTypes['pg/uuid@1']['output'];
-      readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
-      readonly homeCrestUrl: CodecTypes['pg/text@1']['output'] | null;
-      readonly homeName: CodecTypes['pg/text@1']['output'];
-      readonly homePenaltyScore: CodecTypes['pg/int4@1']['output'] | null;
-      readonly homeProviderId: CodecTypes['pg/text@1']['output'] | null;
-      readonly homeScore: CodecTypes['pg/int4@1']['output'] | null;
-      readonly id: CodecTypes['pg/uuid@1']['output'];
-      readonly kickoff: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
-      readonly leg: CodecTypes['pg/int4@1']['output'] | null;
-      readonly matchday: CodecTypes['pg/int4@1']['output'] | null;
-      readonly providerId: CodecTypes['pg/text@1']['output'];
-      readonly round: CodecTypes['pg/text@1']['output'] | null;
-      readonly seasonId: CodecTypes['pg/uuid@1']['output'];
-      readonly sourceCode: CodecTypes['pg/text@1']['output'];
-      readonly stage: CodecTypes['pg/text@1']['output'] | null;
-      readonly status: CodecTypes['pg/text@1']['output'];
-      readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
-    };
     readonly data_source: {
       readonly baseUrl: CodecTypes['pg/text@1']['output'] | null;
       readonly code: CodecTypes['pg/text@1']['output'];
@@ -1808,32 +1730,6 @@ export type StorageColumnInputTypes = {
       readonly name: CodecTypes['pg/text@1']['input'];
       readonly shortName: CodecTypes['pg/text@1']['input'] | null;
       readonly type: 'league' | 'cup' | 'super_cup' | 'continental' | 'friendly' | 'other';
-      readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
-    };
-    readonly competition_fixture_snapshot: {
-      readonly awayCrestUrl: CodecTypes['pg/text@1']['input'] | null;
-      readonly awayName: CodecTypes['pg/text@1']['input'];
-      readonly awayPenaltyScore: CodecTypes['pg/int4@1']['input'] | null;
-      readonly awayProviderId: CodecTypes['pg/text@1']['input'] | null;
-      readonly awayScore: CodecTypes['pg/int4@1']['input'] | null;
-      readonly canonicalMatchId: CodecTypes['pg/uuid@1']['input'] | null;
-      readonly competitionId: CodecTypes['pg/uuid@1']['input'];
-      readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
-      readonly homeCrestUrl: CodecTypes['pg/text@1']['input'] | null;
-      readonly homeName: CodecTypes['pg/text@1']['input'];
-      readonly homePenaltyScore: CodecTypes['pg/int4@1']['input'] | null;
-      readonly homeProviderId: CodecTypes['pg/text@1']['input'] | null;
-      readonly homeScore: CodecTypes['pg/int4@1']['input'] | null;
-      readonly id: CodecTypes['pg/uuid@1']['input'];
-      readonly kickoff: CodecTypes['pg/timestamptz-temporal@1']['input'] | null;
-      readonly leg: CodecTypes['pg/int4@1']['input'] | null;
-      readonly matchday: CodecTypes['pg/int4@1']['input'] | null;
-      readonly providerId: CodecTypes['pg/text@1']['input'];
-      readonly round: CodecTypes['pg/text@1']['input'] | null;
-      readonly seasonId: CodecTypes['pg/uuid@1']['input'];
-      readonly sourceCode: CodecTypes['pg/text@1']['input'];
-      readonly stage: CodecTypes['pg/text@1']['input'] | null;
-      readonly status: CodecTypes['pg/text@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
     };
     readonly data_source: {
@@ -2331,7 +2227,6 @@ export namespace Models {
     createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
     updatedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
     absences: public_PlayerAbsence[];
-    competitionFixtures: public_CompetitionFixtureSnapshot[];
     kitThemes: public_KitTheme[];
     matches: public_Match[];
     mediaItems: public_MediaItem[];
@@ -2342,7 +2237,6 @@ export namespace Models {
     trophyWins: public_TrophyWin[];
     readonly [RelationKeys]?:
       | 'absences'
-      | 'competitionFixtures'
       | 'kitThemes'
       | 'matches'
       | 'mediaItems'
@@ -2362,11 +2256,10 @@ export namespace Models {
     logoUrl: CodecTypes['pg/text@1']['output'] | null;
     createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
     updatedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
-    competitionFixtures: public_CompetitionFixtureSnapshot[];
     matches: public_Match[];
     standings: public_StandingSnapshot[];
     trophyWins: public_TrophyWin[];
-    readonly [RelationKeys]?: 'competitionFixtures' | 'matches' | 'standings' | 'trophyWins';
+    readonly [RelationKeys]?: 'matches' | 'standings' | 'trophyWins';
   };
   export type public_Team = {
     id: CodecTypes['pg/uuid@1']['output'];
@@ -2710,35 +2603,6 @@ export namespace Models {
     team: public_Team;
     readonly [RelationKeys]?: 'competition' | 'dataSource' | 'season' | 'team';
   };
-  export type public_CompetitionFixtureSnapshot = {
-    id: CodecTypes['pg/uuid@1']['output'];
-    seasonId: CodecTypes['pg/uuid@1']['output'];
-    competitionId: CodecTypes['pg/uuid@1']['output'];
-    sourceCode: CodecTypes['pg/text@1']['output'];
-    providerId: CodecTypes['pg/text@1']['output'];
-    stage: CodecTypes['pg/text@1']['output'] | null;
-    round: CodecTypes['pg/text@1']['output'] | null;
-    matchday: CodecTypes['pg/int4@1']['output'] | null;
-    leg: CodecTypes['pg/int4@1']['output'] | null;
-    kickoff: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
-    status: CodecTypes['pg/text@1']['output'];
-    homeProviderId: CodecTypes['pg/text@1']['output'] | null;
-    awayProviderId: CodecTypes['pg/text@1']['output'] | null;
-    homeName: CodecTypes['pg/text@1']['output'];
-    awayName: CodecTypes['pg/text@1']['output'];
-    homeCrestUrl: CodecTypes['pg/text@1']['output'] | null;
-    awayCrestUrl: CodecTypes['pg/text@1']['output'] | null;
-    homeScore: CodecTypes['pg/int4@1']['output'] | null;
-    awayScore: CodecTypes['pg/int4@1']['output'] | null;
-    homePenaltyScore: CodecTypes['pg/int4@1']['output'] | null;
-    awayPenaltyScore: CodecTypes['pg/int4@1']['output'] | null;
-    canonicalMatchId: CodecTypes['pg/uuid@1']['output'] | null;
-    createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
-    updatedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
-    competition: public_Competition;
-    season: public_Season;
-    readonly [RelationKeys]?: 'competition' | 'season';
-  };
   export type public_MediaItem = {
     id: CodecTypes['pg/uuid@1']['output'];
     type:
@@ -3035,7 +2899,6 @@ export declare const models: {
     MatchStatistic: Models.public_MatchStatistic;
     PlayerMatchStatistic: Models.public_PlayerMatchStatistic;
     StandingSnapshot: Models.public_StandingSnapshot;
-    CompetitionFixtureSnapshot: Models.public_CompetitionFixtureSnapshot;
     MediaItem: Models.public_MediaItem;
     MediaReviewCandidate: Models.public_MediaReviewCandidate;
     KitTheme: Models.public_KitTheme;
@@ -3124,179 +2987,6 @@ type ContractBase = Omit<
               uniques: readonly [{ readonly columns: readonly ['code'] }];
               indexes: readonly [];
               foreignKeys: readonly [];
-            };
-            readonly competition_fixture_snapshot: {
-              columns: {
-                readonly id: {
-                  readonly nativeType: 'uuid';
-                  readonly codecId: 'pg/uuid@1';
-                  readonly nullable: false;
-                };
-                readonly seasonId: {
-                  readonly nativeType: 'uuid';
-                  readonly codecId: 'pg/uuid@1';
-                  readonly nullable: false;
-                };
-                readonly competitionId: {
-                  readonly nativeType: 'uuid';
-                  readonly codecId: 'pg/uuid@1';
-                  readonly nullable: false;
-                };
-                readonly sourceCode: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly providerId: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly stage: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                };
-                readonly round: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                };
-                readonly matchday: {
-                  readonly nativeType: 'int4';
-                  readonly codecId: 'pg/int4@1';
-                  readonly nullable: true;
-                };
-                readonly leg: {
-                  readonly nativeType: 'int4';
-                  readonly codecId: 'pg/int4@1';
-                  readonly nullable: true;
-                };
-                readonly kickoff: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-temporal@1';
-                  readonly nullable: true;
-                };
-                readonly status: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly homeProviderId: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                };
-                readonly awayProviderId: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                };
-                readonly homeName: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly awayName: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly homeCrestUrl: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                };
-                readonly awayCrestUrl: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                };
-                readonly homeScore: {
-                  readonly nativeType: 'int4';
-                  readonly codecId: 'pg/int4@1';
-                  readonly nullable: true;
-                };
-                readonly awayScore: {
-                  readonly nativeType: 'int4';
-                  readonly codecId: 'pg/int4@1';
-                  readonly nullable: true;
-                };
-                readonly homePenaltyScore: {
-                  readonly nativeType: 'int4';
-                  readonly codecId: 'pg/int4@1';
-                  readonly nullable: true;
-                };
-                readonly awayPenaltyScore: {
-                  readonly nativeType: 'int4';
-                  readonly codecId: 'pg/int4@1';
-                  readonly nullable: true;
-                };
-                readonly canonicalMatchId: {
-                  readonly nativeType: 'uuid';
-                  readonly codecId: 'pg/uuid@1';
-                  readonly nullable: true;
-                };
-                readonly createdAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-temporal@1';
-                  readonly nullable: false;
-                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
-                };
-                readonly updatedAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-temporal@1';
-                  readonly nullable: false;
-                };
-              };
-              primaryKey: { readonly columns: readonly ['id'] };
-              uniques: readonly [{ readonly columns: readonly ['sourceCode', 'providerId'] }];
-              indexes: readonly [
-                {
-                  readonly name: 'cfs_season_comp_kickoff_be0b801c';
-                  readonly prefix: 'cfs_season_comp_kickoff';
-                  readonly columns: readonly ['seasonId', 'competitionId', 'kickoff'];
-                  readonly unique: false;
-                },
-                {
-                  readonly name: 'competition_fixture_snapshot_seasonId_idx_aa50cbae';
-                  readonly prefix: 'competition_fixture_snapshot_seasonId_idx';
-                  readonly columns: readonly ['seasonId'];
-                  readonly unique: false;
-                },
-                {
-                  readonly name: 'competition_fixture_snapshot_competitionId_idx_53fccd3b';
-                  readonly prefix: 'competition_fixture_snapshot_competitionId_idx';
-                  readonly columns: readonly ['competitionId'];
-                  readonly unique: false;
-                },
-              ];
-              foreignKeys: readonly [
-                {
-                  readonly source: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'competition_fixture_snapshot';
-                    readonly columns: readonly ['seasonId'];
-                  };
-                  readonly target: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'season';
-                    readonly columns: readonly ['id'];
-                  };
-                },
-                {
-                  readonly source: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'competition_fixture_snapshot';
-                    readonly columns: readonly ['competitionId'];
-                  };
-                  readonly target: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'competition';
-                    readonly columns: readonly ['id'];
-                  };
-                },
-              ];
             };
             readonly data_source: {
               columns: {
@@ -6693,10 +6383,6 @@ type ContractBase = Omit<
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'StandingSnapshot';
     };
-    readonly competition_fixture_snapshot: {
-      readonly namespace: 'public' & NamespaceId;
-      readonly model: 'CompetitionFixtureSnapshot';
-    };
     readonly media_item: {
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'MediaItem';
@@ -6798,17 +6484,6 @@ type ContractBase = Omit<
               };
             };
             readonly relations: {
-              readonly competitionFixtures: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'CompetitionFixtureSnapshot';
-                };
-                readonly cardinality: '1:N';
-                readonly on: {
-                  readonly localFields: readonly ['id'];
-                  readonly targetFields: readonly ['competitionId'];
-                };
-              };
               readonly matches: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -6854,171 +6529,6 @@ type ContractBase = Omit<
                 readonly type: { readonly column: 'type' };
                 readonly country: { readonly column: 'country' };
                 readonly logoUrl: { readonly column: 'logoUrl' };
-                readonly createdAt: { readonly column: 'createdAt' };
-                readonly updatedAt: { readonly column: 'updatedAt' };
-              };
-            };
-          };
-          readonly CompetitionFixtureSnapshot: {
-            readonly fields: {
-              readonly id: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
-              };
-              readonly seasonId: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
-              };
-              readonly competitionId: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
-              };
-              readonly sourceCode: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly providerId: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly stage: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly round: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly matchday: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
-              };
-              readonly leg: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
-              };
-              readonly kickoff: {
-                readonly nullable: true;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-temporal@1';
-                };
-              };
-              readonly status: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly homeProviderId: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly awayProviderId: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly homeName: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly awayName: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly homeCrestUrl: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly awayCrestUrl: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly homeScore: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
-              };
-              readonly awayScore: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
-              };
-              readonly homePenaltyScore: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
-              };
-              readonly awayPenaltyScore: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
-              };
-              readonly canonicalMatchId: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
-              };
-              readonly createdAt: {
-                readonly nullable: false;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-temporal@1';
-                };
-              };
-              readonly updatedAt: {
-                readonly nullable: false;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-temporal@1';
-                };
-              };
-            };
-            readonly relations: {
-              readonly competition: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'Competition';
-                };
-                readonly cardinality: 'N:1';
-                readonly nullable: false;
-                readonly on: {
-                  readonly localFields: readonly ['competitionId'];
-                  readonly targetFields: readonly ['id'];
-                };
-              };
-              readonly season: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'Season';
-                };
-                readonly cardinality: 'N:1';
-                readonly nullable: false;
-                readonly on: {
-                  readonly localFields: readonly ['seasonId'];
-                  readonly targetFields: readonly ['id'];
-                };
-              };
-            };
-            readonly storage: {
-              readonly table: 'competition_fixture_snapshot';
-              readonly namespaceId: 'public';
-              readonly fields: {
-                readonly id: { readonly column: 'id' };
-                readonly seasonId: { readonly column: 'seasonId' };
-                readonly competitionId: { readonly column: 'competitionId' };
-                readonly sourceCode: { readonly column: 'sourceCode' };
-                readonly providerId: { readonly column: 'providerId' };
-                readonly stage: { readonly column: 'stage' };
-                readonly round: { readonly column: 'round' };
-                readonly matchday: { readonly column: 'matchday' };
-                readonly leg: { readonly column: 'leg' };
-                readonly kickoff: { readonly column: 'kickoff' };
-                readonly status: { readonly column: 'status' };
-                readonly homeProviderId: { readonly column: 'homeProviderId' };
-                readonly awayProviderId: { readonly column: 'awayProviderId' };
-                readonly homeName: { readonly column: 'homeName' };
-                readonly awayName: { readonly column: 'awayName' };
-                readonly homeCrestUrl: { readonly column: 'homeCrestUrl' };
-                readonly awayCrestUrl: { readonly column: 'awayCrestUrl' };
-                readonly homeScore: { readonly column: 'homeScore' };
-                readonly awayScore: { readonly column: 'awayScore' };
-                readonly homePenaltyScore: { readonly column: 'homePenaltyScore' };
-                readonly awayPenaltyScore: { readonly column: 'awayPenaltyScore' };
-                readonly canonicalMatchId: { readonly column: 'canonicalMatchId' };
                 readonly createdAt: { readonly column: 'createdAt' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
               };
@@ -9627,17 +9137,6 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['seasonId'];
                 };
               };
-              readonly competitionFixtures: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'CompetitionFixtureSnapshot';
-                };
-                readonly cardinality: '1:N';
-                readonly on: {
-                  readonly localFields: readonly ['id'];
-                  readonly targetFields: readonly ['seasonId'];
-                };
-              };
               readonly kitThemes: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -10686,23 +10185,6 @@ type ContractBase = Omit<
           readonly ref: {
             readonly namespace: 'public';
             readonly table: 'competition';
-            readonly column: 'updatedAt';
-          };
-          readonly onCreate: { readonly kind: 'generator'; readonly id: 'instantNow' };
-          readonly onUpdate: { readonly kind: 'generator'; readonly id: 'instantNow' };
-        },
-        {
-          readonly ref: {
-            readonly namespace: 'public';
-            readonly table: 'competition_fixture_snapshot';
-            readonly column: 'id';
-          };
-          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
-        },
-        {
-          readonly ref: {
-            readonly namespace: 'public';
-            readonly table: 'competition_fixture_snapshot';
             readonly column: 'updatedAt';
           };
           readonly onCreate: { readonly kind: 'generator'; readonly id: 'instantNow' };
