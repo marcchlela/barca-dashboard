@@ -1,6 +1,8 @@
 import {
   NextResponse,
 } from "next/server";
+import { Temporal } from "temporal-polyfill";
+import { resolveWatchedAt, validWatchedOn } from "../../../../../lib/my-barca/watch-date";
 
 import {
   db,
@@ -18,6 +20,9 @@ type DiaryInput = {
     unknown;
 
   watchType?:
+    unknown;
+
+  watchedOn?:
     unknown;
 
   rating?:
@@ -224,6 +229,20 @@ export async function PUT(
         })
         .first();
 
+    const watchedOn = body.watchedOn === undefined ? undefined : body.watchedOn === null || body.watchedOn === "" ? null : body.watchedOn;
+    if (watchedOn !== undefined && watchedOn !== null && (typeof watchedOn !== "string" || !validWatchedOn(watchedOn))) {
+      return errorResponse("Watched date must be a real YYYY-MM-DD date.", 400);
+    }
+    const watchedAt = resolveWatchedAt({
+      watched: parsed.value.watched,
+      watchType: parsed.value.watchType,
+      previousWatchType: existing?.watchType ?? null,
+      kickoff: match.kickoff.toString(),
+      existingWatchedAt: existing?.watchedAt?.toString() ?? null,
+      watchedOn: watchedOn as string | null | undefined,
+      now: new Date().toISOString(),
+    });
+
     const data = {
       watched:
         parsed.value
@@ -235,6 +254,8 @@ export async function PUT(
           ? parsed.value
               .watchType
           : null,
+
+      watchedAt: watchedAt ? Temporal.Instant.from(watchedAt) : null,
 
       rating:
         parsed.value

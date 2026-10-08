@@ -171,6 +171,7 @@ model Season {
 
   squadMemberships SquadMembership[]
   matches          Match[]
+  favouriteMatches FavouriteMatch[]
   standings        StandingSnapshot[]
   kitThemes        KitTheme[]
   competitionFixtures CompetitionFixtureSnapshot[]
@@ -317,6 +318,7 @@ model Match {
   mediaReviewCandidates MediaReviewCandidate[]
   predictions        Prediction[]
   diaryEntry         MatchDiaryEntry?
+  favouriteMatch     FavouriteMatch?
   seasonMoments      SeasonMoment[]
 
   @@index([seasonId, competitionId])
@@ -402,6 +404,7 @@ model MatchEvent {
   relatedPlayer    Player?              @relation("RelatedEventPlayer", fields:[relatedPlayerId], references:[id])
   dataSource       DataSource?          @relation(fields:[dataSourceId], references:[id])
   diaryFavouriteIn MatchDiaryEntry[]    @relation("DiaryFavouriteGoal")
+  mediaMoments     MediaMoment[]
 
   @@index([matchId, eventOrder])
   @@index([matchId, type])
@@ -581,6 +584,7 @@ model MediaItem {
   thumbnailUrl    String?
   isOfficial      Boolean              @default(false)
   publishedAt     DateTime?
+  featuredAt      DateTime?
   seasonId        Uuid?
   matchId         Uuid?
   playerId        Uuid?
@@ -592,11 +596,46 @@ model MediaItem {
   match           Match?               @relation(fields:[matchId], references:[id])
   player          Player?              @relation(fields:[playerId], references:[id])
   dataSource      DataSource?          @relation(fields:[dataSourceId], references:[id])
+  saves           MediaSave[]
+  goalMoments     MediaMoment[]
 
   @@index([matchId])
   @@index([seasonId])
   @@index([playerId])
   @@map("media_item")
+}
+
+model MediaSave {
+  id          Uuid                 @id @default(uuid())
+  mediaItemId Uuid                 @unique
+  favourite   Boolean              @default(false)
+  watchLater  Boolean              @default(false)
+  createdAt   temporal.createdAt()
+  updatedAt   temporal.updatedAt()
+
+  mediaItem   MediaItem            @relation(fields:[mediaItemId], references:[id])
+
+  @@map("media_save")
+}
+
+model MediaMoment {
+  id            Uuid                 @id @default(uuid())
+  mediaItemId   Uuid
+  matchEventId  Uuid
+  startSecond   Int?
+  endSecond     Int?
+  evidenceUrl   String?
+  reviewNote    String?
+  verifiedAt    DateTime
+  createdAt     temporal.createdAt()
+  updatedAt     temporal.updatedAt()
+
+  mediaItem     MediaItem            @relation(fields:[mediaItemId], references:[id])
+  matchEvent    MatchEvent           @relation(fields:[matchEventId], references:[id])
+
+  @@unique([mediaItemId, matchEventId])
+  @@index([matchEventId])
+  @@map("media_moment")
 }
 
 model MediaReviewCandidate {
@@ -700,6 +739,20 @@ model FavouritePlayer {
   player    Player               @relation(fields:[playerId], references:[id])
 
   @@map("favourite_player")
+}
+
+model FavouriteMatch {
+  id        Uuid                 @id @default(uuid())
+  seasonId  Uuid
+  matchId   Uuid                 @unique
+  slot      Int
+  createdAt temporal.createdAt()
+
+  season    Season               @relation(fields:[seasonId], references:[id])
+  match     Match                @relation(fields:[matchId], references:[id])
+
+  @@unique([seasonId, slot])
+  @@map("favourite_match")
 }
 
 model MatchDiaryEntry {

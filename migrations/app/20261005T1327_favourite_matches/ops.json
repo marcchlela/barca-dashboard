@@ -1,0 +1,248 @@
+[
+  {
+    "id": "table.favourite_match",
+    "label": "Create table \"favourite_match\"",
+    "summary": "Creates table \"favourite_match\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "favourite_match"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"favourite_match\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"favourite_match\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"favourite_match\"",
+        "sql": "CREATE TABLE \"public\".\"favourite_match\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"matchId\" uuid NOT NULL,\n  \"seasonId\" uuid NOT NULL,\n  \"slot\" int4 NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"favourite_match\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"favourite_match\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.favourite_match.favourite_match_matchId_key",
+    "label": "Add unique constraint on \"favourite_match\" (matchId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "favourite_match_matchId_key",
+        "table": "favourite_match"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"favourite_match_matchId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "favourite_match_matchId_key",
+          "public",
+          "\"public\".\"favourite_match\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"favourite_match_matchId_key\"",
+        "sql": "ALTER TABLE \"public\".\"favourite_match\" ADD CONSTRAINT \"favourite_match_matchId_key\" UNIQUE (\"matchId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"favourite_match_matchId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "favourite_match_matchId_key",
+          "public",
+          "\"public\".\"favourite_match\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.favourite_match.favourite_match_seasonId_slot_key",
+    "label": "Add unique constraint on \"favourite_match\" (seasonId, slot)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "favourite_match_seasonId_slot_key",
+        "table": "favourite_match"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"favourite_match_seasonId_slot_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "favourite_match_seasonId_slot_key",
+          "public",
+          "\"public\".\"favourite_match\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"favourite_match_seasonId_slot_key\"",
+        "sql": "ALTER TABLE \"public\".\"favourite_match\" ADD CONSTRAINT \"favourite_match_seasonId_slot_key\" UNIQUE (\"seasonId\", \"slot\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"favourite_match_seasonId_slot_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "favourite_match_seasonId_slot_key",
+          "public",
+          "\"public\".\"favourite_match\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.favourite_match.favourite_match_seasonId_idx_aa50cbae",
+    "label": "Create index \"favourite_match_seasonId_idx_aa50cbae\" on \"favourite_match\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "favourite_match_seasonId_idx_aa50cbae",
+        "table": "favourite_match"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"favourite_match_seasonId_idx_aa50cbae\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"favourite_match_seasonId_idx_aa50cbae\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"favourite_match_seasonId_idx_aa50cbae\"",
+        "sql": "CREATE INDEX \"favourite_match_seasonId_idx_aa50cbae\" ON \"public\".\"favourite_match\" (\"seasonId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"favourite_match_seasonId_idx_aa50cbae\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"favourite_match_seasonId_idx_aa50cbae\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.favourite_match.favourite_match_seasonId_fkey",
+    "label": "Add foreign key \"favourite_match_seasonId_fkey\" on \"favourite_match\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "favourite_match_seasonId_fkey",
+        "table": "favourite_match"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"favourite_match_seasonId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "favourite_match_seasonId_fkey",
+          "public",
+          "\"public\".\"favourite_match\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"favourite_match_seasonId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"favourite_match\"\nADD CONSTRAINT \"favourite_match_seasonId_fkey\"\nFOREIGN KEY (\"seasonId\")\nREFERENCES \"public\".\"season\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"favourite_match_seasonId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "favourite_match_seasonId_fkey",
+          "public",
+          "\"public\".\"favourite_match\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.favourite_match.favourite_match_matchId_fkey",
+    "label": "Add foreign key \"favourite_match_matchId_fkey\" on \"favourite_match\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "favourite_match_matchId_fkey",
+        "table": "favourite_match"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"favourite_match_matchId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "favourite_match_matchId_fkey",
+          "public",
+          "\"public\".\"favourite_match\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"favourite_match_matchId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"favourite_match\"\nADD CONSTRAINT \"favourite_match_matchId_fkey\"\nFOREIGN KEY (\"matchId\")\nREFERENCES \"public\".\"football_match\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"favourite_match_matchId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "favourite_match_matchId_fkey",
+          "public",
+          "\"public\".\"favourite_match\""
+        ]
+      }
+    ]
+  }
+]

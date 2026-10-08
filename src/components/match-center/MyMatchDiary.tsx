@@ -45,6 +45,11 @@ type WatchType =
   | "replay"
   | "highlights_only";
 
+function localToday() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+}
+
 type SaveState =
   | "idle"
   | "saving"
@@ -109,6 +114,17 @@ export default function MyMatchDiary({
           null,
       ),
     );
+
+  const [watchedOn, setWatchedOn] = useState(
+    initial?.watchType !== "live" && initial?.watchedAt ? initial.watchedAt.slice(0, 10) : "",
+  );
+
+  function selectWatchType(next: WatchType) {
+    setWatchType(next);
+    if (next !== "live" && !watchedOn && !(initial?.watched && initial.watchType === next && !initial.watchedAt)) {
+      setWatchedOn(localToday());
+    }
+  }
 
   const [
     rating,
@@ -239,6 +255,8 @@ export default function MyMatchDiary({
                   watched
                     ? watchType
                     : null,
+
+                watchedOn: watched && watchType !== "live" ? watchedOn || null : undefined,
 
                 rating,
 
@@ -630,7 +648,7 @@ export default function MyMatchDiary({
                     label="Live"
                     theme={theme}
                     onClick={() =>
-                      setWatchType(
+                      selectWatchType(
                         "live",
                       )
                     }
@@ -644,7 +662,7 @@ export default function MyMatchDiary({
                     label="Replay"
                     theme={theme}
                     onClick={() =>
-                      setWatchType(
+                      selectWatchType(
                         "replay",
                       )
                     }
@@ -658,12 +676,16 @@ export default function MyMatchDiary({
                     label="Highlights"
                     theme={theme}
                     onClick={() =>
-                      setWatchType(
+                      selectWatchType(
                         "highlights_only",
                       )
                     }
                   />
                 </div>
+                {watchType === "live" ? <p className="mt-3 text-[10px]" style={{ color: theme.colors.textMuted }}>Watched date follows the match day automatically.</p> : watchType ? <label className="mt-4 block text-[10px]" style={{ color: theme.colors.textMuted }}>Date watched
+                  <input type="date" value={watchedOn} onChange={(event) => setWatchedOn(event.target.value)} className="mt-2 block w-full border px-3 py-2 text-xs outline-none focus-visible:outline-2" style={{ borderColor: theme.colors.border, background: theme.colors.background, color: theme.colors.text, colorScheme: "dark" }} />
+                  {!watchedOn && <span className="mt-1 block">Date not set. Choose one if this is an older replay or highlights entry.</span>}
+                </label> : null}
               </div>
             ) : null}
 

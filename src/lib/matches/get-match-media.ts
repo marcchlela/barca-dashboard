@@ -42,6 +42,7 @@ export type MatchMediaItem = {
     portraitUrl:
       string | null;
   } | null;
+  verifiedGoals: { id: string; label: string; startSecond: number | null; endSecond: number | null }[];
 };
 
 export async function getMatchMedia(
@@ -58,7 +59,10 @@ export async function getMatchMedia(
       .include(
         "player",
       )
+      .include("goalMoments")
       .all();
+  const events = await db.orm.public.MatchEvent.where({ matchId }).include("primaryPlayer").all();
+  const eventById = new Map(events.map((event) => [event.id, event]));
 
   return rows
     .map(
@@ -109,6 +113,12 @@ export async function getMatchMedia(
                     .portraitUrl,
               }
             : null,
+        verifiedGoals: row.goalMoments.flatMap((moment) => {
+          const event = eventById.get(moment.matchEventId);
+          if (!event || !["goal", "own_goal", "penalty_goal"].includes(event.type)) return [];
+          const rawScorer = event.rawData && typeof event.rawData === "object" && "scorerName" in event.rawData && typeof event.rawData.scorerName === "string" ? event.rawData.scorerName : null;
+          return [{ id: event.id, label: `${event.minute ?? "?"}' ${event.primaryPlayer?.displayName ?? rawScorer ?? "Goal"}${event.type === "own_goal" ? " (own goal)" : ""}`, startSecond: moment.startSecond, endSecond: moment.endSecond }];
+        }),
       }),
     )
     .sort(

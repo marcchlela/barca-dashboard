@@ -16,6 +16,10 @@
       "model": "DataSource",
       "namespace": "public"
     },
+    "favourite_match": {
+      "model": "FavouriteMatch",
+      "namespace": "public"
+    },
     "favourite_player": {
       "model": "FavouritePlayer",
       "namespace": "public"
@@ -56,8 +60,16 @@
       "model": "MediaItem",
       "namespace": "public"
     },
+    "media_moment": {
+      "model": "MediaMoment",
+      "namespace": "public"
+    },
     "media_review_candidate": {
       "model": "MediaReviewCandidate",
+      "namespace": "public"
+    },
+    "media_save": {
+      "model": "MediaSave",
       "namespace": "public"
     },
     "model_version": {
@@ -1267,6 +1279,100 @@
               "table": "data_source"
             }
           },
+          "FavouriteMatch": {
+            "fields": {
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "matchId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "seasonId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "slot": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "match": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "matchId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Match",
+                  "namespace": "public"
+                }
+              },
+              "season": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "seasonId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Season",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "matchId": {
+                  "column": "matchId"
+                },
+                "seasonId": {
+                  "column": "seasonId"
+                },
+                "slot": {
+                  "column": "slot"
+                }
+              },
+              "namespaceId": "public",
+              "table": "favourite_match"
+            }
+          },
           "FavouritePlayer": {
             "fields": {
               "id": {
@@ -2192,6 +2298,22 @@
                   "namespace": "public"
                 }
               },
+              "favouriteMatch": {
+                "cardinality": "1:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "matchId"
+                  ]
+                },
+                "to": {
+                  "model": "FavouriteMatch",
+                  "namespace": "public"
+                }
+              },
               "homeTeam": {
                 "cardinality": "N:1",
                 "nullable": false,
@@ -2817,6 +2939,21 @@
                   "namespace": "public"
                 }
               },
+              "mediaMoments": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "matchEventId"
+                  ]
+                },
+                "to": {
+                  "model": "MediaMoment",
+                  "namespace": "public"
+                }
+              },
               "primaryPlayer": {
                 "cardinality": "N:1",
                 "nullable": true,
@@ -3368,6 +3505,13 @@
                   "kind": "scalar"
                 }
               },
+              "featuredAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
               "id": {
                 "nullable": false,
                 "type": {
@@ -3469,6 +3613,21 @@
                   "namespace": "public"
                 }
               },
+              "goalMoments": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "mediaItemId"
+                  ]
+                },
+                "to": {
+                  "model": "MediaMoment",
+                  "namespace": "public"
+                }
+              },
               "match": {
                 "cardinality": "N:1",
                 "nullable": true,
@@ -3498,6 +3657,21 @@
                 },
                 "to": {
                   "model": "Player",
+                  "namespace": "public"
+                }
+              },
+              "saves": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "mediaItemId"
+                  ]
+                },
+                "to": {
+                  "model": "MediaSave",
                   "namespace": "public"
                 }
               },
@@ -3531,6 +3705,9 @@
                 },
                 "externalMediaId": {
                   "column": "externalMediaId"
+                },
+                "featuredAt": {
+                  "column": "featuredAt"
                 },
                 "id": {
                   "column": "id"
@@ -3568,6 +3745,150 @@
               },
               "namespaceId": "public",
               "table": "media_item"
+            }
+          },
+          "MediaMoment": {
+            "fields": {
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "endSecond": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "evidenceUrl": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "matchEventId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "mediaItemId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "reviewNote": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "startSecond": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "verifiedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "matchEvent": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "matchEventId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "MatchEvent",
+                  "namespace": "public"
+                }
+              },
+              "mediaItem": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "mediaItemId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "MediaItem",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "endSecond": {
+                  "column": "endSecond"
+                },
+                "evidenceUrl": {
+                  "column": "evidenceUrl"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "matchEventId": {
+                  "column": "matchEventId"
+                },
+                "mediaItemId": {
+                  "column": "mediaItemId"
+                },
+                "reviewNote": {
+                  "column": "reviewNote"
+                },
+                "startSecond": {
+                  "column": "startSecond"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                },
+                "verifiedAt": {
+                  "column": "verifiedAt"
+                }
+              },
+              "namespaceId": "public",
+              "table": "media_moment"
             }
           },
           "MediaReviewCandidate": {
@@ -3840,6 +4161,94 @@
               },
               "namespaceId": "public",
               "table": "media_review_candidate"
+            }
+          },
+          "MediaSave": {
+            "fields": {
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "favourite": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "mediaItemId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "watchLater": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "mediaItem": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "mediaItemId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "MediaItem",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "favourite": {
+                  "column": "favourite"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "mediaItemId": {
+                  "column": "mediaItemId"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                },
+                "watchLater": {
+                  "column": "watchLater"
+                }
+              },
+              "namespaceId": "public",
+              "table": "media_save"
             }
           },
           "ModelVersion": {
@@ -5308,6 +5717,21 @@
                 },
                 "to": {
                   "model": "CompetitionFixtureSnapshot",
+                  "namespace": "public"
+                }
+              },
+              "favouriteMatches": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "seasonId"
+                  ]
+                },
+                "to": {
+                  "model": "FavouriteMatch",
                   "namespace": "public"
                 }
               },
@@ -6972,6 +7396,101 @@
                 }
               ]
             },
+            "favourite_match": {
+              "columns": {
+                "createdAt": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "matchId": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "seasonId": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "slot": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "source": {
+                    "columns": [
+                      "seasonId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "favourite_match"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "season"
+                  }
+                },
+                {
+                  "source": {
+                    "columns": [
+                      "matchId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "favourite_match"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "football_match"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "seasonId"
+                  ],
+                  "name": "favourite_match_seasonId_idx_aa50cbae",
+                  "prefix": "favourite_match_seasonId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "matchId"
+                  ]
+                },
+                {
+                  "columns": [
+                    "seasonId",
+                    "slot"
+                  ]
+                }
+              ]
+            },
             "favourite_player": {
               "columns": {
                 "id": {
@@ -8589,6 +9108,11 @@
                   "nativeType": "text",
                   "nullable": true
                 },
+                "featuredAt": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
                 "id": {
                   "codecId": "pg/uuid@1",
                   "nativeType": "uuid",
@@ -8761,6 +9285,129 @@
                 ]
               },
               "uniques": []
+            },
+            "media_moment": {
+              "columns": {
+                "createdAt": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "endSecond": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "evidenceUrl": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "matchEventId": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "mediaItemId": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "reviewNote": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "startSecond": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": true
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "verifiedAt": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "source": {
+                    "columns": [
+                      "mediaItemId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "media_moment"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "media_item"
+                  }
+                },
+                {
+                  "source": {
+                    "columns": [
+                      "matchEventId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "media_moment"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "match_event"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "matchEventId"
+                  ],
+                  "name": "media_moment_matchEventId_idx_8e4b5b2a",
+                  "prefix": "media_moment_matchEventId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "mediaItemId"
+                  ],
+                  "name": "media_moment_mediaItemId_idx_5e6c7760",
+                  "prefix": "media_moment_mediaItemId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "mediaItemId",
+                    "matchEventId"
+                  ]
+                }
+              ]
             },
             "media_review_candidate": {
               "checks": [
@@ -9005,6 +9652,83 @@
                     "dataSourceId",
                     "externalMediaId",
                     "matchId"
+                  ]
+                }
+              ]
+            },
+            "media_save": {
+              "columns": {
+                "createdAt": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "favourite": {
+                  "codecId": "pg/bool@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": false
+                  },
+                  "nativeType": "bool",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "mediaItemId": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "watchLater": {
+                  "codecId": "pg/bool@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": false
+                  },
+                  "nativeType": "bool",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "source": {
+                    "columns": [
+                      "mediaItemId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "media_save"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "media_item"
+                  }
+                }
+              ],
+              "indexes": [],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "mediaItemId"
                   ]
                 }
               ]
@@ -11138,10 +11862,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "3b7f071e51ccdd54466d3581e59ebbf3a8c5aea5e21bbb29823dbb97a32a08ab"
+    "storageHash": "54a1195aed4cda88ea25ac558f929b76a2987c4ba5faee8210f17b801ec03a3d"
   },
   "execution": {
-    "executionHash": "ab717b6632d326619df0798673a98c60b8e94b1cb84f0755ab5c26fc36b2a116",
+    "executionHash": "0a8926be11e8c8dc85748a073b6f2b49714f811592b129dbae65483fcc8baebf",
     "mutations": {
       "defaults": [
         {
@@ -11220,6 +11944,17 @@
             "column": "updatedAt",
             "namespace": "public",
             "table": "data_source"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "favourite_match"
           }
         },
         {
@@ -11475,6 +12210,32 @@
           "ref": {
             "column": "id",
             "namespace": "public",
+            "table": "media_moment"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updatedAt",
+            "namespace": "public",
+            "table": "media_moment"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
             "table": "media_review_candidate"
           }
         },
@@ -11491,6 +12252,32 @@
             "column": "updatedAt",
             "namespace": "public",
             "table": "media_review_candidate"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "media_save"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updatedAt",
+            "namespace": "public",
+            "table": "media_save"
           }
         },
         {

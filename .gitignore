@@ -43,3 +43,10 @@ next-env.d.ts
 node_modules/
 dist/
 .env
+
+# Supplied trophy mesh has no documented redistribution rights. Keep the source
+# and the local prepared copy out of Git and shared builds.
+/3d-models/
+/3d-models/champions-league-trophy.glb
+/public/models/club/private-champions-league.glb
+/public/models/club/private-champions-league.proof.png

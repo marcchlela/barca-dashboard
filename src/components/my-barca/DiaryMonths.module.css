@@ -1,0 +1,185 @@
+.month {
+  border: 1px solid;
+}
+
+.month + .month {
+  margin-top: 8px;
+}
+
+.monthHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 50px;
+  padding: 9px 16px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.monthHeader::-webkit-details-marker {
+  display: none;
+}
+
+.monthHeader:focus-visible,
+.row:focus-visible {
+  outline: 2px solid;
+  outline-offset: -2px;
+}
+
+.monthCount {
+  margin-left: 12px;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.chevron {
+  flex: none;
+  transition: transform .2s ease;
+}
+
+.month[open] .chevron {
+  transform: rotate(180deg);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) 56px 76px 16px;
+  align-items: center;
+  gap: 12px;
+  min-height: 60px;
+  padding: 7px 14px;
+  border-top: 1px solid;
+  text-decoration: none;
+}
+
+.row:hover {
+  background: rgb(255 255 255 / 4%);
+}
+
+.date {
+  text-align: center;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.fixture {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.crests {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 3px;
+}
+
+.crest {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 27px;
+  height: 27px;
+}
+
+.fixtureText {
+  min-width: 0;
+}
+
+.opponent {
+  display: block;
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  display: block;
+  overflow: hidden;
+  margin-top: 2px;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.score {
+  text-align: right;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.marks {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+  min-width: 0;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.arrow {
+  flex: none;
+}
+
+@media (max-width: 640px) {
+  .row {
+    grid-template-columns: 25px minmax(0, 1fr) 44px 60px;
+    gap: 7px;
+    min-height: 57px;
+    padding: 7px 9px;
+  }
+
+  .fixture {
+    gap: 6px;
+  }
+
+  .crests {
+    gap: 1px;
+  }
+
+  .crest {
+    width: 21px;
+    height: 21px;
+  }
+
+  .crest img {
+    width: 20px;
+    height: 20px;
+  }
+
+  .opponent {
+    font-size: 12px;
+  }
+
+  .meta {
+    font-size: 10px;
+  }
+
+  .score {
+    font-size: 13px;
+  }
+
+  .marks {
+    gap: 3px;
+    font-size: 11px;
+  }
+
+  .arrow {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chevron {
+    transition: none;
+  }
+}

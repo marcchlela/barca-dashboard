@@ -21,6 +21,12 @@ type CompetitionLogoProps = {
 
   size?:
     number;
+
+  onError?:
+    () => void;
+
+  onLoad?:
+    () => void;
 };
 
 export default function CompetitionLogo({
@@ -29,6 +35,8 @@ export default function CompetitionLogo({
   code = null,
   theme,
   size = 16,
+  onError,
+  onLoad,
 }: CompetitionLogoProps) {
   /*
   |--------------------------------------------------------------------------
@@ -106,6 +114,12 @@ export default function CompetitionLogo({
       <img
         src={
           src
+        }
+        onError={
+          onError
+        }
+        onLoad={
+          onLoad
         }
         alt=""
         className={`

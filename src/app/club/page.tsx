@@ -1,11 +1,8 @@
-import SectionPlaceholder from "../../components/shell/SectionPlaceholder";
+import ClubMuseum from "../../components/club/ClubMuseum";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { title: "The museum | FC Barcelona", description: "Enter the Club museum: trophies, every first-team season, and the identity of FC Barcelona." };
 
 export default function ClubPage() {
-  return (
-    <SectionPlaceholder
-      eyebrow="FC Barcelona"
-      title="Club"
-      description="The trophy cabinet, seasons and eras, Camp Nou experience, club history and Barça identity will live here."
-    />
-  );
+  return <ClubMuseum />;
 }

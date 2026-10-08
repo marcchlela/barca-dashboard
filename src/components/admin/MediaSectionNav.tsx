@@ -9,6 +9,7 @@ import {
 import {
   Film,
   Inbox,
+  Clapperboard,
   Plus,
 } from "lucide-react";
 
@@ -77,6 +78,12 @@ export default function MediaSectionNav({
         pathname.startsWith(
           "/admin/media/add",
         ),
+    },
+    {
+      href: "/admin/media/curation",
+      label: "Curation",
+      icon: Clapperboard,
+      active: pathname.startsWith("/admin/media/curation"),
     },
   ];
 

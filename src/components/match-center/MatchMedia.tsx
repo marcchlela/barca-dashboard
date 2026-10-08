@@ -1,7 +1,9 @@
 "use client";
 
 import {
+  useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 
@@ -10,6 +12,7 @@ import {
   ExternalLink,
   Play,
   Video,
+  X,
 } from "lucide-react";
 
 import FootballIcon from "../icons/FootballIcon";
@@ -76,6 +79,15 @@ export default function MatchMedia({
     ) ??
     items[0] ??
     null;
+  const [showGoals, setShowGoals] = useState(false);
+  const goalDialog = useRef<HTMLDialogElement>(null);
+  const verifiedGoals = items.flatMap((item) => item.verifiedGoals.map((goal) => ({ ...goal, item })));
+  useEffect(() => {
+    const dialog = goalDialog.current;
+    if (!dialog) return;
+    if (showGoals && !dialog.open) dialog.showModal();
+    if (!showGoals && dialog.open) dialog.close();
+  }, [showGoals]);
 
   if (
     items.length ===
@@ -182,6 +194,10 @@ export default function MatchMedia({
             }
             theme={theme}
           />
+
+          {verifiedGoals.length > 0 && <div className="border-t px-5 py-4 sm:px-7" style={{ borderColor: theme.colors.border }}><button type="button" className="border px-4 py-2 text-sm focus-visible:outline-2" style={{ borderColor: theme.colors.accent, color: theme.colors.accent }} onClick={() => setShowGoals(true)}>See the goals · {verifiedGoals.length}</button><p className="mt-2 text-xs" style={{ color: theme.colors.textMuted }}>Only exact moments checked against the goal event are listed.</p></div>}
+
+          <dialog ref={goalDialog} onClose={() => setShowGoals(false)} aria-label="Verified goal videos" className="w-[min(92vw,720px)] border p-0 backdrop:bg-[#020711d9]" style={{ borderColor: theme.colors.border, background: theme.colors.surface, color: theme.colors.text }}><div className="flex items-start justify-between gap-4 border-b p-5" style={{ borderColor: theme.colors.border }}><div><p className="text-[10px] uppercase tracking-widest" style={{ color: theme.colors.accent }}>Match Center / verified footage</p><h3 className="mt-1 text-xl">See the goals</h3></div><button type="button" onClick={() => setShowGoals(false)} aria-label="Close goal videos" className="border p-2" style={{ borderColor: theme.colors.border }}><X size={18} /></button></div><div className="max-h-[65vh] overflow-y-auto p-5">{verifiedGoals.map((goal) => { const id = getYouTubeId(goal.item); const url = id ? `https://www.youtube.com/watch?v=${id}${goal.startSecond !== null ? `&t=${goal.startSecond}s` : ""}` : goal.item.url; return <a key={`${goal.item.id}:${goal.id}`} href={url} target="_blank" rel="noopener noreferrer" className="mb-2 flex items-center justify-between gap-4 border p-4 focus-visible:outline-2" style={{ borderColor: theme.colors.border }}><span><strong className="block text-sm">{goal.label}</strong><small className="mt-1 block" style={{ color: theme.colors.textMuted }}>{goal.item.type === "goal_clip" ? `${goal.item.isOfficial ? "Official" : "Publisher"} goal clip` : `Verified moment in ${goal.item.title}`}{goal.startSecond !== null ? ` · ${goal.startSecond}s` : ""}</small></span><ExternalLink size={17} /></a>; })}</div></dialog>
 
           {items.length >
           1 ? (

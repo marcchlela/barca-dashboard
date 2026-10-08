@@ -1,0 +1,69 @@
+.club-focus:focus-visible { outline: 2px solid var(--club-accent); outline-offset: 3px; }
+
+.club-hero-graphic {
+  background:
+    repeating-linear-gradient(135deg, transparent 0 42px, color-mix(in srgb, var(--club-accent) 6%, transparent) 43px, transparent 44px 86px),
+    linear-gradient(90deg, transparent, color-mix(in srgb, var(--club-accent) 8%, transparent));
+  mask-image: linear-gradient(90deg, transparent, #000);
+}
+
+.club-season-card { transition: background-color 180ms ease, border-color 180ms ease; }
+.club-season-card::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 42%;
+  background: linear-gradient(135deg, transparent 20%, color-mix(in srgb, var(--club-accent) 7%, transparent));
+  opacity: .45;
+  pointer-events: none;
+  transition: opacity 180ms ease;
+}
+.club-season-card:hover::after, .club-season-card:focus-visible::after { opacity: 1; }
+.club-featured-row { perspective: 900px; }
+.club-featured-scene-shade { background: linear-gradient(90deg, #0713219c, #07132130 48%, #0713219c), linear-gradient(0deg, #07132188, transparent 70%); }
+.club-featured-card { transition: transform 200ms ease, border-color 200ms ease, background-color 200ms ease; transform: translateY(0) rotateY(0); }
+.club-featured-card[data-side="left"]:not([data-active="true"]) { transform: rotateY(5deg) translateY(4px); transform-origin: right center; }
+.club-featured-card[data-side="right"]:not([data-active="true"]) { transform: rotateY(-5deg) translateY(4px); transform-origin: left center; }
+.club-featured-card:hover, .club-featured-card:focus-visible { transform: translateY(-3px) rotateY(0) !important; }
+.club-featured-shade { background: linear-gradient(180deg, transparent 24%, #0713219c); }
+.club-identity-layout, .club-identity-panel, .club-cabinet-detail { min-width: 0; }
+@media (min-width: 1024px) {
+  .club-identity-layout { grid-template-columns: minmax(210px, 27%) minmax(0, 1fr); }
+  .club-identity-tabs { grid-template-columns: 1fr; }
+  .club-cabinet-detail { grid-template-columns: minmax(0, 44%) minmax(0, 56%); }
+  .club-cabinet-detail .club-trophy-stage { border-bottom: 0; border-right-width: 1px; }
+}
+@media (min-width: 1280px) {
+  .club-identity-panel { grid-template-columns: minmax(0, 54%) minmax(0, 46%); }
+  .club-identity-picture { border-bottom: 0; border-right-width: 1px; }
+}
+.club-trophy-stage { isolation: isolate; }
+.club-trophy-stage::before { content: ""; position: absolute; z-index: -1; inset: 11% 13% 18%; border: 1px solid color-mix(in srgb, var(--club-accent) 25%, transparent); transform: skewY(-7deg); }
+.club-trophy-stage::after { content: ""; position: absolute; z-index: -1; left: 12%; right: 12%; bottom: 11%; height: 10%; border-radius: 50%; background: color-mix(in srgb, var(--club-accent) 14%, transparent); filter: blur(26px); }
+.club-trophy-silhouette { opacity: .38; background: radial-gradient(circle at 50% 47%, color-mix(in srgb, var(--club-accent) 12%, transparent), transparent 50%); }
+.club-trophy-stage-shade { background: linear-gradient(180deg, transparent 24%, #071321ed 100%); }
+.club-identity-crest {
+  background: radial-gradient(circle at 50% 55%, #2b3850 0, #111f35 52%, #081321 100%);
+}
+.club-identity-crest::before {
+  content: "";
+  position: absolute;
+  inset: 13% 20%;
+  border: 1px solid color-mix(in srgb, var(--club-accent) 30%, transparent);
+  transform: rotate(-5deg);
+}
+.club-identity-colours {
+  background: linear-gradient(180deg, transparent 24%, #071321cc 100%), repeating-linear-gradient(90deg, #004d98 0 17%, #a50044 17% 34%);
+}
+.club-identity-colours::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, #ffffff0a 0 1px, transparent 1px 5px);
+  opacity: .45;
+}
+.club-sources summary::-webkit-details-marker { display: none; }
+.club-sources[open] summary svg { transform: rotate(180deg); }
+@media (prefers-reduced-motion: reduce) {
+  .club-season-card, .club-season-card::after, .club-season-card svg, .club-featured-card, .club-sources summary svg { transition: none !important; }
+}

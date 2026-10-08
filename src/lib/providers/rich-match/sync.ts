@@ -1699,6 +1699,13 @@ for (
                   .first()
               : null;
 
+          // A source-backed manual own-goal correction must survive a later
+          // provider refresh when that provider calls the same event a goal.
+          const retainOwnGoalCorrection =
+            existing?.confidence === "manual_verified" &&
+            existing.type === "own_goal" &&
+            event.type === "goal";
+
           const eventData =
             {
               matchId:
@@ -1717,7 +1724,9 @@ for (
                 goalSource.id,
 
               type:
-                event.type,
+                retainOwnGoalCorrection
+                  ? "own_goal" as const
+                  : event.type,
 
               period:
                 event.minute !==
@@ -1749,7 +1758,9 @@ for (
                 null,
 
               confidence:
-                "exact_provider" as const,
+                retainOwnGoalCorrection
+                  ? "manual_verified" as const
+                  : "exact_provider" as const,
 
               rawData: {
                 providerEventId:
@@ -1772,6 +1783,10 @@ for (
 
                 awayScore:
                   event.awayScore,
+
+                ...(retainOwnGoalCorrection && existing?.rawData && typeof existing.rawData === "object"
+                  ? { correctionSourceUrl: "correctionSourceUrl" in existing.rawData ? existing.rawData.correctionSourceUrl : null }
+                  : {}),
               },
             };
 

@@ -1,0 +1,410 @@
+[
+  {
+    "id": "table.media_moment",
+    "label": "Create table \"media_moment\"",
+    "summary": "Creates table \"media_moment\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "media_moment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"media_moment\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"media_moment\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"media_moment\"",
+        "sql": "CREATE TABLE \"public\".\"media_moment\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"endSecond\" int4,\n  \"evidenceUrl\" text,\n  \"id\" uuid NOT NULL,\n  \"matchEventId\" uuid NOT NULL,\n  \"mediaItemId\" uuid NOT NULL,\n  \"reviewNote\" text,\n  \"startSecond\" int4,\n  \"updatedAt\" timestamptz NOT NULL,\n  \"verifiedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"media_moment\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"media_moment\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.media_save",
+    "label": "Create table \"media_save\"",
+    "summary": "Creates table \"media_save\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "media_save"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"media_save\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"media_save\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"media_save\"",
+        "sql": "CREATE TABLE \"public\".\"media_save\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"favourite\" bool DEFAULT false NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"mediaItemId\" uuid NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  \"watchLater\" bool DEFAULT false NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"media_save\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"media_save\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.media_item.featuredAt",
+    "label": "Add column \"featuredAt\" to \"media_item\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "featuredAt",
+        "table": "media_item"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"featuredAt\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "media_item",
+          "featuredAt"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"featuredAt\"",
+        "sql": "ALTER TABLE \"public\".\"media_item\" ADD COLUMN \"featuredAt\" timestamptz"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"featuredAt\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "media_item",
+          "featuredAt"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.media_moment.media_moment_mediaItemId_matchEventId_key",
+    "label": "Add unique constraint on \"media_moment\" (mediaItemId, matchEventId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "media_moment_mediaItemId_matchEventId_key",
+        "table": "media_moment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"media_moment_mediaItemId_matchEventId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_moment_mediaItemId_matchEventId_key",
+          "public",
+          "\"public\".\"media_moment\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"media_moment_mediaItemId_matchEventId_key\"",
+        "sql": "ALTER TABLE \"public\".\"media_moment\" ADD CONSTRAINT \"media_moment_mediaItemId_matchEventId_key\" UNIQUE (\"mediaItemId\", \"matchEventId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"media_moment_mediaItemId_matchEventId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_moment_mediaItemId_matchEventId_key",
+          "public",
+          "\"public\".\"media_moment\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.media_save.media_save_mediaItemId_key",
+    "label": "Add unique constraint on \"media_save\" (mediaItemId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "media_save_mediaItemId_key",
+        "table": "media_save"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"media_save_mediaItemId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_save_mediaItemId_key",
+          "public",
+          "\"public\".\"media_save\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"media_save_mediaItemId_key\"",
+        "sql": "ALTER TABLE \"public\".\"media_save\" ADD CONSTRAINT \"media_save_mediaItemId_key\" UNIQUE (\"mediaItemId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"media_save_mediaItemId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_save_mediaItemId_key",
+          "public",
+          "\"public\".\"media_save\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.media_moment.media_moment_matchEventId_idx_8e4b5b2a",
+    "label": "Create index \"media_moment_matchEventId_idx_8e4b5b2a\" on \"media_moment\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "media_moment_matchEventId_idx_8e4b5b2a",
+        "table": "media_moment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"media_moment_matchEventId_idx_8e4b5b2a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"media_moment_matchEventId_idx_8e4b5b2a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"media_moment_matchEventId_idx_8e4b5b2a\"",
+        "sql": "CREATE INDEX \"media_moment_matchEventId_idx_8e4b5b2a\" ON \"public\".\"media_moment\" (\"matchEventId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"media_moment_matchEventId_idx_8e4b5b2a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"media_moment_matchEventId_idx_8e4b5b2a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.media_moment.media_moment_mediaItemId_idx_5e6c7760",
+    "label": "Create index \"media_moment_mediaItemId_idx_5e6c7760\" on \"media_moment\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "media_moment_mediaItemId_idx_5e6c7760",
+        "table": "media_moment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"media_moment_mediaItemId_idx_5e6c7760\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"media_moment_mediaItemId_idx_5e6c7760\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"media_moment_mediaItemId_idx_5e6c7760\"",
+        "sql": "CREATE INDEX \"media_moment_mediaItemId_idx_5e6c7760\" ON \"public\".\"media_moment\" (\"mediaItemId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"media_moment_mediaItemId_idx_5e6c7760\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"media_moment_mediaItemId_idx_5e6c7760\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.media_moment.media_moment_mediaItemId_fkey",
+    "label": "Add foreign key \"media_moment_mediaItemId_fkey\" on \"media_moment\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "media_moment_mediaItemId_fkey",
+        "table": "media_moment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"media_moment_mediaItemId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_moment_mediaItemId_fkey",
+          "public",
+          "\"public\".\"media_moment\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"media_moment_mediaItemId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"media_moment\"\nADD CONSTRAINT \"media_moment_mediaItemId_fkey\"\nFOREIGN KEY (\"mediaItemId\")\nREFERENCES \"public\".\"media_item\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"media_moment_mediaItemId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_moment_mediaItemId_fkey",
+          "public",
+          "\"public\".\"media_moment\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.media_moment.media_moment_matchEventId_fkey",
+    "label": "Add foreign key \"media_moment_matchEventId_fkey\" on \"media_moment\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "media_moment_matchEventId_fkey",
+        "table": "media_moment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"media_moment_matchEventId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_moment_matchEventId_fkey",
+          "public",
+          "\"public\".\"media_moment\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"media_moment_matchEventId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"media_moment\"\nADD CONSTRAINT \"media_moment_matchEventId_fkey\"\nFOREIGN KEY (\"matchEventId\")\nREFERENCES \"public\".\"match_event\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"media_moment_matchEventId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_moment_matchEventId_fkey",
+          "public",
+          "\"public\".\"media_moment\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.media_save.media_save_mediaItemId_fkey",
+    "label": "Add foreign key \"media_save_mediaItemId_fkey\" on \"media_save\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "media_save_mediaItemId_fkey",
+        "table": "media_save"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"media_save_mediaItemId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_save_mediaItemId_fkey",
+          "public",
+          "\"public\".\"media_save\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"media_save_mediaItemId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"media_save\"\nADD CONSTRAINT \"media_save_mediaItemId_fkey\"\nFOREIGN KEY (\"mediaItemId\")\nREFERENCES \"public\".\"media_item\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"media_save_mediaItemId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_save_mediaItemId_fkey",
+          "public",
+          "\"public\".\"media_save\""
+        ]
+      }
+    ]
+  }
+]

@@ -2,7 +2,7 @@
 
 **Version:** 0.2.0  
 **Status:** Living source of truth  
-**Last updated:** 2026-10-04  
+**Last updated:** 2026-10-05
 **Audited branch:** `main`  
 **Audited commit:** `b658f0da5055ec19aa3b41cc4b6d5fe09b7a55df`  
 **Commit:** `finish squad page and official player data pipeline`  
@@ -18,7 +18,7 @@ Update it whenever a meaningful product, design, data, architecture, deployment,
 
 The project is currently **one user + FC Barcelona first**. Barça-only multi-user support is a realistic later extension. A fully multi-club platform is a much larger future idea and is explicitly **not current scope**.
 
-Current implementation workflow is deliberately page-by-page. As of 2026-10-04, Overview, Match Center, Admin, Matches/Calendar and Squad are strong/functional; **Analytics and its current-season competition workflow are implemented, live database-verified, and browser-checked across desktop/mobile kit themes**.
+Current implementation workflow is deliberately page-by-page. Overview, Match Center, Admin, Matches/Calendar, Squad and Analytics are functional. **My Barça is now implemented as the single-user personal archive**; account-based privacy remains future scope.
 
 The spec records both pushed repository state and explicitly confirmed/tested local changes when they are newer than the latest pushed commit.
 
@@ -462,43 +462,49 @@ Admin Sync Control now has bounded preview/write actions for missing historical 
 
 ## `/club`
 
-**Placeholder.**
+**Current Club rebuild (2026-10-07):** The former single-page Stage 1–2 cabinet/identity presentation described below has been superseded. `/club` is now a cinematic architectural foyer with three clear doors. `/club/trophies` is a native-scroll, reversible five-stop Blender-authored museum walk (UCL, La Liga, Copa del Rey, Spanish Super Cup, historical Club World Cup), followed by an archive wall covering every other named honour. The architecture is one locally exported GLB with five Blender-rendered stills for no-WebGL, low-power, and reduced-motion use. Trophy meshes load separately near their stops. A case dialog lists stored winning-year labels and links only unambiguous canonical seasons; it does not guess the 1937 Mediterranean League into a season. The walk has direct stop buttons and previous/next controls; closing a dialog returns to the same scroll position. La Liga, Super Cup and historical CWC are honestly labelled image/interpretive cases pending a verified, downloadable and adequately accurate mesh; view-only source models open externally. The supplied 2025 CWC trophy is **not** used to represent Barça's 2009/2011/2015 wins.
 
-Planned:
+`/club/seasons` is the redesigned searchable 128-season index; sourced eras supply context while decades serve navigation only. `/club/seasons/[slug]` is an editorial, title-and-moment exhibit with adjacent-season links and a collapsed provenance section. `/club/identity` presents four keyboard-accessible, horizontally scrollable-on-mobile tabs with one visual chapter visible at a time: the real crest, text-free blaugrana stripes, the supplied newer La Masia photo, and the credited Més que un club seats photograph with the explicit English translation. All routes preserve the canonical history data and read stored curation only; no provider is contacted on render. The private supplied UCL mesh and prepared copy are gitignored; a shareable build falls back to the pre-existing CC0 model. See `assets/source/club-asset-register.md` for the distinctions and `tools/blender/build_club_museum.py` / `prepare_museum_trophy.py` for Blender sources. The deep two-version Camp Nou explorer remains the next distinct Club project.
 
-- trophy cabinet;
-- seasons/eras;
-- club history;
-- deep Camp Nou experience.
+Current verification: `tools/qa-club-history.mjs` found 128 indexed/stored seasons, 150 stored curated moments, and unchanged current-season ID/match spine; TypeScript and production build passed. `tools/qa-club-rebuild-browser.mjs` checked desktop/mobile routes, five stops, case dialog, no horizontal overflow, three kit accents, and Overview loading without browser exceptions. Local model proof renders caught and corrected the supplied Copa OBJ's sideways axis before display. The older browser QA script below targeted the retired single-page UI and is retained only as historical evidence.
+
+**Stages 1–2 implemented / awaiting museum review.** The Club museum has a men’s first-team history spine spanning every season from 1899/00 through 2026/27 (128 selectable seasons). The landing page uses the shared kit themes and a searchable, keyboard-accessible decade rail; it does not present the decades as historical chapters or duplicate them with an era carousel. Each season links to a shareable `/club/seasons/[slug]` page. Season cards show a title count or “Open season,” while the season page lists titles and selected moments without inventing match facts. A past season with no recorded titles says so plainly; the current season is labelled in progress. Existing stored competition logos identify mapped titles without surrounding boxes; a labelled archive marker stands in when no verified logo is stored or its image cannot load. On-page prose is original/paraphrased, and the assets used in the cabinet and identity chapter are itemised below.
+
+`src/lib/club/history.ts` is the checked-in sourced curation and `tools/seed-club-history.mjs` is the deliberate additive importer (`node --experimental-strip-types tools/seed-club-history.mjs --preview`, then omit `--preview` to write). It creates missing canonical `Season` records and sourced `SeasonMoment` trophy/history records, never updates existing seasons, and asserts that the canonical current-season ID is unchanged. First local import created 127 seasons and 150 moments; a repeat created zero of each. Published honour labels are retained, including `1901-1902`. The year-only Mediterranean League `1937` is not assigned to an arbitrary season. The current match/analytics/My Barça loaders continue to use current-season flags and/or seasons with actual matches, not the museum’s historical rows. Club pages make no provider requests.
+
+The season pages read the stored `SeasonMoment` metadata and source URLs, not a provider response. La Liga is the display label for the source's Spanish League Championship category; original published labels remain in storage. The repeated source links and provenance explanation are consolidated into a collapsed “Sources & archive notes” section on the museum and season pages, so the archive remains shareable without making each title or moment a citation row.
+
+The Stage 2 cabinet covers every category and winning label in the checked-in official men’s honours curation, grouped into Europe/world, Spain and Catalonia. A selected category shows all winning years and links only those with a clear season mapping. The 1937 Mediterranean League label remains year-only. The earlier abstract trophy sculptures were replaced: Champions League opens with a credited photo of the real trophy in Barça's museum and uses a locally prepared CC0 fan-made mesh for rotation; La Liga and Copa del Rey use recognisable public Sketchfab models embedded on demand with local preview images. A project-owner-supplied Barça UCL celebration photograph spans the three featured trophy selectors. The latter 3D viewers need internet; if unavailable, the local previews and source links remain visible. No model files were copied from Sketchfab. Other categories retain an illustrated treatment. Asset provenance, rights, creator links, and the Blender preparation script are recorded in `assets/source/club-asset-register.md` and `tools/blender/prepare_club_model.py`. None of these models are official digital twins. The identity chapter now shows the existing Barça crest, a visible blaugrana stripe treatment, a project-owner-supplied photograph of the newer La Masia building, a credited photograph of Camp Nou's “Més que un club” seats, and the explicit English translation “More than a club.” The source and reuse rights for the two supplied photographs should be confirmed before public distribution. Its explanatory text paraphrases official Barça sources.
+
+`node --experimental-strip-types tools/qa-club-history.mjs` audits continuous coverage, unique sourced records, the unmapped year-only honour and the live match spine. `tools/qa-club-browser.mjs` checks decade selection by pointer/keyboard, mobile page width, cabinet years and on-demand 3D, identity tabs, untitled-season copy, title marks, adjacent-season navigation and three kit backgrounds against a local browser debugging endpoint.
+
+Review gate: get feedback on the revised trophy models, category hierarchy, and identity chapter before Stage 3. Stage 3 is the guided two-version Camp Nou explorer. Women’s football is a separate Stage 4 after the men’s archive is approved.
 
 ## `/media`
 
-**Fan-facing route still placeholder.**
+**Screening-room first release implemented.** The fan-facing route reads stored `MediaItem` records only. It presents a curated/recent featured film, current-season matchday timeline, exact-goal shelf, non-match film shelf, historical archive, searchable/filterable library, and a personal favourite/watch-later shelf. Filters cover season, competition, type and text (including opponent). Video playback uses a click-to-load YouTube embed where applicable; other official films open at their publisher. No provider call runs during page rendering.
 
-The underlying match-media system and admin media tooling already exist.
+Five official historical links seed idempotently via `node tools/seed-media-history.mjs`: Berlin 2015 final highlights/full match and 2017 PSG comeback highlights/full match plus the official Sergi Roberto goal film. These are curated season-linked archive entries, not invented canonical historical match rows. Rights-holder access and premium availability can change. No media files are copied or rehosted.
 
-Planned fan-facing route:
+`MediaSave` persists current single-user favourite/watch-later choices. `MediaMoment` links a canonical `MatchEvent` goal to an exact film, with optional clip seconds, evidence URL, note and review time. `/admin/media/curation` selects one featured film and manually verifies goal moments; a longer highlight requires bounded start/end seconds. It accepts sourced third-party films as well as official uploads. Match Center exposes a “See the goals” dialog only when verified links exist. The schema migration is `20261007T1318_media_library_and_goal_moments`; `node tools/qa-media-foundation.mjs` audits counts and link integrity. The local database now has **51 film records: 49 official and two sourced AS/LaLiga single-goal video pages**. Thirty-two are current-season match-linked and 19 historical; there are still no frame-verified current-season `MediaMoment` links. The AS pages identify Fermín's Valencia 0–2 and Cancelo's Racing 1–0, but automated playback yielded no frames, so their provisional event links were removed pending human confirmation. Four YouTube Shorts were removed after playback showed celebrations instead of the goal action; they must not be re-imported as goal clips. The [media source register](assets/source/media-source-register.md) records source, playback status, and free/API provider options. A match highlight or goal-labelled title alone never proves a particular goal clip.
 
-- official highlights;
-- goal clips;
-- interviews;
-- press conferences;
-- training;
-- other Barça media.
+Valencia and Levante's missing goal rows were restored idempotently from LaLiga's published match reports with `node tools/repair-media-goal-coverage.mjs --write`, taking the eight finished games to **44 scoring events**, the scoreline total. The same repair corrected Villalibre's Racing event to an own goal without replacing its ID. A repeat preview reports zero new rows. The existing GOAL API video key was tested for five relevant September 2026 dates and returned no video rows. Highlightly is the next free-key candidate to trial for this exact fixture set; its free-plan coverage is not yet confirmed.
+
+The matchday timeline has its own bounded vertical scroll, with stored competition/team marks and centered date plates. Each row shows two film actions and a jump to the complete selected-fixture collection when more are stored. Around the Match now includes **all** its stored previews, training, highlights, reactions and features, in bounded pages; future actual goal films will appear there only after verification. The archive is grouped into selectable Rome 2009, Wembley 2011, Berlin 2015 and La Remontada chapters. The competition filter uses the existing crest-bearing themed menu. Film cards omit the redundant playback-source banner and use quieter scrollbars/compact actions.
+
+The existing official Barça YouTube key and channel worker were tested deliberately: a forced dry run inspected 180 uploads in ten requests and proposed no missing automatic highlights; a forced write queued one Valencia preview and left the ten existing safe matches unchanged. Metadata/fixture review initially added 16 current-season official videos through Admin Media, followed by a separately found Elche preview. Four Shorts from that batch were removed after playback showed only celebrations, leaving 13 retained films from that manual expansion. Reimporting a preview was idempotent and cleared its pending review state. A separate `tools/seed-media-youtube-history.mjs` preview/write imported 14 official, public, embeddable YouTube videos into their verified historical season IDs; its repeat write created zero. The previously curated five Barça Play archive films and five Barça Play press-room/reaction clips remain. My Barça/Match Center still require video-level `MediaMoment` verification. The provenance, rejected Shorts, and new non-YouTube goal-footage leads are in `assets/source/media-source-register.md`. No provider fetch occurs on the fan page, and no new API key is needed for the existing films. Future multi-user recommendations and per-account saves need the postponed account/auth milestone.
 
 ## `/my-barca`
 
-**Placeholder.**
+**Implemented / personal archive.** The current-season view defaults to 2026/27, with a themed season selector for seasons with canonical finished Barça matches. Season Pulse shows watched matches, rated matches and average personal rating with its denominator. Its ten-bin half-star ratings histogram is informational, not a filter. The diary shows only saved personal entries, with themed competition, watch-type and exact half-star rating controls; there is no "not logged" watch filter. Competition choices show stored competition logos, and the rating control opens five outlined stars with half-star selection. Each filter menu is exactly as wide as its trigger. The diary uses slim match-day rows grouped into collapsible months (newest month open), with both stored club crests, Barça-first score, watch context, rating and a note-present icon; each row links to My Match. A season-scoped top-three collection stores manually chosen finished Barça matches in ranked portrait poster slots; empty cards open a centered visual crest/score/date picker. Picks can be replaced or removed, and one match cannot fill multiple slots. Squad favourites, joint top Man of the Match picks, favourite-goal cards and an editorial season-so-far story complete the page. The automatic standout match is the highest-rated match, breaking equal ratings by latest kickoff; this rule is stated on the card. No AI text or missing values are invented.
 
-Planned personal archive:
+Top-three choices use the `FavouriteMatch` table and `/api/favourites/match` write route. The route validates season, slot, Barça identity and finished status before writing. Migration `20261005T1327_favourite_matches` has been applied to the local database. This is single-user data until accounts are introduced.
 
-- watched matches;
-- ratings;
-- Man of the Match;
-- favourite goals;
-- notes;
-- favourite players;
-- season recap.
+My Match now persists `watchedAt`: live viewing uses canonical kickoff (and displays as game day); replay/highlights default to today when first selected and offer an editable date. Existing live entries with no stored `watchedAt` derive from kickoff in the archive. Existing replay/highlights entries with no date remain unknown until edited. Unmarking watched clears the date. No schema migration was required.
+
+Goal-clip checkpoint: the Media release adds `MediaMoment` for reviewed exact `MatchEvent`–video links. The current local database still has zero such links, so My Barça never labels a general match highlight as a goal clip. Historical standalone Sergi Roberto footage is archive-linked by season only. Exact current-season goals must be reviewed through Admin Media Curation before Match Center offers them. Accounts and multi-user separation remain deferred.
+
+The proposed top-three explanation captions and per-month watched-count/average-rating summaries were declined; do not treat them as planned My Barça work.
 
 ## `/settings`
 
@@ -1152,20 +1158,21 @@ Potential later personal fields:
 
 # 20. My Barça
 
-Planned global personal archive.
-
-Potential aggregate features:
+Implemented global personal archive. Current aggregate features:
 
 - all watched matches;
 - personal ratings;
+- season-scoped top-three favourite matches;
 - average match rating;
 - most-selected Man of the Match;
 - favourite goals;
 - notes;
 - favourite players;
 - season memories;
-- watch history/streaks;
-- end-of-season Barça recap / Wrapped-like summary.
+- watch history by match date and recorded watched date;
+- editorial season-so-far story.
+
+Watch streaks and the separate cinematic end-of-season recap remain later work; they must be based on enough recorded history rather than inferred viewing dates.
 
 ---
 
@@ -1879,7 +1886,7 @@ Use an armband-style icon with `C Captain` semantics rather than plain text such
 
 - add/remove favourite;
 - favourites filter;
-- favourites can later feed My Barça/personal recap.
+- favourites now feed My Barça; richer end-of-season recap use remains future work.
 
 ## Final metadata audit
 
@@ -1909,7 +1916,7 @@ Current behavior:
 
 Future behavior:
 
-- prioritize favourite players in My Barça;
+- prioritize favourite players in My Barça (implemented);
 - surface favourite-player season summaries;
 - use favourites in end-of-season personal recap;
 - optional favourite-player notifications later if notifications are introduced.
@@ -2186,11 +2193,10 @@ Major current limitations are no longer Matches or Squad; both are functional.
 
 Remaining major product gaps:
 
-- `/analytics` still placeholder and is the immediate next fan-facing page;
-- `/club` still placeholder;
+- `/club` history spine is implemented; trophy gallery, identity and deep stadium explorer await staged review;
 - global `/media` still placeholder despite strong match-media/admin infrastructure;
-- `/my-barca` still placeholder;
 - `/settings` still placeholder;
+- exact favourite-goal clips need event-to-media linkage and sourcing;
 - authentication/users are not built;
 - diary is still one-user-first;
 - production-grade scheduled provider/background sync still needs finalization;
@@ -2223,6 +2229,7 @@ Matches         DONE
 Calendar        DONE
 Squad           DONE
 Analytics       IMPLEMENTED / COMPETITION SYNC, DATA QA AND RESPONSIVE VISUAL QA PASSED
+My Barça        IMPLEMENTED / PERSONAL ARCHIVE AND WATCH-DATE FLOW
 ```
 
 ## Phase F — Analytics — IMPLEMENTED / VERIFIED
@@ -2297,12 +2304,11 @@ Continue after/alongside page work where appropriate:
 
 Current broad order:
 
-1. **My Barça** — personal archive/season recap;
-2. **Club** — trophies/history/deep Camp Nou;
-3. **global Media** — browse official Barça media beyond one match;
-4. **Settings** — preferences/diagnostics;
-5. deeper live/pre-match Match Center features;
-6. AI predictor and goal replay when data foundations are ready.
+1. **Club** — trophies/history/deep Camp Nou;
+2. **global Media** — browse official Barça media beyond one match, including an exact-goal clip sourcing/linkage pass;
+3. **Settings** — preferences/diagnostics;
+4. deeper live/pre-match Match Center features;
+5. AI predictor and goal replay when data foundations are ready.
 
 Roadmap may shift if a prerequisite/data-source issue appears, but avoid reopening finished pages for cosmetic churn unless a real issue is found.
 
@@ -2476,8 +2482,9 @@ As of **2026-10-04**:
 
 ## Immediate WIP / next
 
-- **Analytics, League Race history, and current-season competition fixture snapshots are implemented and live data QA passed.**
-- Further polish: linked match inspection across charts and a compact visible "data through matchday" badge.
+- **Analytics and My Barça are implemented; My Barça live data QA found eight watched/rated entries and no exact goal clips yet.**
+- User declined linked Analytics chart inspection and a data-through-matchday badge; do not carry them as next-step work.
+- Next page milestone: Club. Exact-goal clip sourcing/linkage belongs with the global Media pass after the personal goal gallery exposes the need clearly.
 
 ## Cross-cutting remaining
 
@@ -2489,8 +2496,6 @@ As of **2026-10-04**:
 
 ## Major future modules
 
-- Analytics / League Race;
-- My Barça;
 - Club/Trophies;
 - deep Camp Nou;
 - global Media;

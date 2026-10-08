@@ -1,11 +1,9 @@
-import SectionPlaceholder from "../../components/shell/SectionPlaceholder";
+import MyBarcaPageClient from "../../components/my-barca/MyBarcaPageClient";
+import { getMyBarca } from "../../lib/my-barca/get-my-barca";
 
-export default function MyBarcaPage() {
-  return (
-    <SectionPlaceholder
-      eyebrow="Personal Archive"
-      title="My Barça"
-      description="Your watched matches, ratings, favourites, diary, personal calendar and end-of-year Barça recap will live here."
-    />
-  );
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+export default async function MyBarcaPage() {
+  return <MyBarcaPageClient data={await getMyBarca()} />;
 }

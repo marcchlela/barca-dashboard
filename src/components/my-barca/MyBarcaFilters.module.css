@@ -1,0 +1,169 @@
+.field {
+  position: relative;
+  min-width: 0;
+}
+
+.label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 11px;
+  line-height: 1.25;
+}
+
+.menu {
+  position: relative;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 42px;
+  padding: 8px 11px;
+  border: 1px solid;
+  cursor: pointer;
+  list-style: none;
+  font-size: 13px;
+}
+
+.trigger::-webkit-details-marker {
+  display: none;
+}
+
+.triggerText {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chevron {
+  flex: none;
+  transition: transform .18s ease;
+}
+
+.menu[open] .chevron {
+  transform: rotate(180deg);
+}
+
+.options,
+.ratingOptions {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  max-height: 280px;
+  overflow-y: auto;
+  border: 1px solid;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 42px;
+  padding: 9px 11px;
+  border-bottom: 1px solid;
+  cursor: pointer;
+  text-align: left;
+  font-size: 13px;
+}
+
+.option:last-child {
+  border-bottom: 0;
+}
+
+.optionText {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.option:hover {
+  background: rgb(255 255 255 / 5%);
+}
+
+.ratingOptions {
+  padding: 14px;
+}
+
+.stars {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 10px;
+}
+
+.star {
+  position: relative;
+  display: block;
+  flex: 1 1 0;
+  max-width: 42px;
+  min-width: 0;
+  aspect-ratio: 1;
+}
+
+.starVisual {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.starVisual svg {
+  width: 100%;
+  height: 100%;
+}
+
+.half {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  cursor: pointer;
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.halfLeft {
+  left: 0;
+}
+
+.halfRight {
+  right: 0;
+}
+
+.half:focus-visible,
+.trigger:focus-visible,
+.option:focus-visible,
+.clear:focus-visible {
+  outline: 2px solid;
+  outline-offset: -2px;
+}
+
+.clear {
+  width: 100%;
+  margin-top: 12px;
+  padding: 9px 10px;
+  border: 1px solid;
+  text-align: left;
+  font-size: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chevron {
+    transition: none;
+  }
+}
