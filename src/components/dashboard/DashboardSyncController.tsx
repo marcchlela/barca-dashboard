@@ -80,6 +80,8 @@ export default function DashboardSyncController({
     useRef(false);
 
   useEffect(() => {
+    // Production freshness is owned by the authenticated background job.
+    if (process.env.NODE_ENV === "production") return;
     let cancelled =
       false;
 

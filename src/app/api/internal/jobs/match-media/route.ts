@@ -3,8 +3,8 @@ import {
 } from "next/server";
 
 import {
-  runAutomaticMatchMediaWorker,
-} from "../../../../../lib/providers/youtube-fcbarcelona/automatic-worker";
+  runScheduledMatchMediaJob,
+} from "../../../../../lib/providers/youtube-fcbarcelona/scheduled-job";
 
 export const dynamic =
   "force-dynamic";
@@ -66,14 +66,11 @@ export async function POST(
       );
     }
 
-    const result =
-      await runAutomaticMatchMediaWorker({
-        dryRun:
-          false,
-
-        forceAllFinished:
-          false,
-      });
+    const job = await runScheduledMatchMediaJob();
+    if (job.status === "already-running") {
+      return NextResponse.json({ ok: true, status: job.status, result: null, goalMedia: job.goalMedia }, { status: 202 });
+    }
+    const result = job.result;
 
     const failed =
       result.counts
@@ -95,6 +92,9 @@ export async function POST(
           0,
 
         result,
+        fixtureRefresh: job.fixtureRefresh,
+        eventRefresh: job.eventRefresh,
+        goalMedia: job.goalMedia,
       },
       {
         status:

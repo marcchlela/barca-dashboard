@@ -15,6 +15,7 @@ const eslintConfig = defineConfig([
     ".next/**",
     "out/**",
     "build/**",
+    ".artifacts/**",
     "next-env.d.ts",
 
     // Prisma generated contract typings

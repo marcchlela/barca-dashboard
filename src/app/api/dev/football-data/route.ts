@@ -6,6 +6,7 @@ import {
 } from "../../../../lib/providers/football-data/client";
 
 export async function GET() {
+  if (process.env.NODE_ENV === "production") return NextResponse.json({ ok: false, error: "Not found." }, { status: 404 });
   try {
     const [barcelona, standings] =
       await Promise.all([

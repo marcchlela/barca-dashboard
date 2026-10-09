@@ -24,6 +24,7 @@ import {
 import {
   runAutomaticMatchMediaWorker,
 } from "../../../../lib/providers/youtube-fcbarcelona/automatic-worker";
+import { runGoalMediaBackgroundWorker } from "../../../../lib/providers/dailygoal/background-worker";
 
 type SyncAction =
   | "fixture_sync"
@@ -37,7 +38,9 @@ type SyncAction =
   | "media_match_preview"
   | "media_match_sync"
   | "media_worker_preview"
-  | "media_worker_run";
+  | "media_worker_run"
+  | "goal_media_worker_preview"
+  | "goal_media_worker_run";
 
 type RequestBody = {
   action?:
@@ -247,14 +250,24 @@ export async function POST(
           });
 
         break;
+
+      case "goal_media_worker_preview":
+      case "goal_media_worker_run":
+        result = await runGoalMediaBackgroundWorker({ dryRun: action === "goal_media_worker_preview" });
+        break;
     }
 
     const finishedAt =
       new Date();
 
+    const goalWorkerBlocked = (action === "goal_media_worker_preview" || action === "goal_media_worker_run") &&
+      result !== null && typeof result === "object" && "status" in result && result.status === "blocked";
+
     return NextResponse.json({
       ok:
-        true,
+        !goalWorkerBlocked,
+
+      error: goalWorkerBlocked ? "Goal-media source cooldown is active; no requests were made." : undefined,
 
       action,
 
@@ -271,7 +284,7 @@ export async function POST(
         startedAt.getTime(),
 
       result,
-    });
+    }, { status: goalWorkerBlocked ? 503 : 200 });
   } catch (
     error
   ) {
@@ -317,6 +330,8 @@ function isSyncAction(
     "media_match_sync",
     "media_worker_preview",
     "media_worker_run",
+    "goal_media_worker_preview",
+    "goal_media_worker_run",
   ].includes(
     value,
   );

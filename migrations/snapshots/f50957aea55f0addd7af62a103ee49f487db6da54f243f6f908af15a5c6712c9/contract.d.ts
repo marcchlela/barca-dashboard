@@ -34,9 +34,9 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'f6097504120286aca553e1ede724057f6150800b76a93503305c0fc785245fd4'>;
+  StorageHashBase<'f50957aea55f0addd7af62a103ee49f487db6da54f243f6f908af15a5c6712c9'>;
 export type ExecutionHash =
-  ExecutionHashBase<'62f16f44558cb059ebf376918425ae2814d45d8e94d7e08118b750295f57ac8d'>;
+  ExecutionHashBase<'8c2f65fc1647f9f1e8445a0f9fe2af4563d416c19151ae90d0595803209f46a8'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -302,47 +302,6 @@ export type FieldOutputTypes = {
       readonly playerId: CodecTypes['pg/uuid@1']['output'];
       readonly sortOrder: CodecTypes['pg/int4@1']['output'];
       readonly pinnedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
-    };
-    readonly GoalMediaPageCache: {
-      readonly id: CodecTypes['pg/uuid@1']['output'];
-      readonly url: CodecTypes['pg/text@1']['output'];
-      readonly matchId: CodecTypes['pg/uuid@1']['output'] | null;
-      readonly status: CodecTypes['pg/text@1']['output'];
-      readonly checkedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
-      readonly reason: CodecTypes['pg/text@1']['output'] | null;
-      readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
-      readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
-    };
-    readonly GoalMediaSyncRun: {
-      readonly id: CodecTypes['pg/uuid@1']['output'];
-      readonly lockKey: CodecTypes['pg/text@1']['output'] | null;
-      readonly mode: CodecTypes['pg/text@1']['output'];
-      readonly status: CodecTypes['pg/text@1']['output'];
-      readonly startedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
-      readonly finishedAt: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
-      readonly fixturesChecked: CodecTypes['pg/int4@1']['output'];
-      readonly goalsPublished: CodecTypes['pg/int4@1']['output'];
-      readonly goalsQueued: CodecTypes['pg/int4@1']['output'];
-      readonly missingCoverage: CodecTypes['pg/int4@1']['output'];
-      readonly error: CodecTypes['pg/text@1']['output'] | null;
-      readonly result: CodecTypes['pg/json@1']['output'] | null;
-      readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
-    };
-    readonly GoalMediaSyncState: {
-      readonly id: CodecTypes['pg/uuid@1']['output'];
-      readonly matchId: CodecTypes['pg/uuid@1']['output'];
-      readonly status: CodecTypes['pg/text@1']['output'];
-      readonly attempts: CodecTypes['pg/int4@1']['output'];
-      readonly lastCheckedAt: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
-      readonly nextRetryAt: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
-      readonly sourceUrl: CodecTypes['pg/text@1']['output'] | null;
-      readonly lastVideoId: CodecTypes['pg/text@1']['output'] | null;
-      readonly goalsTotal: CodecTypes['pg/int4@1']['output'];
-      readonly goalsCovered: CodecTypes['pg/int4@1']['output'];
-      readonly reviewPending: CodecTypes['pg/int4@1']['output'];
-      readonly lastError: CodecTypes['pg/text@1']['output'] | null;
-      readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
-      readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
     };
     readonly GoalTimestampCandidate: {
       readonly id: CodecTypes['pg/uuid@1']['output'];
@@ -911,47 +870,6 @@ export type FieldInputTypes = {
       readonly playerId: CodecTypes['pg/uuid@1']['input'];
       readonly sortOrder: CodecTypes['pg/int4@1']['input'];
       readonly pinnedAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
-    };
-    readonly GoalMediaPageCache: {
-      readonly id: CodecTypes['pg/uuid@1']['input'];
-      readonly url: CodecTypes['pg/text@1']['input'];
-      readonly matchId: CodecTypes['pg/uuid@1']['input'] | null;
-      readonly status: CodecTypes['pg/text@1']['input'];
-      readonly checkedAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
-      readonly reason: CodecTypes['pg/text@1']['input'] | null;
-      readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
-      readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
-    };
-    readonly GoalMediaSyncRun: {
-      readonly id: CodecTypes['pg/uuid@1']['input'];
-      readonly lockKey: CodecTypes['pg/text@1']['input'] | null;
-      readonly mode: CodecTypes['pg/text@1']['input'];
-      readonly status: CodecTypes['pg/text@1']['input'];
-      readonly startedAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
-      readonly finishedAt: CodecTypes['pg/timestamptz-temporal@1']['input'] | null;
-      readonly fixturesChecked: CodecTypes['pg/int4@1']['input'];
-      readonly goalsPublished: CodecTypes['pg/int4@1']['input'];
-      readonly goalsQueued: CodecTypes['pg/int4@1']['input'];
-      readonly missingCoverage: CodecTypes['pg/int4@1']['input'];
-      readonly error: CodecTypes['pg/text@1']['input'] | null;
-      readonly result: CodecTypes['pg/json@1']['input'] | null;
-      readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
-    };
-    readonly GoalMediaSyncState: {
-      readonly id: CodecTypes['pg/uuid@1']['input'];
-      readonly matchId: CodecTypes['pg/uuid@1']['input'];
-      readonly status: CodecTypes['pg/text@1']['input'];
-      readonly attempts: CodecTypes['pg/int4@1']['input'];
-      readonly lastCheckedAt: CodecTypes['pg/timestamptz-temporal@1']['input'] | null;
-      readonly nextRetryAt: CodecTypes['pg/timestamptz-temporal@1']['input'] | null;
-      readonly sourceUrl: CodecTypes['pg/text@1']['input'] | null;
-      readonly lastVideoId: CodecTypes['pg/text@1']['input'] | null;
-      readonly goalsTotal: CodecTypes['pg/int4@1']['input'];
-      readonly goalsCovered: CodecTypes['pg/int4@1']['input'];
-      readonly reviewPending: CodecTypes['pg/int4@1']['input'];
-      readonly lastError: CodecTypes['pg/text@1']['input'] | null;
-      readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
-      readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
     };
     readonly GoalTimestampCandidate: {
       readonly id: CodecTypes['pg/uuid@1']['input'];
@@ -1554,47 +1472,6 @@ export type StorageColumnTypes = {
       readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly venue: CodecTypes['pg/text@1']['output'] | null;
     };
-    readonly goal_media_page_cache: {
-      readonly checkedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
-      readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
-      readonly id: CodecTypes['pg/uuid@1']['output'];
-      readonly matchId: CodecTypes['pg/uuid@1']['output'] | null;
-      readonly reason: CodecTypes['pg/text@1']['output'] | null;
-      readonly status: CodecTypes['pg/text@1']['output'];
-      readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
-      readonly url: CodecTypes['pg/text@1']['output'];
-    };
-    readonly goal_media_sync_run: {
-      readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
-      readonly error: CodecTypes['pg/text@1']['output'] | null;
-      readonly finishedAt: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
-      readonly fixturesChecked: CodecTypes['pg/int4@1']['output'];
-      readonly goalsPublished: CodecTypes['pg/int4@1']['output'];
-      readonly goalsQueued: CodecTypes['pg/int4@1']['output'];
-      readonly id: CodecTypes['pg/uuid@1']['output'];
-      readonly lockKey: CodecTypes['pg/text@1']['output'] | null;
-      readonly missingCoverage: CodecTypes['pg/int4@1']['output'];
-      readonly mode: CodecTypes['pg/text@1']['output'];
-      readonly result: CodecTypes['pg/json@1']['output'] | null;
-      readonly startedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
-      readonly status: CodecTypes['pg/text@1']['output'];
-    };
-    readonly goal_media_sync_state: {
-      readonly attempts: CodecTypes['pg/int4@1']['output'];
-      readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
-      readonly goalsCovered: CodecTypes['pg/int4@1']['output'];
-      readonly goalsTotal: CodecTypes['pg/int4@1']['output'];
-      readonly id: CodecTypes['pg/uuid@1']['output'];
-      readonly lastCheckedAt: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
-      readonly lastError: CodecTypes['pg/text@1']['output'] | null;
-      readonly lastVideoId: CodecTypes['pg/text@1']['output'] | null;
-      readonly matchId: CodecTypes['pg/uuid@1']['output'];
-      readonly nextRetryAt: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
-      readonly reviewPending: CodecTypes['pg/int4@1']['output'];
-      readonly sourceUrl: CodecTypes['pg/text@1']['output'] | null;
-      readonly status: CodecTypes['pg/text@1']['output'];
-      readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
-    };
     readonly goal_timestamp_candidate: {
       readonly clipUrl: CodecTypes['pg/text@1']['output'];
       readonly confidence: CodecTypes['pg/text@1']['output'];
@@ -2162,47 +2039,6 @@ export type StorageColumnInputTypes = {
         | 'abandoned';
       readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly venue: CodecTypes['pg/text@1']['input'] | null;
-    };
-    readonly goal_media_page_cache: {
-      readonly checkedAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
-      readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
-      readonly id: CodecTypes['pg/uuid@1']['input'];
-      readonly matchId: CodecTypes['pg/uuid@1']['input'] | null;
-      readonly reason: CodecTypes['pg/text@1']['input'] | null;
-      readonly status: CodecTypes['pg/text@1']['input'];
-      readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
-      readonly url: CodecTypes['pg/text@1']['input'];
-    };
-    readonly goal_media_sync_run: {
-      readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
-      readonly error: CodecTypes['pg/text@1']['input'] | null;
-      readonly finishedAt: CodecTypes['pg/timestamptz-temporal@1']['input'] | null;
-      readonly fixturesChecked: CodecTypes['pg/int4@1']['input'];
-      readonly goalsPublished: CodecTypes['pg/int4@1']['input'];
-      readonly goalsQueued: CodecTypes['pg/int4@1']['input'];
-      readonly id: CodecTypes['pg/uuid@1']['input'];
-      readonly lockKey: CodecTypes['pg/text@1']['input'] | null;
-      readonly missingCoverage: CodecTypes['pg/int4@1']['input'];
-      readonly mode: CodecTypes['pg/text@1']['input'];
-      readonly result: CodecTypes['pg/json@1']['input'] | null;
-      readonly startedAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
-      readonly status: CodecTypes['pg/text@1']['input'];
-    };
-    readonly goal_media_sync_state: {
-      readonly attempts: CodecTypes['pg/int4@1']['input'];
-      readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
-      readonly goalsCovered: CodecTypes['pg/int4@1']['input'];
-      readonly goalsTotal: CodecTypes['pg/int4@1']['input'];
-      readonly id: CodecTypes['pg/uuid@1']['input'];
-      readonly lastCheckedAt: CodecTypes['pg/timestamptz-temporal@1']['input'] | null;
-      readonly lastError: CodecTypes['pg/text@1']['input'] | null;
-      readonly lastVideoId: CodecTypes['pg/text@1']['input'] | null;
-      readonly matchId: CodecTypes['pg/uuid@1']['input'];
-      readonly nextRetryAt: CodecTypes['pg/timestamptz-temporal@1']['input'] | null;
-      readonly reviewPending: CodecTypes['pg/int4@1']['input'];
-      readonly sourceUrl: CodecTypes['pg/text@1']['input'] | null;
-      readonly status: CodecTypes['pg/text@1']['input'];
-      readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
     };
     readonly goal_timestamp_candidate: {
       readonly clipUrl: CodecTypes['pg/text@1']['input'];
@@ -2847,8 +2683,6 @@ export namespace Models {
     diaryEntry: public_MatchDiaryEntry | null;
     events: public_MatchEvent[];
     favouriteMatch: public_FavouriteMatch | null;
-    goalMediaPages: public_GoalMediaPageCache[];
-    goalMediaSyncState: public_GoalMediaSyncState | null;
     goalTimestampCandidates: public_GoalTimestampCandidate[];
     homeTeam: public_Team;
     lineups: public_Lineup[];
@@ -2865,8 +2699,6 @@ export namespace Models {
       | 'diaryEntry'
       | 'events'
       | 'favouriteMatch'
-      | 'goalMediaPages'
-      | 'goalMediaSyncState'
       | 'goalTimestampCandidates'
       | 'homeTeam'
       | 'lineups'
@@ -3210,52 +3042,6 @@ export namespace Models {
     mediaItem: public_MediaItem | null;
     readonly [RelationKeys]?: 'match' | 'matchEvent' | 'mediaItem';
   };
-  export type public_GoalMediaSyncState = {
-    id: CodecTypes['pg/uuid@1']['output'];
-    matchId: CodecTypes['pg/uuid@1']['output'];
-    status: CodecTypes['pg/text@1']['output'];
-    attempts: CodecTypes['pg/int4@1']['output'];
-    lastCheckedAt: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
-    nextRetryAt: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
-    sourceUrl: CodecTypes['pg/text@1']['output'] | null;
-    lastVideoId: CodecTypes['pg/text@1']['output'] | null;
-    goalsTotal: CodecTypes['pg/int4@1']['output'];
-    goalsCovered: CodecTypes['pg/int4@1']['output'];
-    reviewPending: CodecTypes['pg/int4@1']['output'];
-    lastError: CodecTypes['pg/text@1']['output'] | null;
-    createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
-    updatedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
-    match: public_Match;
-    readonly [RelationKeys]?: 'match';
-  };
-  export type public_GoalMediaPageCache = {
-    id: CodecTypes['pg/uuid@1']['output'];
-    url: CodecTypes['pg/text@1']['output'];
-    matchId: CodecTypes['pg/uuid@1']['output'] | null;
-    status: CodecTypes['pg/text@1']['output'];
-    checkedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
-    reason: CodecTypes['pg/text@1']['output'] | null;
-    createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
-    updatedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
-    match: public_Match | null;
-    readonly [RelationKeys]?: 'match';
-  };
-  export type public_GoalMediaSyncRun = {
-    id: CodecTypes['pg/uuid@1']['output'];
-    lockKey: CodecTypes['pg/text@1']['output'] | null;
-    mode: CodecTypes['pg/text@1']['output'];
-    status: CodecTypes['pg/text@1']['output'];
-    startedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
-    finishedAt: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
-    fixturesChecked: CodecTypes['pg/int4@1']['output'];
-    goalsPublished: CodecTypes['pg/int4@1']['output'];
-    goalsQueued: CodecTypes['pg/int4@1']['output'];
-    missingCoverage: CodecTypes['pg/int4@1']['output'];
-    error: CodecTypes['pg/text@1']['output'] | null;
-    result: CodecTypes['pg/json@1']['output'] | null;
-    createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
-    readonly [RelationKeys]?: never;
-  };
   export type public_MediaReviewCandidate = {
     id: CodecTypes['pg/uuid@1']['output'];
     seasonId: CodecTypes['pg/uuid@1']['output'];
@@ -3536,9 +3322,6 @@ export declare const models: {
     MediaSave: Models.public_MediaSave;
     MediaMoment: Models.public_MediaMoment;
     GoalTimestampCandidate: Models.public_GoalTimestampCandidate;
-    GoalMediaSyncState: Models.public_GoalMediaSyncState;
-    GoalMediaPageCache: Models.public_GoalMediaPageCache;
-    GoalMediaSyncRun: Models.public_GoalMediaSyncRun;
     MediaReviewCandidate: Models.public_MediaReviewCandidate;
     KitTheme: Models.public_KitTheme;
     Trophy: Models.public_Trophy;
@@ -4192,291 +3975,6 @@ type ContractBase = Omit<
                   readonly target: {
                     readonly namespaceId: 'public' & NamespaceId;
                     readonly tableName: 'team';
-                    readonly columns: readonly ['id'];
-                  };
-                },
-              ];
-            };
-            readonly goal_media_page_cache: {
-              columns: {
-                readonly id: {
-                  readonly nativeType: 'uuid';
-                  readonly codecId: 'pg/uuid@1';
-                  readonly nullable: false;
-                };
-                readonly url: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly matchId: {
-                  readonly nativeType: 'uuid';
-                  readonly codecId: 'pg/uuid@1';
-                  readonly nullable: true;
-                };
-                readonly status: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly checkedAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-temporal@1';
-                  readonly nullable: false;
-                };
-                readonly reason: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                };
-                readonly createdAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-temporal@1';
-                  readonly nullable: false;
-                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
-                };
-                readonly updatedAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-temporal@1';
-                  readonly nullable: false;
-                };
-              };
-              primaryKey: { readonly columns: readonly ['id'] };
-              uniques: readonly [{ readonly columns: readonly ['url'] }];
-              indexes: readonly [
-                {
-                  readonly name: 'goal_media_page_cache_matchId_idx_4caf5ecc';
-                  readonly prefix: 'goal_media_page_cache_matchId_idx';
-                  readonly columns: readonly ['matchId'];
-                  readonly unique: false;
-                },
-              ];
-              foreignKeys: readonly [
-                {
-                  readonly source: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'goal_media_page_cache';
-                    readonly columns: readonly ['matchId'];
-                  };
-                  readonly target: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'football_match';
-                    readonly columns: readonly ['id'];
-                  };
-                },
-              ];
-            };
-            readonly goal_media_sync_run: {
-              columns: {
-                readonly id: {
-                  readonly nativeType: 'uuid';
-                  readonly codecId: 'pg/uuid@1';
-                  readonly nullable: false;
-                };
-                readonly lockKey: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                };
-                readonly mode: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly status: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                };
-                readonly startedAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-temporal@1';
-                  readonly nullable: false;
-                };
-                readonly finishedAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-temporal@1';
-                  readonly nullable: true;
-                };
-                readonly fixturesChecked: {
-                  readonly nativeType: 'int4';
-                  readonly codecId: 'pg/int4@1';
-                  readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/int4@1', 0>;
-                  };
-                };
-                readonly goalsPublished: {
-                  readonly nativeType: 'int4';
-                  readonly codecId: 'pg/int4@1';
-                  readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/int4@1', 0>;
-                  };
-                };
-                readonly goalsQueued: {
-                  readonly nativeType: 'int4';
-                  readonly codecId: 'pg/int4@1';
-                  readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/int4@1', 0>;
-                  };
-                };
-                readonly missingCoverage: {
-                  readonly nativeType: 'int4';
-                  readonly codecId: 'pg/int4@1';
-                  readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/int4@1', 0>;
-                  };
-                };
-                readonly error: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                };
-                readonly result: {
-                  readonly nativeType: 'json';
-                  readonly codecId: 'pg/json@1';
-                  readonly nullable: true;
-                };
-                readonly createdAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-temporal@1';
-                  readonly nullable: false;
-                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
-                };
-              };
-              primaryKey: { readonly columns: readonly ['id'] };
-              uniques: readonly [{ readonly columns: readonly ['lockKey'] }];
-              indexes: readonly [
-                {
-                  readonly name: 'goal_media_sync_run_startedAt_idx_cac56236';
-                  readonly prefix: 'goal_media_sync_run_startedAt_idx';
-                  readonly columns: readonly ['startedAt'];
-                  readonly unique: false;
-                },
-              ];
-              foreignKeys: readonly [];
-            };
-            readonly goal_media_sync_state: {
-              columns: {
-                readonly id: {
-                  readonly nativeType: 'uuid';
-                  readonly codecId: 'pg/uuid@1';
-                  readonly nullable: false;
-                };
-                readonly matchId: {
-                  readonly nativeType: 'uuid';
-                  readonly codecId: 'pg/uuid@1';
-                  readonly nullable: false;
-                };
-                readonly status: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/text@1', 'pending'>;
-                  };
-                };
-                readonly attempts: {
-                  readonly nativeType: 'int4';
-                  readonly codecId: 'pg/int4@1';
-                  readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/int4@1', 0>;
-                  };
-                };
-                readonly lastCheckedAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-temporal@1';
-                  readonly nullable: true;
-                };
-                readonly nextRetryAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-temporal@1';
-                  readonly nullable: true;
-                };
-                readonly sourceUrl: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                };
-                readonly lastVideoId: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                };
-                readonly goalsTotal: {
-                  readonly nativeType: 'int4';
-                  readonly codecId: 'pg/int4@1';
-                  readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/int4@1', 0>;
-                  };
-                };
-                readonly goalsCovered: {
-                  readonly nativeType: 'int4';
-                  readonly codecId: 'pg/int4@1';
-                  readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/int4@1', 0>;
-                  };
-                };
-                readonly reviewPending: {
-                  readonly nativeType: 'int4';
-                  readonly codecId: 'pg/int4@1';
-                  readonly nullable: false;
-                  readonly default: {
-                    readonly kind: 'literal';
-                    readonly value: DefaultLiteralValue<'pg/int4@1', 0>;
-                  };
-                };
-                readonly lastError: {
-                  readonly nativeType: 'text';
-                  readonly codecId: 'pg/text@1';
-                  readonly nullable: true;
-                };
-                readonly createdAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-temporal@1';
-                  readonly nullable: false;
-                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
-                };
-                readonly updatedAt: {
-                  readonly nativeType: 'timestamptz';
-                  readonly codecId: 'pg/timestamptz-temporal@1';
-                  readonly nullable: false;
-                };
-              };
-              primaryKey: { readonly columns: readonly ['id'] };
-              uniques: readonly [{ readonly columns: readonly ['matchId'] }];
-              indexes: readonly [
-                {
-                  readonly name: 'goal_media_sync_state_status_nextRetryAt_idx_58d36316';
-                  readonly prefix: 'goal_media_sync_state_status_nextRetryAt_idx';
-                  readonly columns: readonly ['status', 'nextRetryAt'];
-                  readonly unique: false;
-                },
-              ];
-              foreignKeys: readonly [
-                {
-                  readonly source: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'goal_media_sync_state';
-                    readonly columns: readonly ['matchId'];
-                  };
-                  readonly target: {
-                    readonly namespaceId: 'public' & NamespaceId;
-                    readonly tableName: 'football_match';
                     readonly columns: readonly ['id'];
                   };
                 },
@@ -7912,18 +7410,6 @@ type ContractBase = Omit<
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'GoalTimestampCandidate';
     };
-    readonly goal_media_sync_state: {
-      readonly namespace: 'public' & NamespaceId;
-      readonly model: 'GoalMediaSyncState';
-    };
-    readonly goal_media_page_cache: {
-      readonly namespace: 'public' & NamespaceId;
-      readonly model: 'GoalMediaPageCache';
-    };
-    readonly goal_media_sync_run: {
-      readonly namespace: 'public' & NamespaceId;
-      readonly model: 'GoalMediaSyncRun';
-    };
     readonly media_review_candidate: {
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'MediaReviewCandidate';
@@ -8521,270 +8007,6 @@ type ContractBase = Omit<
                 readonly playerId: { readonly column: 'playerId' };
                 readonly sortOrder: { readonly column: 'sortOrder' };
                 readonly pinnedAt: { readonly column: 'pinnedAt' };
-              };
-            };
-          };
-          readonly GoalMediaPageCache: {
-            readonly fields: {
-              readonly id: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
-              };
-              readonly url: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly matchId: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
-              };
-              readonly status: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly checkedAt: {
-                readonly nullable: false;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-temporal@1';
-                };
-              };
-              readonly reason: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly createdAt: {
-                readonly nullable: false;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-temporal@1';
-                };
-              };
-              readonly updatedAt: {
-                readonly nullable: false;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-temporal@1';
-                };
-              };
-            };
-            readonly relations: {
-              readonly match: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'Match';
-                };
-                readonly cardinality: 'N:1';
-                readonly nullable: true;
-                readonly on: {
-                  readonly localFields: readonly ['matchId'];
-                  readonly targetFields: readonly ['id'];
-                };
-              };
-            };
-            readonly storage: {
-              readonly table: 'goal_media_page_cache';
-              readonly namespaceId: 'public';
-              readonly fields: {
-                readonly id: { readonly column: 'id' };
-                readonly url: { readonly column: 'url' };
-                readonly matchId: { readonly column: 'matchId' };
-                readonly status: { readonly column: 'status' };
-                readonly checkedAt: { readonly column: 'checkedAt' };
-                readonly reason: { readonly column: 'reason' };
-                readonly createdAt: { readonly column: 'createdAt' };
-                readonly updatedAt: { readonly column: 'updatedAt' };
-              };
-            };
-          };
-          readonly GoalMediaSyncRun: {
-            readonly fields: {
-              readonly id: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
-              };
-              readonly lockKey: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly mode: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly status: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly startedAt: {
-                readonly nullable: false;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-temporal@1';
-                };
-              };
-              readonly finishedAt: {
-                readonly nullable: true;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-temporal@1';
-                };
-              };
-              readonly fixturesChecked: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
-              };
-              readonly goalsPublished: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
-              };
-              readonly goalsQueued: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
-              };
-              readonly missingCoverage: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
-              };
-              readonly error: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly result: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/json@1' };
-              };
-              readonly createdAt: {
-                readonly nullable: false;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-temporal@1';
-                };
-              };
-            };
-            readonly relations: Record<string, never>;
-            readonly storage: {
-              readonly table: 'goal_media_sync_run';
-              readonly namespaceId: 'public';
-              readonly fields: {
-                readonly id: { readonly column: 'id' };
-                readonly lockKey: { readonly column: 'lockKey' };
-                readonly mode: { readonly column: 'mode' };
-                readonly status: { readonly column: 'status' };
-                readonly startedAt: { readonly column: 'startedAt' };
-                readonly finishedAt: { readonly column: 'finishedAt' };
-                readonly fixturesChecked: { readonly column: 'fixturesChecked' };
-                readonly goalsPublished: { readonly column: 'goalsPublished' };
-                readonly goalsQueued: { readonly column: 'goalsQueued' };
-                readonly missingCoverage: { readonly column: 'missingCoverage' };
-                readonly error: { readonly column: 'error' };
-                readonly result: { readonly column: 'result' };
-                readonly createdAt: { readonly column: 'createdAt' };
-              };
-            };
-          };
-          readonly GoalMediaSyncState: {
-            readonly fields: {
-              readonly id: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
-              };
-              readonly matchId: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/uuid@1' };
-              };
-              readonly status: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly attempts: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
-              };
-              readonly lastCheckedAt: {
-                readonly nullable: true;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-temporal@1';
-                };
-              };
-              readonly nextRetryAt: {
-                readonly nullable: true;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-temporal@1';
-                };
-              };
-              readonly sourceUrl: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly lastVideoId: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly goalsTotal: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
-              };
-              readonly goalsCovered: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
-              };
-              readonly reviewPending: {
-                readonly nullable: false;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
-              };
-              readonly lastError: {
-                readonly nullable: true;
-                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
-              };
-              readonly createdAt: {
-                readonly nullable: false;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-temporal@1';
-                };
-              };
-              readonly updatedAt: {
-                readonly nullable: false;
-                readonly type: {
-                  readonly kind: 'scalar';
-                  readonly codecId: 'pg/timestamptz-temporal@1';
-                };
-              };
-            };
-            readonly relations: {
-              readonly match: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'Match';
-                };
-                readonly cardinality: 'N:1';
-                readonly nullable: false;
-                readonly on: {
-                  readonly localFields: readonly ['matchId'];
-                  readonly targetFields: readonly ['id'];
-                };
-              };
-            };
-            readonly storage: {
-              readonly table: 'goal_media_sync_state';
-              readonly namespaceId: 'public';
-              readonly fields: {
-                readonly id: { readonly column: 'id' };
-                readonly matchId: { readonly column: 'matchId' };
-                readonly status: { readonly column: 'status' };
-                readonly attempts: { readonly column: 'attempts' };
-                readonly lastCheckedAt: { readonly column: 'lastCheckedAt' };
-                readonly nextRetryAt: { readonly column: 'nextRetryAt' };
-                readonly sourceUrl: { readonly column: 'sourceUrl' };
-                readonly lastVideoId: { readonly column: 'lastVideoId' };
-                readonly goalsTotal: { readonly column: 'goalsTotal' };
-                readonly goalsCovered: { readonly column: 'goalsCovered' };
-                readonly reviewPending: { readonly column: 'reviewPending' };
-                readonly lastError: { readonly column: 'lastError' };
-                readonly createdAt: { readonly column: 'createdAt' };
-                readonly updatedAt: { readonly column: 'updatedAt' };
               };
             };
           };
@@ -9458,29 +8680,6 @@ type ContractBase = Omit<
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
                   readonly model: 'FavouriteMatch';
-                };
-                readonly cardinality: '1:1';
-                readonly nullable: true;
-                readonly on: {
-                  readonly localFields: readonly ['id'];
-                  readonly targetFields: readonly ['matchId'];
-                };
-              };
-              readonly goalMediaPages: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'GoalMediaPageCache';
-                };
-                readonly cardinality: '1:N';
-                readonly on: {
-                  readonly localFields: readonly ['id'];
-                  readonly targetFields: readonly ['matchId'];
-                };
-              };
-              readonly goalMediaSyncState: {
-                readonly to: {
-                  readonly namespace: 'public' & NamespaceId;
-                  readonly model: 'GoalMediaSyncState';
                 };
                 readonly cardinality: '1:1';
                 readonly nullable: true;
@@ -12735,48 +11934,6 @@ type ContractBase = Omit<
           readonly ref: {
             readonly namespace: 'public';
             readonly table: 'football_match';
-            readonly column: 'updatedAt';
-          };
-          readonly onCreate: { readonly kind: 'generator'; readonly id: 'instantNow' };
-          readonly onUpdate: { readonly kind: 'generator'; readonly id: 'instantNow' };
-        },
-        {
-          readonly ref: {
-            readonly namespace: 'public';
-            readonly table: 'goal_media_page_cache';
-            readonly column: 'id';
-          };
-          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
-        },
-        {
-          readonly ref: {
-            readonly namespace: 'public';
-            readonly table: 'goal_media_page_cache';
-            readonly column: 'updatedAt';
-          };
-          readonly onCreate: { readonly kind: 'generator'; readonly id: 'instantNow' };
-          readonly onUpdate: { readonly kind: 'generator'; readonly id: 'instantNow' };
-        },
-        {
-          readonly ref: {
-            readonly namespace: 'public';
-            readonly table: 'goal_media_sync_run';
-            readonly column: 'id';
-          };
-          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
-        },
-        {
-          readonly ref: {
-            readonly namespace: 'public';
-            readonly table: 'goal_media_sync_state';
-            readonly column: 'id';
-          };
-          readonly onCreate: { readonly kind: 'generator'; readonly id: 'uuidv4' };
-        },
-        {
-          readonly ref: {
-            readonly namespace: 'public';
-            readonly table: 'goal_media_sync_state';
             readonly column: 'updatedAt';
           };
           readonly onCreate: { readonly kind: 'generator'; readonly id: 'instantNow' };

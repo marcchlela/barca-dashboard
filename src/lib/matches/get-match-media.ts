@@ -42,7 +42,7 @@ export type MatchMediaItem = {
     portraitUrl:
       string | null;
   } | null;
-  verifiedGoals: { id: string; label: string; startSecond: number | null; endSecond: number | null }[];
+  verifiedGoals: { id: string; label: string; startSecond: number | null; endSecond: number | null; verificationBasis: string }[];
 };
 
 export async function getMatchMedia(
@@ -117,7 +117,7 @@ export async function getMatchMedia(
           const event = eventById.get(moment.matchEventId);
           if (!event || !["goal", "own_goal", "penalty_goal"].includes(event.type)) return [];
           const rawScorer = event.rawData && typeof event.rawData === "object" && "scorerName" in event.rawData && typeof event.rawData.scorerName === "string" ? event.rawData.scorerName : null;
-          return [{ id: event.id, label: `${event.minute ?? "?"}' ${event.primaryPlayer?.displayName ?? rawScorer ?? "Goal"}${event.type === "own_goal" ? " (own goal)" : ""}`, startSecond: moment.startSecond, endSecond: moment.endSecond }];
+          return [{ id: event.id, label: `${event.minute ?? "?"}' ${event.primaryPlayer?.displayName ?? rawScorer ?? "Goal"}${event.type === "own_goal" ? " (own goal)" : ""}`, startSecond: moment.startSecond, endSecond: moment.endSecond, verificationBasis: moment.verificationBasis }];
         }),
       }),
     )

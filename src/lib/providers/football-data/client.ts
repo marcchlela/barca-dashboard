@@ -34,6 +34,7 @@ async function footballDataRequest<T>(
 
       // We will control caching ourselves later.
       cache: "no-store",
+      signal: AbortSignal.timeout(15_000),
     },
   );
 

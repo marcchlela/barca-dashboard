@@ -15,6 +15,7 @@ import {
   splitDisplayName,
 } from "../shared/normalization";
 import { RICH_DATA_SOURCES } from "./constants";
+import { lineupNeedsBackfill } from "./lineup-coverage";
 import { bigBallsPlayerStatisticsProvider } from "./player-stat-provider";
 import {
   emptySyncCounts,
@@ -45,6 +46,7 @@ type GoalResolvedPlayer = {
   providerTeamId: string;
   player: GoalLineupPlayer;
 };
+
 
 function recordMatches(
   existing: Record<string, unknown>,
@@ -2388,4 +2390,71 @@ for (
     unresolvedIdentities:
       result.unresolved,
   };
+}
+
+/** Recover only missing confirmed lineups, leaving existing events, media and stats untouched. */
+export async function syncGoalLineups(input: { matchId: string; dryRun: boolean }) {
+  const { match, internal } = await loadMatchContext(input.matchId);
+  const existing = await db.orm.public.Lineup.where({ matchId: match.id }).include("players").all();
+  const initial = lineupNeedsBackfill(match.homeTeamId, match.awayTeamId, existing);
+  if (initial.home === "partial" || initial.away === "partial") {
+    throw new Error("A partial or unconfirmed lineup needs manual review; refusing to merge it automatically.");
+  }
+  if (initial.home === "complete" && initial.away === "complete") {
+    return { matchId: match.id, status: "unchanged" as const, home: initial.home, away: initial.away, persisted: false };
+  }
+
+  const goal = await fetchGoalMatchBundle(internal);
+  const summary = {
+    matchId: match.id,
+    providerMatchId: goal.providerMatchId,
+    home: initial.home,
+    away: initial.away,
+    homeStarters: goal.home.players.filter((player) => player.role === "starter").length,
+    awayStarters: goal.away.players.filter((player) => player.role === "starter").length,
+    homeSubstitutes: goal.home.players.filter((player) => player.role === "substitute").length,
+    awaySubstitutes: goal.away.players.filter((player) => player.role === "substitute").length,
+    homeFormation: goal.home.formation,
+    awayFormation: goal.away.formation,
+  };
+  if (summary.homeStarters !== 11 || summary.awayStarters !== 11) {
+    throw new Error("GOAL did not supply exactly 11 starters for both sides.");
+  }
+  if (input.dryRun) return { ...summary, status: "preview" as const, persisted: false };
+
+  const counts = await db.transaction(async (tx) => {
+    const orm = tx.orm;
+    const latest = await orm.public.Lineup.where({ matchId: match.id }).include("players").all();
+    const coverage = lineupNeedsBackfill(match.homeTeamId, match.awayTeamId, latest);
+    if (coverage.home === "partial" || coverage.away === "partial") {
+      throw new Error("Lineup changed to partial or unconfirmed during recovery; refusing to merge it.");
+    }
+    const changes = emptySyncCounts();
+    if (coverage.home === "complete" && coverage.away === "complete") return changes;
+    const goalSource = await ensureDataSource(orm, RICH_DATA_SOURCES.goal, changes);
+    await ensureMapping(orm, changes, {
+      dataSourceId: goalSource.id, entityType: "match", internalId: match.id,
+      providerId: goal.providerMatchId, metadata: { ownership: ["lineups"] },
+    });
+    for (const { side, teamId, state } of [
+      { side: goal.home, teamId: match.homeTeamId, state: coverage.home },
+      { side: goal.away, teamId: match.awayTeamId, state: coverage.away },
+    ]) {
+      if (state === "complete") continue;
+      await ensureMapping(orm, changes, {
+        dataSourceId: goalSource.id, entityType: "team", internalId: teamId,
+        providerId: side.providerTeamId,
+      });
+      const resolved: GoalResolvedPlayer[] = [];
+      for (const player of side.players) {
+        resolved.push(await ensureGoalPlayer(
+          orm, changes, goalSource.id, match.seasonId, teamId,
+          side.providerTeamId, player, resolved,
+        ));
+      }
+      await ensureLineupSide(orm, changes, match.id, teamId, side, resolved);
+    }
+    return changes;
+  });
+  return { ...summary, status: "saved" as const, persisted: true, counts };
 }

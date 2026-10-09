@@ -30,12 +30,13 @@ export async function PUT(request: Request) {
     const start = body.startSecond === "" || body.startSecond == null ? null : Number(body.startSecond);
     const end = body.endSecond === "" || body.endSecond == null ? null : Number(body.endSecond);
     if ((start !== null && (!Number.isInteger(start) || start < 0)) || (end !== null && (!Number.isInteger(end) || end <= 0))) return bad("Clip times must be whole seconds.");
-    if ((start === null) !== (end === null) || (start !== null && end !== null && (end <= start || end - start > 180))) return bad("Enter both clip times with an end after the start (maximum three minutes).");
-    if (media.type !== "goal_clip" && (start === null || end === null)) return bad("A match film needs a verified start and end time for this goal.");
+    if ((start === null && end !== null) || (start !== null && end !== null && (end <= start || end - start > 180))) return bad("An end requires a start; when given, it must follow within three minutes.");
+    if (media.type !== "goal_clip" && start === null) return bad("A match film needs a confirmed start time for this goal.");
+    if (media.type !== "goal_clip" && end === null && (media.type !== "match_highlight" || !media.isOfficial || !media.externalMediaId || !/^[A-Za-z0-9_-]{11}$/.test(media.externalMediaId))) return bad("An open-ended goal moment requires an official YouTube match highlight.");
     if (typeof body.evidenceUrl !== "string" || !/^https:\/\//.test(body.evidenceUrl)) return bad("Provide an HTTPS source supporting this exact goal.");
     const note = typeof body.reviewNote === "string" ? body.reviewNote.trim().slice(0, 500) : "";
     const existing = await db.orm.public.MediaMoment.where({ mediaItemId: media.id, matchEventId: event.id }).first();
-    const values = { startSecond: start, endSecond: end, evidenceUrl: body.evidenceUrl, reviewNote: note || null, verifiedAt: Temporal.Now.instant() };
+    const values = { startSecond: start, endSecond: end, evidenceUrl: body.evidenceUrl, reviewNote: note || null, verificationBasis: "manual_visual", verifiedAt: Temporal.Now.instant() };
     if (existing) await db.orm.public.MediaMoment.where({ id: existing.id }).update(values);
     else await db.orm.public.MediaMoment.create({ mediaItemId: media.id, matchEventId: event.id, ...values });
     return NextResponse.json({ ok: true });

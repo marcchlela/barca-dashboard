@@ -316,6 +316,9 @@ model Match {
   playerStats        PlayerMatchStatistic[]
   mediaItems         MediaItem[]
   mediaReviewCandidates MediaReviewCandidate[]
+  goalTimestampCandidates GoalTimestampCandidate[]
+  goalMediaSyncState GoalMediaSyncState?
+  goalMediaPages GoalMediaPageCache[]
   predictions        Prediction[]
   diaryEntry         MatchDiaryEntry?
   favouriteMatch     FavouriteMatch?
@@ -405,6 +408,7 @@ model MatchEvent {
   dataSource       DataSource?          @relation(fields:[dataSourceId], references:[id])
   diaryFavouriteIn MatchDiaryEntry[]    @relation("DiaryFavouriteGoal")
   mediaMoments     MediaMoment[]
+  goalTimestampCandidates GoalTimestampCandidate[]
 
   @@index([matchId, eventOrder])
   @@index([matchId, type])
@@ -598,6 +602,7 @@ model MediaItem {
   dataSource      DataSource?          @relation(fields:[dataSourceId], references:[id])
   saves           MediaSave[]
   goalMoments     MediaMoment[]
+  goalTimestampCandidates GoalTimestampCandidate[]
 
   @@index([matchId])
   @@index([seasonId])
@@ -626,6 +631,7 @@ model MediaMoment {
   endSecond     Int?
   evidenceUrl   String?
   reviewNote    String?
+  verificationBasis String @default("manual_visual")
   verifiedAt    DateTime
   createdAt     temporal.createdAt()
   updatedAt     temporal.updatedAt()
@@ -636,6 +642,92 @@ model MediaMoment {
   @@unique([mediaItemId, matchEventId])
   @@index([matchEventId])
   @@map("media_moment")
+}
+
+model GoalTimestampCandidate {
+  id            Uuid @id @default(uuid())
+  clipUrl       String @unique
+  sourceUrl     String
+  videoId       String
+  matchId       Uuid?
+  mediaItemId   Uuid?
+  matchEventId  Uuid?
+  scorer        String
+  minute        Int
+  sourceSecond  Int
+  startSecond   Int
+  confidence    String
+  reasons       Json
+  status        MediaReviewStatus @default(Pending)
+  reviewedAt    DateTime?
+  reviewNote    String?
+  createdAt     temporal.createdAt()
+  updatedAt     temporal.updatedAt()
+
+  match         Match? @relation(fields:[matchId], references:[id])
+  mediaItem     MediaItem? @relation(fields:[mediaItemId], references:[id])
+  matchEvent    MatchEvent? @relation(fields:[matchEventId], references:[id])
+
+  @@index([status])
+  @@index([matchId, status])
+  @@map("goal_timestamp_candidate")
+}
+
+model GoalMediaSyncState {
+  id             Uuid @id @default(uuid())
+  matchId        Uuid @unique
+  status         String @default("pending")
+  attempts       Int @default(0)
+  lastCheckedAt  DateTime?
+  nextRetryAt    DateTime?
+  sourceUrl      String?
+  lastVideoId    String?
+  goalsTotal     Int @default(0)
+  goalsCovered   Int @default(0)
+  reviewPending  Int @default(0)
+  lastError      String?
+  createdAt      temporal.createdAt()
+  updatedAt      temporal.updatedAt()
+
+  match          Match @relation(fields:[matchId], references:[id])
+
+  @@index([status, nextRetryAt])
+  @@map("goal_media_sync_state")
+}
+
+model GoalMediaPageCache {
+  id        Uuid @id @default(uuid())
+  url       String @unique
+  matchId   Uuid?
+  status    String
+  checkedAt DateTime
+  reason    String?
+  createdAt temporal.createdAt()
+  updatedAt temporal.updatedAt()
+
+  match     Match? @relation(fields:[matchId], references:[id])
+
+  @@index([matchId])
+  @@map("goal_media_page_cache")
+}
+
+model GoalMediaSyncRun {
+  id              Uuid @id @default(uuid())
+  lockKey         String? @unique
+  mode            String
+  status          String
+  startedAt       DateTime
+  finishedAt      DateTime?
+  fixturesChecked Int @default(0)
+  goalsPublished  Int @default(0)
+  goalsQueued     Int @default(0)
+  missingCoverage Int @default(0)
+  error           String?
+  result          Json?
+  createdAt       temporal.createdAt()
+
+  @@index([startedAt])
+  @@map("goal_media_sync_run")
 }
 
 model MediaReviewCandidate {

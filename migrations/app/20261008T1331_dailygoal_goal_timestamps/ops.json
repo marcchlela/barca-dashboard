@@ -1,0 +1,446 @@
+[
+  {
+    "id": "table.goal_timestamp_candidate",
+    "label": "Create table \"goal_timestamp_candidate\"",
+    "summary": "Creates table \"goal_timestamp_candidate\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "goal_timestamp_candidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"goal_timestamp_candidate\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"goal_timestamp_candidate\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"goal_timestamp_candidate\"",
+        "sql": "CREATE TABLE \"public\".\"goal_timestamp_candidate\" (\n  \"clipUrl\" text NOT NULL,\n  \"confidence\" text NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"matchEventId\" uuid,\n  \"matchId\" uuid,\n  \"mediaItemId\" uuid,\n  \"minute\" int4 NOT NULL,\n  \"reasons\" json NOT NULL,\n  \"reviewNote\" text,\n  \"reviewedAt\" timestamptz,\n  \"scorer\" text NOT NULL,\n  \"sourceSecond\" int4 NOT NULL,\n  \"sourceUrl\" text NOT NULL,\n  \"startSecond\" int4 NOT NULL,\n  \"status\" text DEFAULT 'pending' NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  \"videoId\" text NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"goal_timestamp_candidate_status_check_19a2b525\" CHECK (\"status\" IN ('pending', 'approved', 'rejected'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"goal_timestamp_candidate\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"goal_timestamp_candidate\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.media_moment.verificationBasis",
+    "label": "Add column \"verificationBasis\" to \"media_moment\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "verificationBasis",
+        "table": "media_moment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"verificationBasis\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "media_moment",
+          "verificationBasis"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"verificationBasis\"",
+        "sql": "ALTER TABLE \"public\".\"media_moment\" ADD COLUMN \"verificationBasis\" text DEFAULT 'manual_visual' NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"verificationBasis\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "media_moment",
+          "verificationBasis"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.goal_timestamp_candidate.goal_timestamp_candidate_clipUrl_key",
+    "label": "Add unique constraint on \"goal_timestamp_candidate\" (clipUrl)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "goal_timestamp_candidate_clipUrl_key",
+        "table": "goal_timestamp_candidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"goal_timestamp_candidate_clipUrl_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "goal_timestamp_candidate_clipUrl_key",
+          "public",
+          "\"public\".\"goal_timestamp_candidate\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"goal_timestamp_candidate_clipUrl_key\"",
+        "sql": "ALTER TABLE \"public\".\"goal_timestamp_candidate\" ADD CONSTRAINT \"goal_timestamp_candidate_clipUrl_key\" UNIQUE (\"clipUrl\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"goal_timestamp_candidate_clipUrl_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "goal_timestamp_candidate_clipUrl_key",
+          "public",
+          "\"public\".\"goal_timestamp_candidate\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.goal_timestamp_candidate.goal_timestamp_candidate_matchEventId_idx_8e4b5b2a",
+    "label": "Create index \"goal_timestamp_candidate_matchEventId_idx_8e4b5b2a\" on \"goal_timestamp_candidate\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "goal_timestamp_candidate_matchEventId_idx_8e4b5b2a",
+        "table": "goal_timestamp_candidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"goal_timestamp_candidate_matchEventId_idx_8e4b5b2a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"goal_timestamp_candidate_matchEventId_idx_8e4b5b2a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"goal_timestamp_candidate_matchEventId_idx_8e4b5b2a\"",
+        "sql": "CREATE INDEX \"goal_timestamp_candidate_matchEventId_idx_8e4b5b2a\" ON \"public\".\"goal_timestamp_candidate\" (\"matchEventId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"goal_timestamp_candidate_matchEventId_idx_8e4b5b2a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"goal_timestamp_candidate_matchEventId_idx_8e4b5b2a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.goal_timestamp_candidate.goal_timestamp_candidate_matchId_idx_4caf5ecc",
+    "label": "Create index \"goal_timestamp_candidate_matchId_idx_4caf5ecc\" on \"goal_timestamp_candidate\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "goal_timestamp_candidate_matchId_idx_4caf5ecc",
+        "table": "goal_timestamp_candidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"goal_timestamp_candidate_matchId_idx_4caf5ecc\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"goal_timestamp_candidate_matchId_idx_4caf5ecc\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"goal_timestamp_candidate_matchId_idx_4caf5ecc\"",
+        "sql": "CREATE INDEX \"goal_timestamp_candidate_matchId_idx_4caf5ecc\" ON \"public\".\"goal_timestamp_candidate\" (\"matchId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"goal_timestamp_candidate_matchId_idx_4caf5ecc\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"goal_timestamp_candidate_matchId_idx_4caf5ecc\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.goal_timestamp_candidate.goal_timestamp_candidate_matchId_status_idx_d47c0c0a",
+    "label": "Create index \"goal_timestamp_candidate_matchId_status_idx_d47c0c0a\" on \"goal_timestamp_candidate\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "goal_timestamp_candidate_matchId_status_idx_d47c0c0a",
+        "table": "goal_timestamp_candidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"goal_timestamp_candidate_matchId_status_idx_d47c0c0a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"goal_timestamp_candidate_matchId_status_idx_d47c0c0a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"goal_timestamp_candidate_matchId_status_idx_d47c0c0a\"",
+        "sql": "CREATE INDEX \"goal_timestamp_candidate_matchId_status_idx_d47c0c0a\" ON \"public\".\"goal_timestamp_candidate\" (\"matchId\", \"status\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"goal_timestamp_candidate_matchId_status_idx_d47c0c0a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"goal_timestamp_candidate_matchId_status_idx_d47c0c0a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.goal_timestamp_candidate.goal_timestamp_candidate_mediaItemId_idx_5e6c7760",
+    "label": "Create index \"goal_timestamp_candidate_mediaItemId_idx_5e6c7760\" on \"goal_timestamp_candidate\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "goal_timestamp_candidate_mediaItemId_idx_5e6c7760",
+        "table": "goal_timestamp_candidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"goal_timestamp_candidate_mediaItemId_idx_5e6c7760\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"goal_timestamp_candidate_mediaItemId_idx_5e6c7760\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"goal_timestamp_candidate_mediaItemId_idx_5e6c7760\"",
+        "sql": "CREATE INDEX \"goal_timestamp_candidate_mediaItemId_idx_5e6c7760\" ON \"public\".\"goal_timestamp_candidate\" (\"mediaItemId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"goal_timestamp_candidate_mediaItemId_idx_5e6c7760\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"goal_timestamp_candidate_mediaItemId_idx_5e6c7760\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.goal_timestamp_candidate.goal_timestamp_candidate_status_idx_e98638ab",
+    "label": "Create index \"goal_timestamp_candidate_status_idx_e98638ab\" on \"goal_timestamp_candidate\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "goal_timestamp_candidate_status_idx_e98638ab",
+        "table": "goal_timestamp_candidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"goal_timestamp_candidate_status_idx_e98638ab\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"goal_timestamp_candidate_status_idx_e98638ab\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"goal_timestamp_candidate_status_idx_e98638ab\"",
+        "sql": "CREATE INDEX \"goal_timestamp_candidate_status_idx_e98638ab\" ON \"public\".\"goal_timestamp_candidate\" (\"status\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"goal_timestamp_candidate_status_idx_e98638ab\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"goal_timestamp_candidate_status_idx_e98638ab\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.goal_timestamp_candidate.goal_timestamp_candidate_matchId_fkey",
+    "label": "Add foreign key \"goal_timestamp_candidate_matchId_fkey\" on \"goal_timestamp_candidate\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "goal_timestamp_candidate_matchId_fkey",
+        "table": "goal_timestamp_candidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"goal_timestamp_candidate_matchId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "goal_timestamp_candidate_matchId_fkey",
+          "public",
+          "\"public\".\"goal_timestamp_candidate\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"goal_timestamp_candidate_matchId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"goal_timestamp_candidate\"\nADD CONSTRAINT \"goal_timestamp_candidate_matchId_fkey\"\nFOREIGN KEY (\"matchId\")\nREFERENCES \"public\".\"football_match\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"goal_timestamp_candidate_matchId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "goal_timestamp_candidate_matchId_fkey",
+          "public",
+          "\"public\".\"goal_timestamp_candidate\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.goal_timestamp_candidate.goal_timestamp_candidate_mediaItemId_fkey",
+    "label": "Add foreign key \"goal_timestamp_candidate_mediaItemId_fkey\" on \"goal_timestamp_candidate\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "goal_timestamp_candidate_mediaItemId_fkey",
+        "table": "goal_timestamp_candidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"goal_timestamp_candidate_mediaItemId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "goal_timestamp_candidate_mediaItemId_fkey",
+          "public",
+          "\"public\".\"goal_timestamp_candidate\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"goal_timestamp_candidate_mediaItemId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"goal_timestamp_candidate\"\nADD CONSTRAINT \"goal_timestamp_candidate_mediaItemId_fkey\"\nFOREIGN KEY (\"mediaItemId\")\nREFERENCES \"public\".\"media_item\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"goal_timestamp_candidate_mediaItemId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "goal_timestamp_candidate_mediaItemId_fkey",
+          "public",
+          "\"public\".\"goal_timestamp_candidate\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.goal_timestamp_candidate.goal_timestamp_candidate_matchEventId_fkey",
+    "label": "Add foreign key \"goal_timestamp_candidate_matchEventId_fkey\" on \"goal_timestamp_candidate\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "goal_timestamp_candidate_matchEventId_fkey",
+        "table": "goal_timestamp_candidate"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"goal_timestamp_candidate_matchEventId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "goal_timestamp_candidate_matchEventId_fkey",
+          "public",
+          "\"public\".\"goal_timestamp_candidate\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"goal_timestamp_candidate_matchEventId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"goal_timestamp_candidate\"\nADD CONSTRAINT \"goal_timestamp_candidate_matchEventId_fkey\"\nFOREIGN KEY (\"matchEventId\")\nREFERENCES \"public\".\"match_event\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"goal_timestamp_candidate_matchEventId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "goal_timestamp_candidate_matchEventId_fkey",
+          "public",
+          "\"public\".\"goal_timestamp_candidate\""
+        ]
+      }
+    ]
+  }
+]

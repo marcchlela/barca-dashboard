@@ -8,6 +8,7 @@ import {
   goalCandidate,
   normalizeGoalBundle,
 } from "./normalize";
+import { goalFixtureListingPath } from "./fixture-search-path";
 
 import type {
   GoalMatchBundle,
@@ -91,7 +92,7 @@ async function fetchGoalMatchBundleUncached(
   ) {
     const body =
       await client.get(
-        `/fixtures?from=${date}&to=${date}&limit=100&offset=${offset}`,
+        goalFixtureListingPath(internal.competition.name, date, offset),
       );
 
     const rows =

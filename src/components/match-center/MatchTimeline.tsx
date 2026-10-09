@@ -3,11 +3,13 @@
 import type {
   ReactNode,
 } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
   ArrowDown,
   ArrowUp,
   CircleX,
+  ExternalLink,
   Flag,
   Hand,
   HeartPulse,
@@ -16,6 +18,7 @@ import {
   Play,
   Target,
   TriangleAlert,
+  X,
 } from "lucide-react";
 
 import FootballIcon from "../icons/FootballIcon";
@@ -27,6 +30,8 @@ import type {
 import type {
   KitTheme,
 } from "../../lib/themes";
+import type { MatchMediaItem } from "../../lib/matches/get-match-media";
+import { goalEmbedUrl, goalYouTubeUrl, selectPlayableGoals } from "../../lib/matches/goal-playback";
 
 type MatchTimelineProps = {
   data:
@@ -34,6 +39,9 @@ type MatchTimelineProps = {
 
   theme:
     KitTheme;
+
+  media:
+    MatchMediaItem[];
 };
 
 type MatchEvent =
@@ -74,7 +82,18 @@ const SUBSTITUTION_TYPES =
 export default function MatchTimeline({
   data,
   theme,
+  media,
 }: MatchTimelineProps) {
+  const playable = useMemo(() => selectPlayableGoals(data.events, media), [data.events, media]);
+  const [activeGoalId, setActiveGoalId] = useState<string | null>(null);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const activeGoal = activeGoalId ? playable.get(activeGoalId) ?? null : null;
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    if (activeGoal && !dialog.open) dialog.showModal();
+    if (!activeGoal && dialog.open) dialog.close();
+  }, [activeGoal]);
   const events =
     [...data.events].sort(
       (
@@ -234,6 +253,8 @@ export default function MatchTimeline({
         }
         data={data}
         theme={theme}
+        playable={playable.has(event.id)}
+        onPlay={() => setActiveGoalId(event.id)}
       />,
     );
   }
@@ -297,6 +318,27 @@ export default function MatchTimeline({
         {rows}
       </div>
 
+      <dialog
+        ref={dialogRef}
+        aria-label={activeGoal ? `Watch ${activeGoal.label}` : "Goal video"}
+        onCancel={() => setActiveGoalId(null)}
+        className="w-[min(94vw,760px)] max-h-[90vh] overflow-y-auto border p-0 backdrop:bg-[#020711db]"
+        style={{ position: "fixed", left: "50%", top: "50%", transform: "translate(-50%, -50%)", margin: 0, borderColor: theme.colors.border, background: theme.colors.surface, color: theme.colors.text }}
+      >
+        {activeGoal && <>
+          <div className="flex items-start justify-between gap-4 border-b p-4 sm:p-5" style={{ borderColor: theme.colors.border }}>
+            <div className="min-w-0"><p className="text-[9px] uppercase tracking-[.2em]" style={{ color: theme.colors.accent }}>Match Flow / Goal footage</p><h3 className="mt-1 text-lg font-medium sm:text-xl">{activeGoal.label}</h3><p className="mt-1 text-xs" style={{ color: theme.colors.textMuted }}>{data.match.homeTeam.name} {data.match.score.home ?? "–"}–{data.match.score.away ?? "–"} {data.match.awayTeam.name} · {data.match.competition.name}</p></div>
+            <button type="button" onClick={() => setActiveGoalId(null)} aria-label="Close goal video" className="cursor-pointer border p-2 focus-visible:outline-2" style={{ borderColor: theme.colors.border, outlineColor: theme.colors.accent }}><X size={18} /></button>
+          </div>
+          <div className="p-4 sm:p-5">
+            <div className="aspect-video w-full bg-black"><iframe key={`${activeGoal.eventId}:${activeGoal.videoId}:${activeGoal.startSecond}`} src={goalEmbedUrl(activeGoal)} title={`${activeGoal.label} · ${activeGoal.mediaTitle}`} allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" className="h-full w-full border-0" /></div>
+            <div className="mt-3 flex flex-wrap items-start justify-between gap-3 text-xs" style={{ color: theme.colors.textMuted }}><p>{activeGoal.verificationBasis === "manual_visual" ? "Visually verified goal" : "Metadata-confirmed start; footage not visually verified"} · starts at {activeGoal.startSecond}s{activeGoal.endSecond !== null ? ` · ends at ${activeGoal.endSecond}s` : ""}</p><a href={goalYouTubeUrl(activeGoal)} target="_blank" rel="noopener noreferrer" className="inline-flex cursor-pointer items-center gap-1 underline focus-visible:outline-2" style={{ color: theme.colors.accent }}>Open on YouTube <ExternalLink size={12} /></a></div>
+            <p className="mt-2 text-[11px]" style={{ color: theme.colors.textMuted }}>If the embed is unavailable or blocked, open the same video on YouTube at this timestamp.</p>
+            {playable.size > 1 && <div className="mt-4 border-t pt-4" style={{ borderColor: theme.colors.border }}><p className="mb-2 text-[9px] uppercase tracking-widest" style={{ color: theme.colors.textMuted }}>Other goals</p><div className="flex flex-wrap gap-2">{[...playable.values()].map((goal) => <button key={goal.eventId} type="button" onClick={() => setActiveGoalId(goal.eventId)} aria-current={goal.eventId === activeGoalId ? "true" : undefined} className="cursor-pointer border px-2.5 py-1.5 text-xs focus-visible:outline-2" style={{ borderColor: goal.eventId === activeGoalId ? theme.colors.accent : theme.colors.border, color: goal.eventId === activeGoalId ? theme.colors.accent : theme.colors.text }}>{goal.label}</button>)}</div></div>}
+          </div>
+        </>}
+      </dialog>
+
       <div
         className="
           border-t
@@ -327,6 +369,8 @@ function TimelineEvent({
   score,
   data,
   theme,
+  playable,
+  onPlay,
 }: {
   event:
     MatchEvent;
@@ -339,6 +383,12 @@ function TimelineEvent({
 
   theme:
     KitTheme;
+
+  playable:
+    boolean;
+
+  onPlay:
+    () => void;
 }) {
   const isBarcelona =
     event.team
@@ -374,6 +424,7 @@ function TimelineEvent({
             : "transparent",
       }}
     >
+      {isGoal && playable && <button type="button" onClick={onPlay} aria-label={`Watch goal: ${eventTitle(event)} at ${formatMinute(event.minute)}`} className="absolute inset-0 z-20 cursor-pointer hover:bg-white/5 focus-visible:outline-2 focus-visible:outline-offset-[-2px]" style={{ outlineColor: theme.colors.accent }} />}
       {isBarcelona ? (
         <div
           className="
@@ -488,6 +539,7 @@ function TimelineEvent({
               event={event}
               theme={theme}
             />
+            {isGoal && playable && <span className="mt-2 inline-flex items-center gap-1.5 text-[9px] font-semibold uppercase tracking-[.12em]" style={{ color: theme.colors.accent }}><Play size={11} fill="currentColor" aria-hidden="true" />Watch goal</span>}
           </div>
 
           <div className="flex shrink-0 items-center gap-3">

@@ -5,11 +5,12 @@ import { db } from "../../prisma/db";
 const GOAL_TYPES = new Set(["goal", "own_goal", "penalty_goal"]);
 
 export async function getMediaCuration() {
-  const [media, matches, events, moments] = await Promise.all([
+  const [media, matches, events, moments, timestampCandidates] = await Promise.all([
     db.orm.public.MediaItem.all(),
     db.orm.public.Match.include("homeTeam").include("awayTeam").all(),
     db.orm.public.MatchEvent.include("primaryPlayer").all(),
     db.orm.public.MediaMoment.all(),
+    db.orm.public.GoalTimestampCandidate.where({ status: "pending" }).all(),
   ]);
   const matchById = new Map(matches.map((match) => [match.id, match]));
   const mediaById = new Map(media.map((item) => [item.id, item]));
@@ -34,7 +35,13 @@ export async function getMediaCuration() {
       id: moment.id, mediaItemId: moment.mediaItemId, matchEventId: moment.matchEventId,
       mediaTitle: mediaById.get(moment.mediaItemId)?.title ?? "Unknown film",
       goalLabel: goals.find((goal) => goal.id === moment.matchEventId)?.label ?? "Unknown goal",
-      startSecond: moment.startSecond, endSecond: moment.endSecond,
+      startSecond: moment.startSecond, endSecond: moment.endSecond, verificationBasis: moment.verificationBasis,
+    })),
+    timestampCandidates: timestampCandidates.map((candidate) => ({
+      id: candidate.id, clipUrl: candidate.clipUrl, scorer: candidate.scorer, minute: candidate.minute,
+      sourceSecond: candidate.sourceSecond, startSecond: candidate.startSecond,
+      matchId: candidate.matchId, mediaItemId: candidate.mediaItemId, matchEventId: candidate.matchEventId,
+      reasons: Array.isArray(candidate.reasons) ? candidate.reasons.filter((value): value is string => typeof value === "string") : [],
     })),
   };
 }

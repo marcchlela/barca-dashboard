@@ -459,6 +459,7 @@ export default function MatchCenterClient({
                 <MatchTimeline
                   data={data}
                   theme={theme}
+                  media={media}
                 />
               </section>
             </div>

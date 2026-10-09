@@ -46,7 +46,9 @@ type SyncAction =
   | "media_match_preview"
   | "media_match_sync"
   | "media_worker_preview"
-  | "media_worker_run";
+  | "media_worker_run"
+  | "goal_media_worker_preview"
+  | "goal_media_worker_run";
 
 type RunMode =
   | "read"
@@ -992,6 +994,54 @@ export default function AdminSyncControl({
                 onClick={() => requestWrite("standings_history_sync", "Write standings history", "This fetches and validates up to eight missing La Liga matchdays, then persists their 20-team tables. Repeat until no rounds remain.")}
               />
             </div>
+          </OperationCard>
+
+          <OperationCard
+            eyebrow="Automation Layer / Goal Media"
+            title="Goal Timestamp Worker"
+            icon={Film}
+            description="Check recent finished fixtures for DailyGoal goal metadata, then reuse the existing official-video matcher and review queue. The scheduled stage is controlled by an off-by-default flag."
+          >
+            <div className="mt-4 grid grid-cols-2 gap-px border text-[9px] sm:grid-cols-3" style={{ borderColor: theme.colors.border, background: theme.colors.border }}>
+              {[
+                ["Last successful", data.goalMedia.lastSuccessfulRun ? formatDateTime(data.goalMedia.lastSuccessfulRun) : "Never"],
+                ["Fixtures checked", String(data.goalMedia.lastRun?.fixturesChecked ?? 0)],
+                ["Goals published", String(data.goalMedia.lastRun?.goalsPublished ?? 0)],
+                ["Review queued", String(data.goalMedia.lastRun?.goalsQueued ?? 0)],
+                ["Missing fixtures", String(data.goalMedia.missingFixtures)],
+                ["Retry due / waiting", `${data.goalMedia.retryDue} / ${data.goalMedia.waiting}`],
+              ].map(([label, value]) => <div key={label} className="min-w-0 p-3" style={{ background: theme.colors.backgroundElevated }}><p className="text-[8px] uppercase tracking-wider" style={{ color: theme.colors.textMuted }}>{label}</p><p className="mt-1 break-words tabular-nums">{value}</p></div>)}
+            </div>
+            <p className="mt-3 text-[9px]" style={{ color: data.goalMedia.lastRun?.status === "blocked" || data.goalMedia.lastRun?.status === "failed" ? theme.colors.danger : theme.colors.textMuted }}>
+              Last run: {data.goalMedia.lastRun?.status ?? "none"}{data.goalMedia.lastRun?.error ? ` · ${data.goalMedia.lastRun.error}` : ""} · {data.goalMedia.lastRun?.missingCoverage ?? 0} fixtures not found in last scan · {data.goalMedia.review} queued for review · {data.goalMedia.exhausted} exhausted · {data.goalMedia.missingGoals} goals without footage.
+            </p>
+            <p className="mt-2 text-[9px]" style={{ color: data.goalMedia.lastScheduledJob?.error ? theme.colors.danger : theme.colors.textMuted }}>
+              Authenticated job: goal stage {data.goalMedia.schedulingActive ? "enabled" : "off"} · Last job {data.goalMedia.lastScheduledJob ? `${formatDateTime(data.goalMedia.lastScheduledJob.at)} · ${data.goalMedia.lastScheduledJob.status} · fixtures ${data.goalMedia.lastScheduledJob.fixtureStatus ?? "unknown"} · events ${data.goalMedia.lastScheduledJob.eventStatus ?? "unknown"} · official failures ${data.goalMedia.lastScheduledJob.officialFailed ?? "?"} · goal stage ${data.goalMedia.lastScheduledJob.goalStatus ?? "unknown"}` : "never run"}{data.goalMedia.lastScheduledJob?.error ? ` · ${data.goalMedia.lastScheduledJob.error}` : ""}.
+            </p>
+            <p className="mt-2 text-[9px]" style={{ color: data.goalMedia.lastFixtureRefresh?.error ? theme.colors.danger : theme.colors.textMuted }}>
+              Canonical fixture stage: {data.goalMedia.lastFixtureRefresh ? `${data.goalMedia.lastFixtureRefresh.status} · ${formatDateTime(data.goalMedia.lastFixtureRefresh.at)}${data.goalMedia.lastFixtureRefresh.nextAt ? ` · next eligible ${formatDateTime(data.goalMedia.lastFixtureRefresh.nextAt)}` : ""}` : "not run yet"}{data.goalMedia.lastFixtureRefresh?.error ? ` · ${data.goalMedia.lastFixtureRefresh.error}` : ""}.
+            </p>
+            <p className="mt-2 text-[9px]" style={{ color: data.goalMedia.lastEventRefresh?.error ? theme.colors.danger : theme.colors.textMuted }}>
+              Canonical goal events: {data.goalMedia.lastEventRefresh ? `${data.goalMedia.lastEventRefresh.status} · ${formatDateTime(data.goalMedia.lastEventRefresh.at)}` : "not run yet"} · {data.goalMedia.awaitingGoalEvents} finished fixtures awaiting complete goal events{data.goalMedia.lastEventRefresh?.error ? ` · ${data.goalMedia.lastEventRefresh.error}` : ""}.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <ActionButton label="Preview goal worker" icon={FileSearch} busy={busyAction === "goal_media_worker_preview"}
+                disabled={isBusy || !data.executionEnabled || !data.automation.youtubeConfigured}
+                onClick={() => execute("goal_media_worker_preview", "Preview Goal Timestamp Worker", "preview")} />
+              <ActionButton label="Run goal worker" icon={Play} tone="warning" busy={busyAction === "goal_media_worker_run"}
+                disabled={isBusy || !data.executionEnabled || !data.automation.youtubeConfigured}
+                onClick={() => requestWrite("goal_media_worker_run", "Run Goal Timestamp Worker", "This will inspect bounded recent DailyGoal pages, publish only high-confidence goal moments, queue uncertain timestamps, and save retry state. It does not enable scheduling.")} />
+            </div>
+            <p className="mt-3 text-[8px] leading-4" style={{ color: theme.colors.textMuted }}>When GOAL_MEDIA_SCHEDULE_ENABLED=true, the existing authenticated job refreshes canonical fixtures and missing goal events when due, then official YouTube, then DailyGoal. With the flag off, only the pre-existing official YouTube stage runs. The flag is currently {data.goalMedia.schedulingActive ? "on" : "off"}; no new scheduler was added.</p>
+            {data.goalMedia.fixtures.length > 0 && <details className="mt-4 border-t pt-3" style={{ borderColor: theme.colors.border }}>
+              <summary className="cursor-pointer text-[9px] uppercase tracking-wider" style={{ color: theme.colors.accent }}>Fixture retry details</summary>
+              <div className="mt-3 max-h-56 overflow-y-auto border" style={{ borderColor: theme.colors.border }}>
+                {data.goalMedia.fixtures.map((fixture) => <div key={fixture.matchId} className="flex flex-wrap items-center justify-between gap-2 border-b px-3 py-2 text-[9px] last:border-b-0" style={{ borderColor: theme.colors.border }}>
+                  <span>{fixture.fixture}</span>
+                  <span className="tabular-nums" style={{ color: fixture.error ? theme.colors.danger : theme.colors.textMuted }}>{fixture.status} · {fixture.covered}/{fixture.total} goals · attempt {fixture.attempts}{fixture.nextRetryAt ? ` · retry ${formatDateTime(fixture.nextRetryAt)}` : ""}{fixture.error ? ` · ${fixture.error}` : ""}</span>
+                </div>)}
+              </div>
+            </details>}
           </OperationCard>
 
           {/* MEDIA WORKER */}
