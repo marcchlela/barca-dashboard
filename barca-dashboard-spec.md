@@ -2330,6 +2330,7 @@ Possible later:
 - team/role spatial profiles built from real heatmaps;
 - goal replay / 2D path animation from trustworthy event coordinates;
 - private friend sharing;
+- later account/profile page redesign after the account and data-ownership rollout, with a fuller personal profile and account-management experience; keep this separate from the initial sign-in screen;
 - Barça-only multi-user accounts;
 - end-of-season Barça Wrapped-style personal recap;
 - trophy cabinet with image/3D presentation;

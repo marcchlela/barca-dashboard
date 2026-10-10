@@ -1,4 +1,5 @@
 import AdminMediaManager from "../../../components/admin/AdminMediaManager";
+import { requireAdminPage } from "../../../lib/admin/access";
 
 import {
   getAdminMediaData,
@@ -30,6 +31,7 @@ async function loadMediaData() {
 }
 
 export default async function AdminMediaPage() {
+  await requireAdminPage();
   const data =
     await loadMediaData();
 

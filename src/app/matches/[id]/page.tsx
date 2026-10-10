@@ -3,6 +3,7 @@ import {
 } from "next/navigation";
 
 import MatchCenterClient from "../../../components/match-center/MatchCenterClient";
+import { getViewer } from "../../../lib/auth/session";
 
 import {
   PlayerPerformanceProvider,
@@ -33,6 +34,7 @@ export default async function MatchPage({
   const {
     id,
   } = await params;
+  const viewer = await getViewer();
 
   const [
     data,
@@ -42,6 +44,7 @@ export default async function MatchPage({
     await Promise.all([
       getMatchCenter(
         id,
+        viewer?.id ?? null,
       ),
 
       getMatchNavigation(
@@ -67,6 +70,7 @@ export default async function MatchPage({
           navigation
         }
         media={media}
+        viewerSignedIn={Boolean(viewer)}
       />
     </PlayerPerformanceProvider>
   );

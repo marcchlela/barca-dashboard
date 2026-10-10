@@ -447,6 +447,7 @@ function serializeTeamStatistic(
 export async function getMatchCenter(
   matchId:
     string,
+  userId: string | null = null,
 ) {
   /*
   |--------------------------------------------------------------------------
@@ -569,11 +570,7 @@ export async function getMatchCenter(
         })
         .all(),
 
-      db.orm.public.MatchDiaryEntry
-        .where({
-          matchId,
-        })
-        .first(),
+      userId ? db.orm.public.MatchDiaryEntry.where({ userId, matchId }).first() : Promise.resolve(null),
     ]);
 
   /*

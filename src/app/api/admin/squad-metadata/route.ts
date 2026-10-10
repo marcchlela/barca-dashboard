@@ -1,6 +1,7 @@
 import {
   NextResponse,
 } from "next/server";
+import { guardAdminRequest } from "../../../../lib/admin/access";
 
 import {
   syncCurrentBarcelonaOfficialSquad,
@@ -14,7 +15,9 @@ import {
   syncCurrentBarcelonaCaptains,
 } from "../../../../lib/squad/sync-captains";
 
-export async function POST() {
+export async function POST(request: Request) {
+  const denied = await guardAdminRequest(request);
+  if (denied) return denied;
   /*
   |--------------------------------------------------------------------------
   | Development-only until admin auth exists

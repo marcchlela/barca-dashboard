@@ -75,6 +75,12 @@ const navigation = [
     href: "/my-barca",
     icon: Shield,
   },
+
+  {
+    label: "Account",
+    href: "/account",
+    icon: UserRound,
+  },
 ] as const;
 
 export default function StadiumRail({

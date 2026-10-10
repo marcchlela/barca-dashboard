@@ -1,13 +1,16 @@
 import { NextResponse } from "next/server";
 import { db } from "../../../../../prisma/db";
 import { getMyBarca } from "../../../../../lib/my-barca/get-my-barca";
+import { getViewer } from "../../../../../lib/auth/session";
 import { seasonSummary } from "../../../../../lib/my-barca/archive-math";
 
 export async function GET() {
   if (process.env.NODE_ENV === "production") return NextResponse.json({ ok: false, error: "Not found." }, { status: 404 });
+  const viewer = await getViewer();
+  if (!viewer) return NextResponse.json({ ok: false, error: "Sign in to run personal QA." }, { status: 401 });
   try {
     const [archive, clips] = await Promise.all([
-      getMyBarca(),
+      getMyBarca(viewer.id),
       db.orm.public.MediaItem.where({ type: "goal_clip" }).all(),
     ]);
     const currentEntries = archive.entries.filter((entry) => entry.seasonId === archive.currentSeasonId);

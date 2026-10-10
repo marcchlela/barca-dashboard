@@ -2,13 +2,13 @@ import "server-only";
 
 import { db } from "../../prisma/db";
 
-export async function getMyBarca() {
+export async function getMyBarca(userId: string) {
   const [seasons, barcelona, diaries, favourites, favouriteMatches, players, media] = await Promise.all([
     db.orm.public.Season.all(),
     db.orm.public.Team.where({ isBarcelona: true }).first(),
-    db.orm.public.MatchDiaryEntry.all(),
-    db.orm.public.FavouritePlayer.all(),
-    db.orm.public.FavouriteMatch.all(),
+    db.orm.public.MatchDiaryEntry.where({ userId }).all(),
+    db.orm.public.FavouritePlayer.where({ userId }).all(),
+    db.orm.public.FavouriteMatch.where({ userId }).all(),
     db.orm.public.Player.all(),
     db.orm.public.MediaItem.all(),
   ]);

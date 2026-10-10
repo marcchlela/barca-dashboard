@@ -1,6 +1,8 @@
 import {
   NextResponse,
 } from "next/server";
+import { guardPersonalWrite } from "../../../../../lib/admin/access";
+import { getViewer } from "../../../../../lib/auth/session";
 import { Temporal } from "temporal-polyfill";
 import { resolveWatchedAt, validWatchedOn } from "../../../../../lib/my-barca/watch-date";
 
@@ -52,6 +54,9 @@ export async function PUT(
   context:
     RouteContext,
 ) {
+  const denied = await guardPersonalWrite(request);
+  if (denied) return denied;
+  const userId = (await getViewer())!.id;
   try {
     const {
       id: matchId,
@@ -225,6 +230,7 @@ export async function PUT(
     const existing =
       await db.orm.public.MatchDiaryEntry
         .where({
+          userId,
           matchId,
         })
         .first();
@@ -286,6 +292,7 @@ export async function PUT(
             )
         : await db.orm.public.MatchDiaryEntry
             .create({
+              userId,
               matchId,
 
               ...data,

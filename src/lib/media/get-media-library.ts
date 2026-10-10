@@ -38,6 +38,7 @@ export type MediaLibraryItem = {
 };
 
 export type MediaLibraryData = {
+  signedIn: boolean;
   items: MediaLibraryItem[];
   featuredId: string | null;
   currentSeasonId: string | null;
@@ -59,13 +60,13 @@ function validId(value: string | null | undefined) {
   return value && /^[A-Za-z0-9_-]{11}$/.test(value) ? value : null;
 }
 
-export async function getMediaLibrary(): Promise<MediaLibraryData> {
+export async function getMediaLibrary(userId: string | null): Promise<MediaLibraryData> {
   const [media, matches, seasons, players, saves, moments] = await Promise.all([
     db.orm.public.MediaItem.all(),
     db.orm.public.Match.include("homeTeam").include("awayTeam").include("competition").all(),
     db.orm.public.Season.all(),
     db.orm.public.Player.all(),
-    db.orm.public.MediaSave.all(),
+    userId ? db.orm.public.MediaSave.where({ userId }).all() : Promise.resolve([]),
     db.orm.public.MediaMoment.all(),
   ]);
   const matchById = new Map(matches.map((match) => [match.id, match]));
@@ -108,5 +109,5 @@ export async function getMediaLibrary(): Promise<MediaLibraryData> {
   }).sort((a, b) => (b.date ?? "").localeCompare(a.date ?? "") || b.id.localeCompare(a.id));
   const featured = [...media].filter((item) => item.featuredAt).sort((a, b) => (b.featuredAt?.toString() ?? "").localeCompare(a.featuredAt?.toString() ?? ""))[0];
   const fallback = items.find((item) => item.seasonId === current?.id && item.type === "match_highlight") ?? items[0];
-  return { items, featuredId: featured?.id ?? fallback?.id ?? null, currentSeasonId: current?.id ?? null, currentSeasonLabel: current?.label ?? null };
+  return { signedIn: Boolean(userId), items, featuredId: featured?.id ?? fallback?.id ?? null, currentSeasonId: current?.id ?? null, currentSeasonLabel: current?.label ?? null };
 }

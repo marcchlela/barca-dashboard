@@ -249,7 +249,7 @@ model Player {
   relatedEvents         MatchEvent[]           @relation("RelatedEventPlayer")
   matchStats            PlayerMatchStatistic[]
   mediaItems            MediaItem[]
-  favouriteRecord       FavouritePlayer?
+  favouriteRecords      FavouritePlayer[]
   diaryFavouriteEntries MatchDiaryEntry[]      @relation("DiaryFavouritePlayer")
   seasonMoments         SeasonMoment[]
   absences              PlayerAbsence[]
@@ -320,8 +320,8 @@ model Match {
   goalMediaSyncState GoalMediaSyncState?
   goalMediaPages GoalMediaPageCache[]
   predictions        Prediction[]
-  diaryEntry         MatchDiaryEntry?
-  favouriteMatch     FavouriteMatch?
+  diaryEntries       MatchDiaryEntry[]
+  favouriteMatches   FavouriteMatch[]
   seasonMoments      SeasonMoment[]
 
   @@index([seasonId, competitionId])
@@ -544,6 +544,54 @@ model StandingSnapshot {
   @@map("standing_snapshot")
 }
 
+enum AccountRole {
+  @@type("pg/text@1")
+  User = "user"
+  Admin = "admin"
+}
+
+model AppUser {
+  id            Uuid        @id @default(uuid())
+  email         String      @unique
+  username      String      @unique
+  passwordHash  String
+  role          AccountRole @default(User)
+  createdAt     temporal.createdAt()
+  updatedAt     temporal.updatedAt()
+
+  sessions      UserSession[]
+  mediaSaves    MediaSave[]
+  favouritePlayers FavouritePlayer[]
+  favouriteMatches FavouriteMatch[]
+  diaryEntries  MatchDiaryEntry[]
+
+  @@map("app_user")
+}
+
+model UserSession {
+  id         Uuid     @id @default(uuid())
+  userId     Uuid
+  tokenHash  String   @unique
+  expiresAt  DateTime
+  createdAt  temporal.createdAt()
+
+  user       AppUser  @relation(fields:[userId], references:[id])
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("user_session")
+}
+
+model AuthThrottle {
+  key          String   @id
+  attempts     Int      @default(0)
+  windowStart  DateTime
+  blockedUntil DateTime?
+  updatedAt    temporal.updatedAt()
+
+  @@map("auth_throttle")
+}
+
 model CompetitionFixtureSnapshot {
   id               Uuid        @id @default(uuid())
   seasonId         Uuid
@@ -612,14 +660,18 @@ model MediaItem {
 
 model MediaSave {
   id          Uuid                 @id @default(uuid())
-  mediaItemId Uuid                 @unique
+  userId      Uuid?
+  mediaItemId Uuid
   favourite   Boolean              @default(false)
   watchLater  Boolean              @default(false)
   createdAt   temporal.createdAt()
   updatedAt   temporal.updatedAt()
 
   mediaItem   MediaItem            @relation(fields:[mediaItemId], references:[id])
+  user        AppUser?             @relation(fields:[userId], references:[id])
 
+  @@unique([userId, mediaItemId])
+  @@index([mediaItemId])
   @@map("media_save")
 }
 
@@ -824,32 +876,41 @@ model TrophyWin {
 
 model FavouritePlayer {
   id        Uuid                 @id @default(uuid())
-  playerId  Uuid                 @unique
+  userId    Uuid?
+  playerId  Uuid
   sortOrder Int                  @default(0)
   pinnedAt  temporal.createdAt()
 
   player    Player               @relation(fields:[playerId], references:[id])
+  user      AppUser?             @relation(fields:[userId], references:[id])
 
+  @@unique([userId, playerId])
+  @@index([playerId])
   @@map("favourite_player")
 }
 
 model FavouriteMatch {
   id        Uuid                 @id @default(uuid())
+  userId    Uuid?
   seasonId  Uuid
-  matchId   Uuid                 @unique
+  matchId   Uuid
   slot      Int
   createdAt temporal.createdAt()
 
   season    Season               @relation(fields:[seasonId], references:[id])
   match     Match                @relation(fields:[matchId], references:[id])
+  user      AppUser?             @relation(fields:[userId], references:[id])
 
-  @@unique([seasonId, slot])
+  @@unique([userId, matchId])
+  @@unique([userId, seasonId, slot])
+  @@index([matchId])
   @@map("favourite_match")
 }
 
 model MatchDiaryEntry {
   id                   Uuid                 @id @default(uuid())
-  matchId              Uuid                 @unique
+  userId               Uuid?
+  matchId              Uuid
   watched              Boolean              @default(true)
   watchType            WatchType?
   watchedAt            DateTime?
@@ -863,7 +924,10 @@ model MatchDiaryEntry {
   match                Match                @relation(fields:[matchId], references:[id])
   favouritePlayer      Player?              @relation("DiaryFavouritePlayer", fields:[favouritePlayerId], references:[id])
   favouriteGoalEvent   MatchEvent?          @relation("DiaryFavouriteGoal", fields:[favouriteGoalEventId], references:[id])
+  user                 AppUser?             @relation(fields:[userId], references:[id])
 
+  @@unique([userId, matchId])
+  @@index([matchId])
   @@index([watchedAt])
   @@map("match_diary_entry")
 }

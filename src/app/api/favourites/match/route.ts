@@ -1,10 +1,15 @@
 import { NextResponse } from "next/server";
+import { guardPersonalWrite } from "../../../../lib/admin/access";
+import { getViewer } from "../../../../lib/auth/session";
 import { db } from "../../../../prisma/db";
 
 type Body = { seasonId?: unknown; matchId?: unknown; slot?: unknown };
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export async function PUT(request: Request) {
+  const denied = await guardPersonalWrite(request);
+  if (denied) return denied;
+  const userId = (await getViewer())!.id;
   try {
     const body = await request.json() as Body;
     if (typeof body.seasonId !== "string" || !uuid.test(body.seasonId) || !Number.isInteger(body.slot) || ![1, 2, 3].includes(body.slot as number) || (body.matchId !== null && (typeof body.matchId !== "string" || !uuid.test(body.matchId)))) {
@@ -22,16 +27,16 @@ export async function PUT(request: Request) {
       if (!match || match.seasonId !== seasonId || match.status !== "finished" || (!match.homeTeam.isBarcelona && !match.awayTeam.isBarcelona)) {
         return NextResponse.json({ ok: false, error: "Choose a finished Barça match from this season." }, { status: 400 });
       }
-      const alreadyPicked = await db.orm.public.FavouriteMatch.where({ matchId }).first();
+      const alreadyPicked = await db.orm.public.FavouriteMatch.where({ userId, matchId }).first();
       if (alreadyPicked && (alreadyPicked.seasonId !== seasonId || alreadyPicked.slot !== slot)) {
         return NextResponse.json({ ok: false, error: "That match is already in your top three." }, { status: 409 });
       }
     }
 
-    const existing = await db.orm.public.FavouriteMatch.where({ seasonId, slot }).first();
+    const existing = await db.orm.public.FavouriteMatch.where({ userId, seasonId, slot }).first();
     if (existing && !matchId) await db.orm.public.FavouriteMatch.where({ id: existing.id }).delete();
     else if (existing && matchId && existing.matchId !== matchId) await db.orm.public.FavouriteMatch.where({ id: existing.id }).update({ matchId });
-    else if (!existing && matchId) await db.orm.public.FavouriteMatch.create({ seasonId, matchId, slot });
+    else if (!existing && matchId) await db.orm.public.FavouriteMatch.create({ userId, seasonId, matchId, slot });
     return NextResponse.json({ ok: true, result: { seasonId, slot, matchId } });
   } catch (error) {
     console.error("FAVOURITE MATCH SAVE FAILED:", error);

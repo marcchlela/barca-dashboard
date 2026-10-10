@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { Temporal } from "temporal-polyfill";
 import { db } from "../../../../../prisma/db";
+import { guardAdminRequest } from "../../../../../lib/admin/access";
 
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const goalTypes = new Set(["goal", "own_goal", "penalty_goal"]);
@@ -8,6 +9,8 @@ type Body = { action?: unknown; mediaItemId?: unknown; matchEventId?: unknown; s
 const bad = (error: string, status = 400) => NextResponse.json({ ok: false, error }, { status });
 
 export async function PUT(request: Request) {
+  const denied = await guardAdminRequest(request);
+  if (denied) return denied;
   try {
     const body = await request.json() as Body;
     if (typeof body.mediaItemId !== "string" || !uuid.test(body.mediaItemId)) return bad("Choose a valid film.");
@@ -47,6 +50,8 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+  const denied = await guardAdminRequest(request);
+  if (denied) return denied;
   try {
     const body = await request.json() as { id?: unknown };
     if (typeof body.id !== "string" || !uuid.test(body.id)) return bad("Choose a verified link.");

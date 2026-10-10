@@ -1,6 +1,8 @@
 import {
   NextResponse,
 } from "next/server";
+import { guardPersonalWrite } from "../../../../lib/admin/access";
+import { getViewer } from "../../../../lib/auth/session";
 
 import {
   db,
@@ -21,6 +23,9 @@ export async function PUT(
   request:
     Request,
 ) {
+  const denied = await guardPersonalWrite(request);
+  if (denied) return denied;
+  const userId = (await getViewer())!.id;
   try {
     const body =
       (
@@ -66,6 +71,7 @@ export async function PUT(
     const existing =
       await db.orm.public.FavouritePlayer
         .where({
+          userId,
           playerId:
             player.id,
         })
@@ -91,6 +97,7 @@ export async function PUT(
 
     const favourites =
       await db.orm.public.FavouritePlayer
+        .where({ userId })
         .all();
 
     const nextSortOrder =
@@ -110,6 +117,7 @@ export async function PUT(
     const favourite =
       await db.orm.public.FavouritePlayer
         .create({
+          userId,
           playerId:
             player.id,
 
@@ -156,6 +164,9 @@ export async function DELETE(
   request:
     Request,
 ) {
+  const denied = await guardPersonalWrite(request);
+  if (denied) return denied;
+  const userId = (await getViewer())!.id;
   try {
     const body =
       (
@@ -177,6 +188,7 @@ export async function DELETE(
     const favourite =
       await db.orm.public.FavouritePlayer
         .where({
+          userId,
           playerId:
             body.playerId,
         })

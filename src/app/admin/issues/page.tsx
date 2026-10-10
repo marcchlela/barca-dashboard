@@ -1,4 +1,5 @@
 import AdminDataIssues from "../../../components/admin/AdminDataIssues";
+import { requireAdminPage } from "../../../lib/admin/access";
 
 import {
   getAdminDataIssues,
@@ -11,6 +12,7 @@ export const revalidate =
   0;
 
 export default async function AdminIssuesPage() {
+  await requireAdminPage();
   const data =
     await getAdminDataIssues();
 

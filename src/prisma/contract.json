@@ -4,6 +4,14 @@
   "target": "postgres",
   "profileHash": "3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2",
   "roots": {
+    "app_user": {
+      "model": "AppUser",
+      "namespace": "public"
+    },
+    "auth_throttle": {
+      "model": "AuthThrottle",
+      "namespace": "public"
+    },
     "competition": {
       "model": "Competition",
       "namespace": "public"
@@ -139,6 +147,10 @@
     "trophy_win": {
       "model": "TrophyWin",
       "namespace": "public"
+    },
+    "user_session": {
+      "model": "UserSession",
+      "namespace": "public"
     }
   },
   "domain": {
@@ -184,6 +196,19 @@
               {
                 "name": "Other",
                 "value": "other"
+              }
+            ]
+          },
+          "AccountRole": {
+            "codecId": "pg/text@1",
+            "members": [
+              {
+                "name": "User",
+                "value": "user"
+              },
+              {
+                "name": "Admin",
+                "value": "admin"
               }
             ]
           },
@@ -606,6 +631,230 @@
           }
         },
         "models": {
+          "AppUser": {
+            "fields": {
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "email": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "passwordHash": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "role": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "AccountRole",
+                  "namespaceId": "public",
+                  "plane": "domain"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "username": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "diaryEntries": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "userId"
+                  ]
+                },
+                "to": {
+                  "model": "MatchDiaryEntry",
+                  "namespace": "public"
+                }
+              },
+              "favouriteMatches": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "userId"
+                  ]
+                },
+                "to": {
+                  "model": "FavouriteMatch",
+                  "namespace": "public"
+                }
+              },
+              "favouritePlayers": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "userId"
+                  ]
+                },
+                "to": {
+                  "model": "FavouritePlayer",
+                  "namespace": "public"
+                }
+              },
+              "mediaSaves": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "userId"
+                  ]
+                },
+                "to": {
+                  "model": "MediaSave",
+                  "namespace": "public"
+                }
+              },
+              "sessions": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "userId"
+                  ]
+                },
+                "to": {
+                  "model": "UserSession",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "email": {
+                  "column": "email"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "passwordHash": {
+                  "column": "passwordHash"
+                },
+                "role": {
+                  "column": "role"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                },
+                "username": {
+                  "column": "username"
+                }
+              },
+              "namespaceId": "public",
+              "table": "app_user"
+            }
+          },
+          "AuthThrottle": {
+            "fields": {
+              "attempts": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "blockedUntil": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "key": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "windowStart": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {},
+            "storage": {
+              "fields": {
+                "attempts": {
+                  "column": "attempts"
+                },
+                "blockedUntil": {
+                  "column": "blockedUntil"
+                },
+                "key": {
+                  "column": "key"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                },
+                "windowStart": {
+                  "column": "windowStart"
+                }
+              },
+              "namespaceId": "public",
+              "table": "auth_throttle"
+            }
+          },
           "Competition": {
             "fields": {
               "code": {
@@ -1331,6 +1580,13 @@
                   "codecId": "pg/int4@1",
                   "kind": "scalar"
                 }
+              },
+              "userId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
               }
             },
             "relations": {
@@ -1365,6 +1621,22 @@
                   "model": "Season",
                   "namespace": "public"
                 }
+              },
+              "user": {
+                "cardinality": "N:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "AppUser",
+                  "namespace": "public"
+                }
               }
             },
             "storage": {
@@ -1383,6 +1655,9 @@
                 },
                 "slot": {
                   "column": "slot"
+                },
+                "userId": {
+                  "column": "userId"
                 }
               },
               "namespaceId": "public",
@@ -1418,6 +1693,13 @@
                   "codecId": "pg/int4@1",
                   "kind": "scalar"
                 }
+              },
+              "userId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
               }
             },
             "relations": {
@@ -1436,6 +1718,22 @@
                   "model": "Player",
                   "namespace": "public"
                 }
+              },
+              "user": {
+                "cardinality": "N:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "AppUser",
+                  "namespace": "public"
+                }
               }
             },
             "storage": {
@@ -1451,6 +1749,9 @@
                 },
                 "sortOrder": {
                   "column": "sortOrder"
+                },
+                "userId": {
+                  "column": "userId"
                 }
               },
               "namespaceId": "public",
@@ -2946,9 +3247,8 @@
                   "namespace": "public"
                 }
               },
-              "diaryEntry": {
-                "cardinality": "1:1",
-                "nullable": true,
+              "diaryEntries": {
+                "cardinality": "1:N",
                 "on": {
                   "localFields": [
                     "id"
@@ -2977,9 +3277,8 @@
                   "namespace": "public"
                 }
               },
-              "favouriteMatch": {
-                "cardinality": "1:1",
-                "nullable": true,
+              "favouriteMatches": {
+                "cardinality": "1:N",
                 "on": {
                   "localFields": [
                     "id"
@@ -3308,6 +3607,13 @@
                   "kind": "scalar"
                 }
               },
+              "userId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
               "watchType": {
                 "nullable": true,
                 "type": {
@@ -3384,6 +3690,22 @@
                   "model": "Match",
                   "namespace": "public"
                 }
+              },
+              "user": {
+                "cardinality": "N:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "AppUser",
+                  "namespace": "public"
+                }
               }
             },
             "storage": {
@@ -3411,6 +3733,9 @@
                 },
                 "updatedAt": {
                   "column": "updatedAt"
+                },
+                "userId": {
+                  "column": "userId"
                 },
                 "watchType": {
                   "column": "watchType"
@@ -4965,6 +5290,13 @@
                   "kind": "scalar"
                 }
               },
+              "userId": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
               "watchLater": {
                 "nullable": false,
                 "type": {
@@ -4989,6 +5321,22 @@
                   "model": "MediaItem",
                   "namespace": "public"
                 }
+              },
+              "user": {
+                "cardinality": "N:1",
+                "nullable": true,
+                "on": {
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "AppUser",
+                  "namespace": "public"
+                }
               }
             },
             "storage": {
@@ -5007,6 +5355,9 @@
                 },
                 "updatedAt": {
                   "column": "updatedAt"
+                },
+                "userId": {
+                  "column": "userId"
                 },
                 "watchLater": {
                   "column": "watchLater"
@@ -5257,9 +5608,8 @@
                   "namespace": "public"
                 }
               },
-              "favouriteRecord": {
-                "cardinality": "1:1",
-                "nullable": true,
+              "favouriteRecords": {
+                "cardinality": "1:N",
                 "on": {
                   "localFields": [
                     "id"
@@ -7793,6 +8143,84 @@
               "namespaceId": "public",
               "table": "trophy_win"
             }
+          },
+          "UserSession": {
+            "fields": {
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "expiresAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              },
+              "tokenHash": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "userId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/uuid@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "user": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "AppUser",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "expiresAt": {
+                  "column": "expiresAt"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "tokenHash": {
+                  "column": "tokenHash"
+                },
+                "userId": {
+                  "column": "userId"
+                }
+              },
+              "namespaceId": "public",
+              "table": "user_session"
+            }
           }
         }
       }
@@ -7803,6 +8231,126 @@
       "public": {
         "entries": {
           "table": {
+            "app_user": {
+              "checks": [
+                {
+                  "expression": "\"role\" IN ('user', 'admin')",
+                  "name": "app_user_role_check_5b6d1a59",
+                  "prefix": "app_user_role_check"
+                }
+              ],
+              "columns": {
+                "createdAt": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "email": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "passwordHash": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "role": {
+                  "codecId": "pg/text@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": "user"
+                  },
+                  "nativeType": "text",
+                  "nullable": false,
+                  "valueSet": {
+                    "entityKind": "valueSet",
+                    "entityName": "AccountRole",
+                    "namespaceId": "public",
+                    "plane": "storage"
+                  }
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "username": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [],
+              "indexes": [],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "email"
+                  ]
+                },
+                {
+                  "columns": [
+                    "username"
+                  ]
+                }
+              ]
+            },
+            "auth_throttle": {
+              "columns": {
+                "attempts": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": 0
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "blockedUntil": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": true
+                },
+                "key": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "windowStart": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [],
+              "indexes": [],
+              "primaryKey": {
+                "columns": [
+                  "key"
+                ]
+              },
+              "uniques": []
+            },
             "competition": {
               "checks": [
                 {
@@ -8191,6 +8739,11 @@
                   "codecId": "pg/int4@1",
                   "nativeType": "int4",
                   "nullable": false
+                },
+                "userId": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": true
                 }
               },
               "foreignKeys": [
@@ -8225,15 +8778,47 @@
                     "namespaceId": "public",
                     "tableName": "football_match"
                   }
+                },
+                {
+                  "source": {
+                    "columns": [
+                      "userId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "favourite_match"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "app_user"
+                  }
                 }
               ],
               "indexes": [
+                {
+                  "columns": [
+                    "matchId"
+                  ],
+                  "name": "favourite_match_matchId_idx_4caf5ecc",
+                  "prefix": "favourite_match_matchId_idx",
+                  "unique": false
+                },
                 {
                   "columns": [
                     "seasonId"
                   ],
                   "name": "favourite_match_seasonId_idx_aa50cbae",
                   "prefix": "favourite_match_seasonId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "userId"
+                  ],
+                  "name": "favourite_match_userId_idx_a489d58a",
+                  "prefix": "favourite_match_userId_idx",
                   "unique": false
                 }
               ],
@@ -8245,11 +8830,13 @@
               "uniques": [
                 {
                   "columns": [
+                    "userId",
                     "matchId"
                   ]
                 },
                 {
                   "columns": [
+                    "userId",
                     "seasonId",
                     "slot"
                   ]
@@ -8285,6 +8872,11 @@
                   },
                   "nativeType": "int4",
                   "nullable": false
+                },
+                "userId": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": true
                 }
               },
               "foreignKeys": [
@@ -8303,9 +8895,42 @@
                     "namespaceId": "public",
                     "tableName": "player"
                   }
+                },
+                {
+                  "source": {
+                    "columns": [
+                      "userId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "favourite_player"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "app_user"
+                  }
                 }
               ],
-              "indexes": [],
+              "indexes": [
+                {
+                  "columns": [
+                    "playerId"
+                  ],
+                  "name": "favourite_player_playerId_idx_710cf1aa",
+                  "prefix": "favourite_player_playerId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "userId"
+                  ],
+                  "name": "favourite_player_userId_idx_a489d58a",
+                  "prefix": "favourite_player_userId_idx",
+                  "unique": false
+                }
+              ],
               "primaryKey": {
                 "columns": [
                   "id"
@@ -8314,6 +8939,7 @@
               "uniques": [
                 {
                   "columns": [
+                    "userId",
                     "playerId"
                   ]
                 }
@@ -9705,6 +10331,11 @@
                   "nativeType": "timestamptz",
                   "nullable": false
                 },
+                "userId": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": true
+                },
                 "watchType": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
@@ -9779,6 +10410,22 @@
                     "namespaceId": "public",
                     "tableName": "match_event"
                   }
+                },
+                {
+                  "source": {
+                    "columns": [
+                      "userId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "match_diary_entry"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "app_user"
+                  }
                 }
               ],
               "indexes": [
@@ -9800,6 +10447,22 @@
                 },
                 {
                   "columns": [
+                    "matchId"
+                  ],
+                  "name": "match_diary_entry_matchId_idx_4caf5ecc",
+                  "prefix": "match_diary_entry_matchId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "userId"
+                  ],
+                  "name": "match_diary_entry_userId_idx_a489d58a",
+                  "prefix": "match_diary_entry_userId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
                     "watchedAt"
                   ],
                   "name": "match_diary_entry_watchedAt_idx_89256024",
@@ -9815,6 +10478,7 @@
               "uniques": [
                 {
                   "columns": [
+                    "userId",
                     "matchId"
                   ]
                 }
@@ -11024,6 +11688,11 @@
                   "nativeType": "timestamptz",
                   "nullable": false
                 },
+                "userId": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": true
+                },
                 "watchLater": {
                   "codecId": "pg/bool@1",
                   "default": {
@@ -11050,9 +11719,42 @@
                     "namespaceId": "public",
                     "tableName": "media_item"
                   }
+                },
+                {
+                  "source": {
+                    "columns": [
+                      "userId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "media_save"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "app_user"
+                  }
                 }
               ],
-              "indexes": [],
+              "indexes": [
+                {
+                  "columns": [
+                    "mediaItemId"
+                  ],
+                  "name": "media_save_mediaItemId_idx_5e6c7760",
+                  "prefix": "media_save_mediaItemId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "userId"
+                  ],
+                  "name": "media_save_userId_idx_a489d58a",
+                  "prefix": "media_save_userId_idx",
+                  "unique": false
+                }
+              ],
               "primaryKey": {
                 "columns": [
                   "id"
@@ -11061,6 +11763,7 @@
               "uniques": [
                 {
                   "columns": [
+                    "userId",
                     "mediaItemId"
                   ]
                 }
@@ -13015,6 +13718,87 @@
                 ]
               },
               "uniques": []
+            },
+            "user_session": {
+              "columns": {
+                "createdAt": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "expiresAt": {
+                  "codecId": "pg/timestamptz-temporal@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                },
+                "tokenHash": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "userId": {
+                  "codecId": "pg/uuid@1",
+                  "nativeType": "uuid",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "source": {
+                    "columns": [
+                      "userId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "user_session"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "app_user"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "expiresAt"
+                  ],
+                  "name": "user_session_expiresAt_idx_6b6b8c10",
+                  "prefix": "user_session_expiresAt_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "userId"
+                  ],
+                  "name": "user_session_userId_idx_a489d58a",
+                  "prefix": "user_session_userId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "tokenHash"
+                  ]
+                }
+              ]
             }
           },
           "valueSet": {
@@ -13034,6 +13818,13 @@
                 "illness",
                 "rest",
                 "other"
+              ]
+            },
+            "AccountRole": {
+              "kind": "valueSet",
+              "values": [
+                "user",
+                "admin"
               ]
             },
             "CompetitionType": {
@@ -13195,12 +13986,53 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "f6097504120286aca553e1ede724057f6150800b76a93503305c0fc785245fd4"
+    "storageHash": "6556dd3eff7b2c4e96bb1d824c445291f6e47fafcc42cff0509497cb3e450878"
   },
   "execution": {
-    "executionHash": "62f16f44558cb059ebf376918425ae2814d45d8e94d7e08118b750295f57ac8d",
+    "executionHash": "891f2fc38689458c2a08455927ef5babd3ff9731f850462036d9fa62ce69d615",
     "mutations": {
       "defaults": [
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "app_user"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updatedAt",
+            "namespace": "public",
+            "table": "app_user"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "instantNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updatedAt",
+            "namespace": "public",
+            "table": "auth_throttle"
+          }
+        },
         {
           "onCreate": {
             "id": "uuidv4",
@@ -14038,6 +14870,17 @@
             "column": "updatedAt",
             "namespace": "public",
             "table": "trophy_win"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "uuidv4",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "id",
+            "namespace": "public",
+            "table": "user_session"
           }
         }
       ]

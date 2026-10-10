@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
 import { discoverDailyGoalMatches } from "../../../../../../lib/providers/dailygoal/discovery";
+import { guardAdminRequest } from "../../../../../../lib/admin/access";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
+  const denied = await guardAdminRequest(request);
+  if (denied) return denied;
   try {
     const body = await request.json() as { mode?: unknown; preRoll?: unknown };
     if (body.mode !== "preview" && body.mode !== "apply") return NextResponse.json({ ok: false, error: "Choose preview or apply." }, { status: 400 });

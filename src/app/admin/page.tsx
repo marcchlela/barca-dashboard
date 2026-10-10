@@ -1,4 +1,5 @@
 import AdminOverview from "../../components/admin/AdminOverview";
+import { requireAdminPage } from "../../lib/admin/access";
 
 import {
   getAdminOverview,
@@ -43,6 +44,7 @@ async function loadAdminOverview() {
 */
 
 export default async function AdminPage() {
+  await requireAdminPage();
   const data =
     await loadAdminOverview();
 

@@ -47,6 +47,8 @@ COPY package.json package-lock.json ./
 COPY prisma.config.ts ./
 COPY migrations ./migrations
 COPY src/prisma ./src/prisma
+COPY src/lib/auth/policy.ts ./src/lib/auth/policy.ts
+COPY tools/auth ./tools/auth
 
 CMD ["npx", "prisma", "db", "migrate", "--advance-ref", "db"]
 

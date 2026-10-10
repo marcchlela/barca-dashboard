@@ -1,4 +1,5 @@
 import AdminMediaAddForm from "../../../../components/admin/AdminMediaAddForm";
+import { requireAdminPage } from "../../../../lib/admin/access";
 
 import {
   getAdminMediaData,
@@ -11,6 +12,7 @@ export const revalidate =
   0;
 
 export default async function AddMediaPage() {
+  await requireAdminPage();
   const data =
     await getAdminMediaData();
 

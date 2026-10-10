@@ -1,0 +1,1433 @@
+[
+  {
+    "id": "dropConstraint.favourite_match.favourite_match_matchId_key",
+    "label": "Drop constraint \"favourite_match_matchId_key\" on \"favourite_match\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "favourite_match_matchId_key",
+        "table": "favourite_match"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"favourite_match_matchId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "favourite_match_matchId_key",
+          "public",
+          "\"public\".\"favourite_match\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop constraint \"favourite_match_matchId_key\"",
+        "sql": "ALTER TABLE \"public\".\"favourite_match\" DROP CONSTRAINT \"favourite_match_matchId_key\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"favourite_match_matchId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "favourite_match_matchId_key",
+          "public",
+          "\"public\".\"favourite_match\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dropConstraint.favourite_match.favourite_match_seasonId_slot_key",
+    "label": "Drop constraint \"favourite_match_seasonId_slot_key\" on \"favourite_match\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "favourite_match_seasonId_slot_key",
+        "table": "favourite_match"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"favourite_match_seasonId_slot_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "favourite_match_seasonId_slot_key",
+          "public",
+          "\"public\".\"favourite_match\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop constraint \"favourite_match_seasonId_slot_key\"",
+        "sql": "ALTER TABLE \"public\".\"favourite_match\" DROP CONSTRAINT \"favourite_match_seasonId_slot_key\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"favourite_match_seasonId_slot_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "favourite_match_seasonId_slot_key",
+          "public",
+          "\"public\".\"favourite_match\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dropConstraint.favourite_player.favourite_player_playerId_key",
+    "label": "Drop constraint \"favourite_player_playerId_key\" on \"favourite_player\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "favourite_player_playerId_key",
+        "table": "favourite_player"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"favourite_player_playerId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "favourite_player_playerId_key",
+          "public",
+          "\"public\".\"favourite_player\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop constraint \"favourite_player_playerId_key\"",
+        "sql": "ALTER TABLE \"public\".\"favourite_player\" DROP CONSTRAINT \"favourite_player_playerId_key\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"favourite_player_playerId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "favourite_player_playerId_key",
+          "public",
+          "\"public\".\"favourite_player\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dropConstraint.match_diary_entry.match_diary_entry_matchId_key",
+    "label": "Drop constraint \"match_diary_entry_matchId_key\" on \"match_diary_entry\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "match_diary_entry_matchId_key",
+        "table": "match_diary_entry"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"match_diary_entry_matchId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "match_diary_entry_matchId_key",
+          "public",
+          "\"public\".\"match_diary_entry\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop constraint \"match_diary_entry_matchId_key\"",
+        "sql": "ALTER TABLE \"public\".\"match_diary_entry\" DROP CONSTRAINT \"match_diary_entry_matchId_key\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"match_diary_entry_matchId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "match_diary_entry_matchId_key",
+          "public",
+          "\"public\".\"match_diary_entry\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dropConstraint.media_save.media_save_mediaItemId_key",
+    "label": "Drop constraint \"media_save_mediaItemId_key\" on \"media_save\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "media_save_mediaItemId_key",
+        "table": "media_save"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"media_save_mediaItemId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_save_mediaItemId_key",
+          "public",
+          "\"public\".\"media_save\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop constraint \"media_save_mediaItemId_key\"",
+        "sql": "ALTER TABLE \"public\".\"media_save\" DROP CONSTRAINT \"media_save_mediaItemId_key\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"media_save_mediaItemId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_save_mediaItemId_key",
+          "public",
+          "\"public\".\"media_save\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.app_user",
+    "label": "Create table \"app_user\"",
+    "summary": "Creates table \"app_user\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "app_user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"app_user\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"app_user\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"app_user\"",
+        "sql": "CREATE TABLE \"public\".\"app_user\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"email\" text NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"passwordHash\" text NOT NULL,\n  \"role\" text DEFAULT 'user' NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  \"username\" text NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"app_user_role_check_5b6d1a59\" CHECK (\"role\" IN ('user', 'admin'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"app_user\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"app_user\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.auth_throttle",
+    "label": "Create table \"auth_throttle\"",
+    "summary": "Creates table \"auth_throttle\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "auth_throttle"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"auth_throttle\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"auth_throttle\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"auth_throttle\"",
+        "sql": "CREATE TABLE \"public\".\"auth_throttle\" (\n  \"attempts\" int4 DEFAULT 0 NOT NULL,\n  \"blockedUntil\" timestamptz,\n  \"key\" text NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  \"windowStart\" timestamptz NOT NULL,\n  PRIMARY KEY (\"key\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"auth_throttle\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"auth_throttle\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.user_session",
+    "label": "Create table \"user_session\"",
+    "summary": "Creates table \"user_session\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "user_session"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"user_session\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"user_session\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"user_session\"",
+        "sql": "CREATE TABLE \"public\".\"user_session\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"expiresAt\" timestamptz NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"tokenHash\" text NOT NULL,\n  \"userId\" uuid NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"user_session\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"user_session\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.favourite_match.userId",
+    "label": "Add column \"userId\" to \"favourite_match\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "userId",
+        "table": "favourite_match"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"userId\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "favourite_match",
+          "userId"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"userId\"",
+        "sql": "ALTER TABLE \"public\".\"favourite_match\" ADD COLUMN \"userId\" uuid"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"userId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "favourite_match",
+          "userId"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.favourite_player.userId",
+    "label": "Add column \"userId\" to \"favourite_player\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "userId",
+        "table": "favourite_player"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"userId\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "favourite_player",
+          "userId"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"userId\"",
+        "sql": "ALTER TABLE \"public\".\"favourite_player\" ADD COLUMN \"userId\" uuid"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"userId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "favourite_player",
+          "userId"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.match_diary_entry.userId",
+    "label": "Add column \"userId\" to \"match_diary_entry\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "userId",
+        "table": "match_diary_entry"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"userId\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "match_diary_entry",
+          "userId"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"userId\"",
+        "sql": "ALTER TABLE \"public\".\"match_diary_entry\" ADD COLUMN \"userId\" uuid"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"userId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "match_diary_entry",
+          "userId"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.media_save.userId",
+    "label": "Add column \"userId\" to \"media_save\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "userId",
+        "table": "media_save"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"userId\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "media_save",
+          "userId"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"userId\"",
+        "sql": "ALTER TABLE \"public\".\"media_save\" ADD COLUMN \"userId\" uuid"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"userId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "media_save",
+          "userId"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.app_user.app_user_email_key",
+    "label": "Add unique constraint on \"app_user\" (email)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "app_user_email_key",
+        "table": "app_user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"app_user_email_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "app_user_email_key",
+          "public",
+          "\"public\".\"app_user\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"app_user_email_key\"",
+        "sql": "ALTER TABLE \"public\".\"app_user\" ADD CONSTRAINT \"app_user_email_key\" UNIQUE (\"email\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"app_user_email_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "app_user_email_key",
+          "public",
+          "\"public\".\"app_user\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.app_user.app_user_username_key",
+    "label": "Add unique constraint on \"app_user\" (username)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "app_user_username_key",
+        "table": "app_user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"app_user_username_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "app_user_username_key",
+          "public",
+          "\"public\".\"app_user\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"app_user_username_key\"",
+        "sql": "ALTER TABLE \"public\".\"app_user\" ADD CONSTRAINT \"app_user_username_key\" UNIQUE (\"username\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"app_user_username_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "app_user_username_key",
+          "public",
+          "\"public\".\"app_user\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.favourite_match.favourite_match_userId_matchId_key",
+    "label": "Add unique constraint on \"favourite_match\" (userId, matchId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "favourite_match_userId_matchId_key",
+        "table": "favourite_match"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"favourite_match_userId_matchId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "favourite_match_userId_matchId_key",
+          "public",
+          "\"public\".\"favourite_match\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"favourite_match_userId_matchId_key\"",
+        "sql": "ALTER TABLE \"public\".\"favourite_match\" ADD CONSTRAINT \"favourite_match_userId_matchId_key\" UNIQUE (\"userId\", \"matchId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"favourite_match_userId_matchId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "favourite_match_userId_matchId_key",
+          "public",
+          "\"public\".\"favourite_match\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.favourite_match.favourite_match_userId_seasonId_slot_key",
+    "label": "Add unique constraint on \"favourite_match\" (userId, seasonId, slot)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "favourite_match_userId_seasonId_slot_key",
+        "table": "favourite_match"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"favourite_match_userId_seasonId_slot_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "favourite_match_userId_seasonId_slot_key",
+          "public",
+          "\"public\".\"favourite_match\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"favourite_match_userId_seasonId_slot_key\"",
+        "sql": "ALTER TABLE \"public\".\"favourite_match\" ADD CONSTRAINT \"favourite_match_userId_seasonId_slot_key\" UNIQUE (\"userId\", \"seasonId\", \"slot\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"favourite_match_userId_seasonId_slot_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "favourite_match_userId_seasonId_slot_key",
+          "public",
+          "\"public\".\"favourite_match\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.favourite_player.favourite_player_userId_playerId_key",
+    "label": "Add unique constraint on \"favourite_player\" (userId, playerId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "favourite_player_userId_playerId_key",
+        "table": "favourite_player"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"favourite_player_userId_playerId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "favourite_player_userId_playerId_key",
+          "public",
+          "\"public\".\"favourite_player\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"favourite_player_userId_playerId_key\"",
+        "sql": "ALTER TABLE \"public\".\"favourite_player\" ADD CONSTRAINT \"favourite_player_userId_playerId_key\" UNIQUE (\"userId\", \"playerId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"favourite_player_userId_playerId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "favourite_player_userId_playerId_key",
+          "public",
+          "\"public\".\"favourite_player\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.match_diary_entry.match_diary_entry_userId_matchId_key",
+    "label": "Add unique constraint on \"match_diary_entry\" (userId, matchId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "match_diary_entry_userId_matchId_key",
+        "table": "match_diary_entry"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"match_diary_entry_userId_matchId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "match_diary_entry_userId_matchId_key",
+          "public",
+          "\"public\".\"match_diary_entry\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"match_diary_entry_userId_matchId_key\"",
+        "sql": "ALTER TABLE \"public\".\"match_diary_entry\" ADD CONSTRAINT \"match_diary_entry_userId_matchId_key\" UNIQUE (\"userId\", \"matchId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"match_diary_entry_userId_matchId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "match_diary_entry_userId_matchId_key",
+          "public",
+          "\"public\".\"match_diary_entry\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.media_save.media_save_userId_mediaItemId_key",
+    "label": "Add unique constraint on \"media_save\" (userId, mediaItemId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "media_save_userId_mediaItemId_key",
+        "table": "media_save"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"media_save_userId_mediaItemId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_save_userId_mediaItemId_key",
+          "public",
+          "\"public\".\"media_save\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"media_save_userId_mediaItemId_key\"",
+        "sql": "ALTER TABLE \"public\".\"media_save\" ADD CONSTRAINT \"media_save_userId_mediaItemId_key\" UNIQUE (\"userId\", \"mediaItemId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"media_save_userId_mediaItemId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_save_userId_mediaItemId_key",
+          "public",
+          "\"public\".\"media_save\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.user_session.user_session_tokenHash_key",
+    "label": "Add unique constraint on \"user_session\" (tokenHash)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "user_session_tokenHash_key",
+        "table": "user_session"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"user_session_tokenHash_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_session_tokenHash_key",
+          "public",
+          "\"public\".\"user_session\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"user_session_tokenHash_key\"",
+        "sql": "ALTER TABLE \"public\".\"user_session\" ADD CONSTRAINT \"user_session_tokenHash_key\" UNIQUE (\"tokenHash\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"user_session_tokenHash_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_session_tokenHash_key",
+          "public",
+          "\"public\".\"user_session\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.favourite_match.favourite_match_matchId_idx_4caf5ecc",
+    "label": "Create index \"favourite_match_matchId_idx_4caf5ecc\" on \"favourite_match\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "favourite_match_matchId_idx_4caf5ecc",
+        "table": "favourite_match"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"favourite_match_matchId_idx_4caf5ecc\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"favourite_match_matchId_idx_4caf5ecc\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"favourite_match_matchId_idx_4caf5ecc\"",
+        "sql": "CREATE INDEX \"favourite_match_matchId_idx_4caf5ecc\" ON \"public\".\"favourite_match\" (\"matchId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"favourite_match_matchId_idx_4caf5ecc\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"favourite_match_matchId_idx_4caf5ecc\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.favourite_match.favourite_match_userId_idx_a489d58a",
+    "label": "Create index \"favourite_match_userId_idx_a489d58a\" on \"favourite_match\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "favourite_match_userId_idx_a489d58a",
+        "table": "favourite_match"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"favourite_match_userId_idx_a489d58a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"favourite_match_userId_idx_a489d58a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"favourite_match_userId_idx_a489d58a\"",
+        "sql": "CREATE INDEX \"favourite_match_userId_idx_a489d58a\" ON \"public\".\"favourite_match\" (\"userId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"favourite_match_userId_idx_a489d58a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"favourite_match_userId_idx_a489d58a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.favourite_player.favourite_player_playerId_idx_710cf1aa",
+    "label": "Create index \"favourite_player_playerId_idx_710cf1aa\" on \"favourite_player\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "favourite_player_playerId_idx_710cf1aa",
+        "table": "favourite_player"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"favourite_player_playerId_idx_710cf1aa\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"favourite_player_playerId_idx_710cf1aa\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"favourite_player_playerId_idx_710cf1aa\"",
+        "sql": "CREATE INDEX \"favourite_player_playerId_idx_710cf1aa\" ON \"public\".\"favourite_player\" (\"playerId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"favourite_player_playerId_idx_710cf1aa\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"favourite_player_playerId_idx_710cf1aa\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.favourite_player.favourite_player_userId_idx_a489d58a",
+    "label": "Create index \"favourite_player_userId_idx_a489d58a\" on \"favourite_player\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "favourite_player_userId_idx_a489d58a",
+        "table": "favourite_player"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"favourite_player_userId_idx_a489d58a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"favourite_player_userId_idx_a489d58a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"favourite_player_userId_idx_a489d58a\"",
+        "sql": "CREATE INDEX \"favourite_player_userId_idx_a489d58a\" ON \"public\".\"favourite_player\" (\"userId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"favourite_player_userId_idx_a489d58a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"favourite_player_userId_idx_a489d58a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.match_diary_entry.match_diary_entry_matchId_idx_4caf5ecc",
+    "label": "Create index \"match_diary_entry_matchId_idx_4caf5ecc\" on \"match_diary_entry\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "match_diary_entry_matchId_idx_4caf5ecc",
+        "table": "match_diary_entry"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"match_diary_entry_matchId_idx_4caf5ecc\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"match_diary_entry_matchId_idx_4caf5ecc\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"match_diary_entry_matchId_idx_4caf5ecc\"",
+        "sql": "CREATE INDEX \"match_diary_entry_matchId_idx_4caf5ecc\" ON \"public\".\"match_diary_entry\" (\"matchId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"match_diary_entry_matchId_idx_4caf5ecc\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"match_diary_entry_matchId_idx_4caf5ecc\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.match_diary_entry.match_diary_entry_userId_idx_a489d58a",
+    "label": "Create index \"match_diary_entry_userId_idx_a489d58a\" on \"match_diary_entry\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "match_diary_entry_userId_idx_a489d58a",
+        "table": "match_diary_entry"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"match_diary_entry_userId_idx_a489d58a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"match_diary_entry_userId_idx_a489d58a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"match_diary_entry_userId_idx_a489d58a\"",
+        "sql": "CREATE INDEX \"match_diary_entry_userId_idx_a489d58a\" ON \"public\".\"match_diary_entry\" (\"userId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"match_diary_entry_userId_idx_a489d58a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"match_diary_entry_userId_idx_a489d58a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.media_save.media_save_mediaItemId_idx_5e6c7760",
+    "label": "Create index \"media_save_mediaItemId_idx_5e6c7760\" on \"media_save\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "media_save_mediaItemId_idx_5e6c7760",
+        "table": "media_save"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"media_save_mediaItemId_idx_5e6c7760\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"media_save_mediaItemId_idx_5e6c7760\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"media_save_mediaItemId_idx_5e6c7760\"",
+        "sql": "CREATE INDEX \"media_save_mediaItemId_idx_5e6c7760\" ON \"public\".\"media_save\" (\"mediaItemId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"media_save_mediaItemId_idx_5e6c7760\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"media_save_mediaItemId_idx_5e6c7760\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.media_save.media_save_userId_idx_a489d58a",
+    "label": "Create index \"media_save_userId_idx_a489d58a\" on \"media_save\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "media_save_userId_idx_a489d58a",
+        "table": "media_save"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"media_save_userId_idx_a489d58a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"media_save_userId_idx_a489d58a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"media_save_userId_idx_a489d58a\"",
+        "sql": "CREATE INDEX \"media_save_userId_idx_a489d58a\" ON \"public\".\"media_save\" (\"userId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"media_save_userId_idx_a489d58a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"media_save_userId_idx_a489d58a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.user_session.user_session_expiresAt_idx_6b6b8c10",
+    "label": "Create index \"user_session_expiresAt_idx_6b6b8c10\" on \"user_session\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "user_session_expiresAt_idx_6b6b8c10",
+        "table": "user_session"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"user_session_expiresAt_idx_6b6b8c10\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"user_session_expiresAt_idx_6b6b8c10\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"user_session_expiresAt_idx_6b6b8c10\"",
+        "sql": "CREATE INDEX \"user_session_expiresAt_idx_6b6b8c10\" ON \"public\".\"user_session\" (\"expiresAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"user_session_expiresAt_idx_6b6b8c10\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"user_session_expiresAt_idx_6b6b8c10\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.user_session.user_session_userId_idx_a489d58a",
+    "label": "Create index \"user_session_userId_idx_a489d58a\" on \"user_session\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "user_session_userId_idx_a489d58a",
+        "table": "user_session"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"user_session_userId_idx_a489d58a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"user_session_userId_idx_a489d58a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"user_session_userId_idx_a489d58a\"",
+        "sql": "CREATE INDEX \"user_session_userId_idx_a489d58a\" ON \"public\".\"user_session\" (\"userId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"user_session_userId_idx_a489d58a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"user_session_userId_idx_a489d58a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.favourite_match.favourite_match_userId_fkey",
+    "label": "Add foreign key \"favourite_match_userId_fkey\" on \"favourite_match\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "favourite_match_userId_fkey",
+        "table": "favourite_match"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"favourite_match_userId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "favourite_match_userId_fkey",
+          "public",
+          "\"public\".\"favourite_match\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"favourite_match_userId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"favourite_match\"\nADD CONSTRAINT \"favourite_match_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"public\".\"app_user\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"favourite_match_userId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "favourite_match_userId_fkey",
+          "public",
+          "\"public\".\"favourite_match\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.favourite_player.favourite_player_userId_fkey",
+    "label": "Add foreign key \"favourite_player_userId_fkey\" on \"favourite_player\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "favourite_player_userId_fkey",
+        "table": "favourite_player"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"favourite_player_userId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "favourite_player_userId_fkey",
+          "public",
+          "\"public\".\"favourite_player\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"favourite_player_userId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"favourite_player\"\nADD CONSTRAINT \"favourite_player_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"public\".\"app_user\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"favourite_player_userId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "favourite_player_userId_fkey",
+          "public",
+          "\"public\".\"favourite_player\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.match_diary_entry.match_diary_entry_userId_fkey",
+    "label": "Add foreign key \"match_diary_entry_userId_fkey\" on \"match_diary_entry\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "match_diary_entry_userId_fkey",
+        "table": "match_diary_entry"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"match_diary_entry_userId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "match_diary_entry_userId_fkey",
+          "public",
+          "\"public\".\"match_diary_entry\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"match_diary_entry_userId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"match_diary_entry\"\nADD CONSTRAINT \"match_diary_entry_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"public\".\"app_user\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"match_diary_entry_userId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "match_diary_entry_userId_fkey",
+          "public",
+          "\"public\".\"match_diary_entry\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.media_save.media_save_userId_fkey",
+    "label": "Add foreign key \"media_save_userId_fkey\" on \"media_save\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "media_save_userId_fkey",
+        "table": "media_save"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"media_save_userId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_save_userId_fkey",
+          "public",
+          "\"public\".\"media_save\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"media_save_userId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"media_save\"\nADD CONSTRAINT \"media_save_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"public\".\"app_user\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"media_save_userId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "media_save_userId_fkey",
+          "public",
+          "\"public\".\"media_save\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.user_session.user_session_userId_fkey",
+    "label": "Add foreign key \"user_session_userId_fkey\" on \"user_session\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "user_session_userId_fkey",
+        "table": "user_session"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"user_session_userId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_session_userId_fkey",
+          "public",
+          "\"public\".\"user_session\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"user_session_userId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"user_session\"\nADD CONSTRAINT \"user_session_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"public\".\"app_user\" (\"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"user_session_userId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_session_userId_fkey",
+          "public",
+          "\"public\".\"user_session\""
+        ]
+      }
+    ]
+  }
+]

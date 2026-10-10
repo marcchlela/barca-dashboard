@@ -1,4 +1,5 @@
 import AdminSyncControl from "../../../components/admin/AdminSyncControl";
+import { requireAdminPage } from "../../../lib/admin/access";
 
 import {
   getAdminSyncData,
@@ -11,6 +12,7 @@ export const revalidate =
   0;
 
 export default async function AdminSyncPage() {
+  await requireAdminPage();
   const data =
     await getAdminSyncData();
 

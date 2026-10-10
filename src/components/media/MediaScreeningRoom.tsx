@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { ArrowLeft, ArrowRight, ArrowUpRight, Bookmark, Check, Film, Heart, Layers3, Play, Search, X } from "lucide-react";
 import DashboardSectionShell, { useDashboardSectionTheme } from "../shell/DashboardSectionShell";
@@ -19,6 +20,7 @@ const itemTypeLabel = (item: MediaLibraryItem) => item.type === "goal_clip" && !
 const dateLabel = (date: string | null) => date ? new Date(date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }) : "Date not recorded";
 
 export default function MediaScreeningRoom({ data }: { data: MediaLibraryData }) {
+  const router = useRouter();
   const { theme } = useDashboardSectionTheme(data.currentSeasonLabel ?? "2026/27");
   const [items, setItems] = useState(data.items);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -73,6 +75,10 @@ export default function MediaScreeningRoom({ data }: { data: MediaLibraryData })
   });
 
   async function toggleSave(item: MediaLibraryItem, field: "favourite" | "watchLater") {
+    if (!data.signedIn) {
+      router.push("/account?next=/media");
+      return;
+    }
     const value = !item[field];
     setItems((previous) => previous.map((entry) => entry.id === item.id ? { ...entry, [field]: value } : entry));
     setMessage("");

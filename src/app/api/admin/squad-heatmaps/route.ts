@@ -1,6 +1,7 @@
 import {
   NextResponse,
 } from "next/server";
+import { guardAdminRequest } from "../../../../lib/admin/access";
 
 import {
   syncCurrentBarcelonaPlayerHeatmaps,
@@ -18,6 +19,8 @@ export async function POST(
   request:
     Request,
 ) {
+  const denied = await guardAdminRequest(request);
+  if (denied) return denied;
   if (
     process.env.NODE_ENV ===
     "production"

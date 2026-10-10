@@ -24,7 +24,7 @@ export type SquadAvailability =
   | "available"
   | "unavailable";
 
-export async function getSquadOverview() {
+export async function getSquadOverview(userId: string | null = null) {
   const generatedAt =
     new Date().toISOString();
 
@@ -101,8 +101,7 @@ export async function getSquadOverview() {
         })
         .all(),
 
-      db.orm.public.FavouritePlayer
-        .all(),
+      userId ? db.orm.public.FavouritePlayer.where({ userId }).all() : Promise.resolve([]),
 
       db.orm.public.PlayerAbsence
         .where({

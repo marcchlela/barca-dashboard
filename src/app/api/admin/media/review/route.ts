@@ -1,6 +1,7 @@
 import {
   NextResponse,
 } from "next/server";
+import { guardAdminRequest } from "../../../../../lib/admin/access";
 
 import {
   Temporal,
@@ -33,6 +34,8 @@ export async function PATCH(
   request:
     Request,
 ) {
+  const denied = await guardAdminRequest(request);
+  if (denied) return denied;
   try {
     const body =
       (

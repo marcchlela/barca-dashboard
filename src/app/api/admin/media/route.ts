@@ -1,6 +1,7 @@
 import {
   NextResponse,
 } from "next/server";
+import { guardAdminRequest } from "../../../../lib/admin/access";
 
 import {
   db,
@@ -57,6 +58,8 @@ export async function PATCH(
   request:
     Request,
 ) {
+  const denied = await guardAdminRequest(request);
+  if (denied) return denied;
   try {
     const body =
       (
@@ -305,6 +308,8 @@ export async function DELETE(
   request:
     Request,
 ) {
+  const denied = await guardAdminRequest(request);
+  if (denied) return denied;
   try {
     const body =
       (
@@ -508,6 +513,8 @@ export async function POST(
   request:
     Request,
 ) {
+  const denied = await guardAdminRequest(request);
+  if (denied) return denied;
   try {
     const body =
       (

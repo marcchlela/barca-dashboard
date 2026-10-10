@@ -12,9 +12,11 @@ import type {
 
 export default function SquadPageClient({
   data,
+  signedIn,
 }: {
   data:
     SquadOverviewData;
+  signedIn: boolean;
 }) {
   const {
     theme,
@@ -34,6 +36,7 @@ export default function SquadPageClient({
       }
     >
       <SquadOverview
+        signedIn={signedIn}
         data={
           data
         }

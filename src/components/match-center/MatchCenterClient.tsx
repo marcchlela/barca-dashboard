@@ -58,6 +58,8 @@ type MatchCenterClientProps = {
 
   media:
     MatchMediaItem[];
+
+  viewerSignedIn: boolean;
 };
 
 const KIT_STORAGE_KEY =
@@ -67,6 +69,7 @@ export default function MatchCenterClient({
   data,
   navigation,
   media,
+  viewerSignedIn,
 }: MatchCenterClientProps) {
   const [
     kit,
@@ -535,13 +538,13 @@ export default function MatchCenterClient({
                 theme={theme}
               />
 
-              <MyMatchDiary
+              {viewerSignedIn ? <MyMatchDiary
                 key={
                   data.match.id
                 }
                 data={data}
                 theme={theme}
-              />
+              /> : <section id="my-match" className="border p-5" style={{ borderColor: theme.colors.border, background: theme.colors.surface }}><h2 className="text-xl">Your match diary</h2><p className="mt-2 text-sm" style={{ color: theme.colors.textMuted }}>Sign in to rate this match and keep your notes private.</p><a className="mt-4 inline-block border px-4 py-2" style={{ borderColor: theme.colors.accent, color: theme.colors.accent }} href={`/account?next=/matches/${data.match.id}%23my-match`}>Sign in</a></section>}
           </div>
         </div>
       </div>

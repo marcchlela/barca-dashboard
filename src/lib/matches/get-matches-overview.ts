@@ -4,7 +4,7 @@ import {
   db,
 } from "../../prisma/db";
 
-export async function getMatchesOverview() {
+export async function getMatchesOverview(userId: string | null = null) {
   const season =
     await db.orm.public.Season
       .where({
@@ -60,8 +60,7 @@ export async function getMatchesOverview() {
         )
         .all(),
 
-      db.orm.public.MatchDiaryEntry
-        .all(),
+      userId ? db.orm.public.MatchDiaryEntry.where({ userId }).all() : Promise.resolve([]),
     ]);
 
   const barcelonaMatches =

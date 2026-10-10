@@ -1,4 +1,5 @@
 import MatchesPageClient from "../../components/matches/MatchesPageClient";
+import { getViewer } from "../../lib/auth/session";
 
 import {
   getMatchesOverview,
@@ -12,7 +13,7 @@ export const revalidate =
 
 export default async function MatchesPage() {
   const data =
-    await getMatchesOverview();
+    await getMatchesOverview((await getViewer())?.id ?? null);
 
   return (
     <MatchesPageClient

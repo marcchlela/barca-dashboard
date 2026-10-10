@@ -1,5 +1,7 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 import {
   useMemo,
   useState,
@@ -64,13 +66,16 @@ const POSITION_ORDER:
 export default function SquadOverview({
   data,
   theme,
+  signedIn,
 }: {
   data:
     SquadOverviewData;
 
   theme:
     KitTheme;
+  signedIn: boolean;
 }) {
+  const router = useRouter();
   const [
     query,
     setQuery,
@@ -358,6 +363,10 @@ export default function SquadOverview({
     playerId:
       string,
   ) {
+    if (!signedIn) {
+      router.push("/account?next=/squad");
+      return;
+    }
     if (
       favouriteBusy.has(
         playerId,
