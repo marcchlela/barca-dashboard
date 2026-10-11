@@ -95,6 +95,7 @@ export async function POST(
         fixtureRefresh: job.fixtureRefresh,
         eventRefresh: job.eventRefresh,
         goalMedia: job.goalMedia,
+        heatmapSync: job.heatmapSync,
       },
       {
         status:

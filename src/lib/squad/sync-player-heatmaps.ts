@@ -235,6 +235,32 @@ export async function syncCurrentBarcelonaPlayerHeatmaps(
         continue;
       }
 
+      // Avoid provider requests when every appearance already
+      // has a usable cached PitchAPI heatmap.
+      const allHeatmapsCached =
+        appearances.every((statistic) => {
+          const rawData =
+            asObject(statistic.rawData) ?? {};
+
+          const spatial =
+            asObject(rawData.spatialHeatmap);
+
+          return (
+            spatial?.provider === SOURCE.code &&
+            Array.isArray(spatial.cells) &&
+            spatial.cells.length > 0
+          );
+        });
+
+      if (!options.force && allHeatmapsCached) {
+        matchResults.push({
+          matchId: match.id,
+          status: "already_cached",
+        });
+
+        continue;
+      }
+
       /*
       |--------------------------------------------------------------------------
       | Resolve PitchAPI match
