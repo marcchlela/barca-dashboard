@@ -148,9 +148,7 @@ export async function PUT(
       error,
     );
 
-    return serverError(
-      error,
-    );
+    return serverError();
   }
 }
 
@@ -236,9 +234,7 @@ export async function DELETE(
       error,
     );
 
-    return serverError(
-      error,
-    );
+    return serverError();
   }
 }
 
@@ -269,21 +265,14 @@ function badRequest(
   );
 }
 
-function serverError(
-  error:
-    unknown,
-) {
+function serverError() {
   return NextResponse.json(
     {
       ok:
         false,
 
       error:
-        error instanceof Error
-          ? error.message
-          : String(
-              error,
-            ),
+        "Could not update your favourite players. Please try again.",
     },
     {
       status:
