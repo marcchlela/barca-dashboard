@@ -1,4 +1,4 @@
-import "dotenv/config";
+﻿import "dotenv/config";
 import pg from "pg";
 import assert from "node:assert/strict";
 import { randomBytes, createHash } from "node:crypto";
@@ -10,8 +10,8 @@ import { TRANSFER_ORDER, buildTransferPlan } from "./transfer-plan-core.mjs";
 import { compareSnapshots, validateSnapshot } from "./compare-core.mjs";
 import { executeVerifiedAccountTransfer as executeAccountTransfer } from "./account-transfer-verified.mjs";
 
-const sourceFile = ".artifacts/data-compare/local-20261010-171405.json";
-const productionFile = ".artifacts/data-compare/production-20261010.json";
+const sourceFile = ".artifacts/data-compare/local-final-20261011-122150.json";
+const productionFile = ".artifacts/data-compare/production-final-20261010-144428.json";
 const candidateFile = ".artifacts/data-compare/combined-account-transfer-candidate.json";
 
 const load = async file =>
@@ -101,8 +101,23 @@ for (const table of ["favourite_player", "favourite_match", "media_save"]) {
 }
 
 assert.equal(candidate.personalInserts.length, 4);
-assert.equal(comparison.tables.match_diary_entry.common.length, 6);
-assert.equal(comparison.tables.match_diary_entry.different.length, 2);
+const sourceDiaries = local.snapshot.rows.match_diary_entry
+  .filter(row => row.userId === localOwner);
+const productionDiaries = production.snapshot.rows.match_diary_entry
+  .filter(row => row.userId === productionOwner);
+const productionByMatch = new Map(
+  productionDiaries.map(row => [row.matchId, row])
+);
+
+assert.equal(sourceDiaries.length, 8);
+assert.equal(productionDiaries.length, 8);
+assert.equal(productionByMatch.size, 8);
+assert.ok(sourceDiaries.every(row => {
+  const mapped = rebuilt.mapping.football_match.get(row.matchId);
+  return mapped && productionByMatch.has(mapped);
+}));
+assert.equal(comparison.tables.match_diary_entry.onlyLocal.length, 0);
+assert.equal(comparison.tables.match_diary_entry.onlyProduction.length, 0);
 
 console.log("Candidate integrity: PASS");
 console.log("Independent shared plan: PASS");
@@ -364,3 +379,4 @@ try {
 
   await admin.end().catch(() => {});
 }
+

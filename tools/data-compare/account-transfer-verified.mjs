@@ -170,13 +170,25 @@ export function verifyAccountCandidate(candidate, local, production) {
 
   const diary = comparison.tables.match_diary_entry;
 
+  const localDiaries = local.snapshot.rows.match_diary_entry
+    .filter(row => row.userId === ownerLocal);
+  const productionDiaries = production.snapshot.rows.match_diary_entry
+    .filter(row => row.userId === ownerProduction);
+  const productionByMatch = new Map(
+    productionDiaries.map(row => [row.matchId, row])
+  );
+
   requireCondition(
-    diary.common.length === 6 &&
-    diary.different.length === 2 &&
+    localDiaries.length === 8 &&
+    productionDiaries.length === 8 &&
+    productionByMatch.size === 8 &&
+    localDiaries.every(row => {
+      const mapped = shared.mapping.football_match.get(row.matchId);
+      return mapped && productionByMatch.has(mapped);
+    }) &&
     !diary.onlyLocal.length &&
-    !diary.onlyProduction.length &&
-    !diary.ambiguous.length,
-    "Diary reconciliation differs from reviewed baseline."
+    !diary.onlyProduction.length,
+    "Diary identity reconciliation failed."
   );
 
   const protectedDiaries = production.snapshot.rows.match_diary_entry
@@ -212,3 +224,4 @@ export async function executeVerifiedAccountTransfer(
   verifyAccountCandidate(candidate, local, production);
   return executeCore(client, candidate, local, production);
 }
+

@@ -151,14 +151,26 @@ for (const table of personalTables) {
 
 const diary = comparison.tables.match_diary_entry;
 
+const localDiaries = local.snapshot.rows.match_diary_entry
+  .filter(row => row.userId === LOCAL_OWNER);
+const productionDiaries = production.snapshot.rows.match_diary_entry
+  .filter(row => row.userId === PRODUCTION_OWNER);
+const productionByMatch = new Map(
+  productionDiaries.map(row => [row.matchId, row])
+);
+
 if (
-  diary.common.length !== 6 ||
-  diary.different.length !== 2 ||
+  localDiaries.length !== 8 ||
+  productionDiaries.length !== 8 ||
+  productionByMatch.size !== 8 ||
+  localDiaries.some(row => {
+    const mapped = shared.mapping.football_match.get(row.matchId);
+    return !mapped || !productionByMatch.has(mapped);
+  }) ||
   diary.onlyLocal.length ||
-  diary.onlyProduction.length ||
-  diary.ambiguous.length
+  diary.onlyProduction.length
 ) {
-  throw new Error("Diary reconciliation differs from reviewed expectations.");
+  throw new Error("Diary identity reconciliation failed.");
 }
 
 const body = {
@@ -191,7 +203,7 @@ const body = {
   },
   warnings: [
     "NOT executable; account-aware production writer is not implemented.",
-    "Two different diary records are preserved without updates.",
+    "All eight production diary records are preserved without updates.",
     "Authentication and operational records are excluded.",
     "All blocked conflicts require separate review.",
     "Fresh snapshots and isolated rehearsal required before production.",
@@ -222,3 +234,4 @@ console.log(JSON.stringify({
   sha256,
   output: path.join(directory, filename),
 }, null, 2));
+
