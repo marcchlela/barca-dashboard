@@ -348,11 +348,7 @@ export async function PUT(
     );
 
     return errorResponse(
-      error instanceof Error
-        ? error.message
-        : String(
-            error,
-          ),
+      "Could not save your diary entry. Please try again.",
       500,
     );
   }
