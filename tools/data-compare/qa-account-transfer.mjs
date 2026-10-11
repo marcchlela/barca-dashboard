@@ -11,7 +11,7 @@ import { compareSnapshots, validateSnapshot } from "./compare-core.mjs";
 import { executeVerifiedAccountTransfer as executeAccountTransfer } from "./account-transfer-verified.mjs";
 
 const sourceFile = ".artifacts/data-compare/local-final-20261011-122150.json";
-const productionFile = ".artifacts/data-compare/production-final-20261010-144428.json";
+const productionFile = ".artifacts/data-compare/production-pretransfer-20261011-101504.json";
 const candidateFile = ".artifacts/data-compare/combined-account-transfer-candidate.json";
 
 const load = async file =>
@@ -379,4 +379,5 @@ try {
 
   await admin.end().catch(() => {});
 }
+
 
