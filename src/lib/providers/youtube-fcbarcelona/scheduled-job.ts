@@ -6,6 +6,7 @@ import { runScheduledFixtureRefresh } from "../football-data/scheduled-refresh";
 import { runScheduledGoalEventRefresh } from "../rich-match/scheduled-events";
 import { runGoalMediaBackgroundWorker } from "../dailygoal/background-worker";
 import { runAutomaticMatchMediaWorker } from "./automatic-worker";
+import { syncCurrentBarcelonaPlayerHeatmaps } from "../../squad/sync-player-heatmaps";  
 
 const JOB_LOCK = "scheduled-match-media-job";
 const LOCK_LEASE_MS = 45 * 60_000;
@@ -100,6 +101,32 @@ export async function runScheduledMatchMediaJob(input: {
       console.error("CANONICAL GOAL EVENT STAGE FAILED:", error);
     }
     const result = await officialWorker({ dryRun: false, forceAllFinished: false });
+    let heatmapSync: {
+      status: string;
+      written?: number;
+      error?: string;
+    } = { status: "disabled" };
+
+    if (enabled) {
+      try {
+        const heatmapResult =
+          await syncCurrentBarcelonaPlayerHeatmaps({
+            force: false,
+          });
+
+        heatmapSync = {
+          status: "completed",
+          written: heatmapResult.summary.written,
+        };
+      } catch (error) {
+        heatmapSync = {
+          status: "failed",
+          error: message(error).slice(0, 500),
+        };
+
+        console.error("HEATMAP SYNC STAGE FAILED:", error);
+      }
+    }
     const youtubeConfigured = input.youtubeConfigured ?? Boolean(process.env.YOUTUBE_API_KEY);
     let goalMedia: { status: string; reason?: string; error?: string; result?: Awaited<ReturnType<GoalWorker>> };
     if (!enabled) goalMedia = { status: "disabled", reason: "GOAL_MEDIA_SCHEDULE_ENABLED is off." };
