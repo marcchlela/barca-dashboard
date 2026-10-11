@@ -155,8 +155,14 @@ export async function runScheduledMatchMediaJob(input: {
       eventStatus: eventRefresh.status, eventMatchId: eventRefresh.matchId, officialFailed: result.counts.failed, officialEligible: result.counts.eligible,
       goalStatus: goalMedia.status, goalsPublished: goalMedia.result && "goalsPublished" in goalMedia.result ? goalMedia.result.goalsPublished : 0,
       goalsQueued: goalMedia.result && "goalsQueued" in goalMedia.result ? goalMedia.result.goalsQueued : 0 };
-    return { status: "completed" as const, fixtureRefresh, eventRefresh, result, goalMedia };
-  } catch (error) {
+    return {
+      status: "completed" as const,
+      fixtureRefresh,
+      eventRefresh,
+      result,
+      goalMedia,
+      heatmapSync,
+    };  } catch (error) {
     errorText = `Official media stage: ${message(error)}`.slice(0, 500);
     throw error;
   } finally {
