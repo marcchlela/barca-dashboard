@@ -92,7 +92,16 @@ export async function getAnalyticsOverview() {
     roundsMap.set(row.matchday, rows);
   }
   const rounds = [...roundsMap].sort(([a], [b]) => a - b).map(([matchday, rows]) => ({
-    matchday, complete: rows.length === 20 && new Set(rows.map((row) => row.position)).size === 20,
+    matchday,
+      complete:
+        rows.length === 20 &&
+        new Set(rows.map((row) => row.teamId)).size === 20 &&
+        rows.every(
+          (row) =>
+            Number.isInteger(row.position) &&
+            row.position >= 1 &&
+            row.position <= 20,
+        ),
     basis: rows.some((row) => row.basis === "official_current") ? "official_current" :
       rows.every((row) => row.basis === "results_compiled") ? "results_compiled" : "unverified_legacy",
     table: rows.sort((a, b) => a.position - b.position).map((row) => ({
