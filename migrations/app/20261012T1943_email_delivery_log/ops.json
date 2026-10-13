@@ -1,0 +1,119 @@
+[
+  {
+    "id": "table.email_delivery_attempt",
+    "label": "Create table \"email_delivery_attempt\"",
+    "summary": "Creates table \"email_delivery_attempt\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "email_delivery_attempt"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"email_delivery_attempt\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"email_delivery_attempt\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"email_delivery_attempt\"",
+        "sql": "CREATE TABLE \"public\".\"email_delivery_attempt\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"errorCode\" text,\n  \"id\" uuid NOT NULL,\n  \"kind\" text NOT NULL,\n  \"providerMessageId\" text,\n  \"recipientMasked\" text NOT NULL,\n  \"status\" text NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"email_delivery_attempt\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"email_delivery_attempt\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.email_delivery_attempt.email_delivery_attempt_createdAt_idx_9575dbd7",
+    "label": "Create index \"email_delivery_attempt_createdAt_idx_9575dbd7\" on \"email_delivery_attempt\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "email_delivery_attempt_createdAt_idx_9575dbd7",
+        "table": "email_delivery_attempt"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"email_delivery_attempt_createdAt_idx_9575dbd7\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"email_delivery_attempt_createdAt_idx_9575dbd7\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"email_delivery_attempt_createdAt_idx_9575dbd7\"",
+        "sql": "CREATE INDEX \"email_delivery_attempt_createdAt_idx_9575dbd7\" ON \"public\".\"email_delivery_attempt\" (\"createdAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"email_delivery_attempt_createdAt_idx_9575dbd7\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"email_delivery_attempt_createdAt_idx_9575dbd7\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.email_delivery_attempt.email_delivery_attempt_status_createdAt_idx_58610442",
+    "label": "Create index \"email_delivery_attempt_status_createdAt_idx_58610442\" on \"email_delivery_attempt\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "email_delivery_attempt_status_createdAt_idx_58610442",
+        "table": "email_delivery_attempt"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"email_delivery_attempt_status_createdAt_idx_58610442\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"email_delivery_attempt_status_createdAt_idx_58610442\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"email_delivery_attempt_status_createdAt_idx_58610442\"",
+        "sql": "CREATE INDEX \"email_delivery_attempt_status_createdAt_idx_58610442\" ON \"public\".\"email_delivery_attempt\" (\"status\", \"createdAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"email_delivery_attempt_status_createdAt_idx_58610442\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"email_delivery_attempt_status_createdAt_idx_58610442\""
+        ]
+      }
+    ]
+  }
+]

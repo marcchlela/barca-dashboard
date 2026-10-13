@@ -1,11 +1,9 @@
-import SectionPlaceholder from "../../components/shell/SectionPlaceholder";
+import SettingsScreen from "../../components/auth/SettingsScreen";
+import { getViewer } from "../../lib/auth/session";
 
-export default function SettingsPage() {
-  return (
-    <SectionPlaceholder
-      eyebrow="Command Center"
-      title="Settings"
-      description="Themes, season preferences, dashboard behaviour, data sources and personal settings will live here."
-    />
-  );
+export const dynamic = "force-dynamic";
+
+export default async function SettingsPage() {
+  const viewer = await getViewer();
+  return <SettingsScreen viewer={viewer ? { username: viewer.username, email: viewer.email, role: viewer.role } : null} />;
 }

@@ -46,7 +46,7 @@ export default function AdminMediaAddForm({
 
   /*
   |--------------------------------------------------------------------------
-  | Finished matches only
+  | Finished fixtures plus scheduled previews
   |--------------------------------------------------------------------------
   */
 
@@ -106,6 +106,15 @@ export default function AdminMediaAddForm({
       "match_highlight",
     );
 
+  const availableMatches =
+    useMemo(() => {
+      const upcoming = type === "match_preview"
+        ? data.matches.filter((match) => match.status === "scheduled")
+            .sort((left, right) => new Date(left.kickoff).getTime() - new Date(right.kickoff).getTime())
+        : [];
+      return [...upcoming, ...finishedMatches];
+    }, [data.matches, finishedMatches, type]);
+
   const [
     matchPickerOpen,
     setMatchPickerOpen,
@@ -141,7 +150,7 @@ export default function AdminMediaAddForm({
     useTransition();
 
   const selectedMatch =
-    finishedMatches.find(
+    availableMatches.find(
       (
         match,
       ) =>
@@ -256,11 +265,7 @@ export default function AdminMediaAddForm({
         }}
       >
         Paste an official FC
-        Barcelona YouTube URL and
-        attach it to a completed
-        Barça fixture. Video
-        metadata is fetched
-        automatically.
+        Barcelona YouTube URL. Finished fixtures accept all media types; upcoming fixtures accept Match Preview only.
       </p>
 
       {/* FORM */}
@@ -391,8 +396,7 @@ export default function AdminMediaAddForm({
                       theme.colors.textMuted,
                   }}
                 >
-                  Select a completed
-                  match
+                  Select a match
                 </span>
               )}
 
@@ -437,7 +441,7 @@ export default function AdminMediaAddForm({
                     theme.colors.backgroundElevated,
                 }}
               >
-                {finishedMatches.map(
+                {availableMatches.map(
                   (
                     match,
                   ) => {
@@ -514,6 +518,7 @@ export default function AdminMediaAddForm({
                             {formatDate(
                               match.kickoff,
                             )}
+                            {match.status === "scheduled" ? " · UPCOMING" : ""}
                           </p>
                         </div>
 
@@ -546,10 +551,8 @@ export default function AdminMediaAddForm({
                 theme.colors.textMuted,
             }}
           >
-            Only completed Barça
-            matches are available.
-            Future fixtures cannot
-            receive match media yet.
+            Finished fixtures accept all types.
+            Upcoming fixtures are available only for Match Preview.
           </p>
         </div>
 
@@ -566,14 +569,20 @@ export default function AdminMediaAddForm({
                 type
               }
               onChange={
-                (
-                  event,
-                ) =>
-                  setType(
-                    event.target
-                      .value as
-                      AdminMediaType,
-                  )
+                (event) => {
+                  const nextType = event.target.value as AdminMediaType;
+                  setType(nextType);
+                  const canKeepSelected = data.matches.some((match) =>
+                    match.id === matchId &&
+                    (match.status === "finished" || (nextType === "match_preview" && match.status === "scheduled" && new Date(match.kickoff).getTime() > Date.now()))
+                  );
+                  if (!canKeepSelected) {
+                    const nextMatch = nextType === "match_preview"
+                      ? availableMatches.find((match) => match.status === "scheduled") ?? finishedMatches[0]
+                      : finishedMatches[0];
+                    setMatchId(nextMatch?.id ?? "");
+                  }
+                }
               }
               className="
                 h-12

@@ -1469,70 +1469,29 @@ function StageArchitecture({
   theme: KitTheme;
 }) {
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 overflow-hidden"
+      style={{
+        backgroundColor: theme.colors.surface,
+      }}
+    >
       <div
-        className="absolute left-1/2 top-0 h-full w-px opacity-60"
+        className="absolute inset-0 bg-cover bg-center"
         style={{
-          backgroundColor:
-            theme.colors.border,
+          backgroundImage: "url('/images/brand/matchday-atmosphere-v2.webp')",
+          // The source itself now carries visible stadium detail; use it at
+          // full strength and let the theme wash control text contrast.
+          opacity: 1,
         }}
       />
-
       <div
-        className="absolute left-[22%] top-[38%] h-[46%] w-px opacity-30"
+        className="absolute inset-0"
         style={{
-          backgroundColor:
-            theme.colors.pitchLine,
+          background: `linear-gradient(90deg, ${theme.colors.surface}b3 0%, ${theme.colors.surface}24 50%, ${theme.colors.surface}b3 100%), linear-gradient(180deg, ${theme.colors.surface}99 0%, ${theme.colors.surface}20 48%, ${theme.colors.surface}99 100%)`,
         }}
       />
-
-      <div
-        className="absolute right-[22%] top-[38%] h-[46%] w-px opacity-30"
-        style={{
-          backgroundColor:
-            theme.colors.pitchLine,
-        }}
-      />
-
-      <div
-        className="absolute left-1/2 top-[58%] h-[350px] w-[740px] -translate-x-1/2 -translate-y-1/2 rounded-[50%] border opacity-[0.13]"
-        style={{
-          borderColor:
-            theme.colors.pitchLine,
-        }}
-      />
-
-      <div
-        className="absolute left-1/2 top-[58%] h-[265px] w-[575px] -translate-x-1/2 -translate-y-1/2 rounded-[50%] border opacity-[0.1]"
-        style={{
-          borderColor:
-            theme.colors.pitchLine,
-        }}
-      />
-
-      <div
-        className="absolute left-1/2 top-[59%] h-[135px] w-[135px] -translate-x-1/2 -translate-y-1/2 rounded-full border opacity-[0.12]"
-        style={{
-          borderColor:
-            theme.colors.pitchLine,
-        }}
-      />
-
-      <div
-        className="absolute left-1/2 top-[59%] h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full opacity-30"
-        style={{
-          backgroundColor:
-            theme.colors.pitchLine,
-        }}
-      />
-
-      <div
-        className="absolute left-[12%] right-[12%] top-[59%] h-px opacity-[0.11]"
-        style={{
-          backgroundColor:
-            theme.colors.pitchLine,
-        }}
-      />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_43%,rgba(7,17,31,0.3)_0%,rgba(7,17,31,0.12)_52%,transparent_82%)]" />
     </div>
   );
 }

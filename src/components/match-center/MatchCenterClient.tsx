@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import {
   useEffect,
@@ -71,6 +72,7 @@ export default function MatchCenterClient({
   media,
   viewerSignedIn,
 }: MatchCenterClientProps) {
+  const router = useRouter();
   const [
     kit,
     setKit,
@@ -130,6 +132,20 @@ export default function MatchCenterClient({
     kit,
     kitLoaded,
   ]);
+
+  useEffect(() => {
+    const kickoff = Date.parse(data.match.kickoff);
+    const now = Date.now();
+    const isActive = ["live", "halftime", "extra_time", "penalties"].includes(data.match.status);
+    const nearKickoff = data.match.status === "scheduled" && Number.isFinite(kickoff) && now >= kickoff - 5 * 60_000 && now <= kickoff + 4 * 60 * 60_000;
+    if (!isActive && !nearKickoff) return;
+
+    const refresh = () => {
+      if (document.visibilityState === "visible") router.refresh();
+    };
+    const timer = window.setInterval(refresh, 60_000);
+    return () => window.clearInterval(timer);
+  }, [data.match.kickoff, data.match.status, router]);
 
   const [
     lineupSide,

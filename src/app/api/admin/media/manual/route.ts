@@ -236,6 +236,19 @@ export async function POST(
       AdminMediaType =
       body.type;
 
+    if (match.status !== "finished" && match.status !== "scheduled") {
+      return badRequest("Only finished matches and scheduled pre-match fixtures can receive media.");
+    }
+
+    if (match.status === "scheduled") {
+      if (Date.parse(match.kickoff.toString()) <= Date.now()) {
+        return badRequest("The fixture has already reached kickoff; upcoming fixtures can only receive pre-match media before kickoff.");
+      }
+      if (mediaType !== "match_preview") {
+        return badRequest("Upcoming fixtures can only receive Match Preview media before kickoff.");
+      }
+    }
+
     /*
     |--------------------------------------------------------------------------
     | YouTube API
@@ -311,6 +324,10 @@ export async function POST(
       return badRequest(
         "YouTube video was not found.",
       );
+    }
+
+    if (match.status === "scheduled" && !/\b(preview|previa)\b/i.test(video.snippet.title)) {
+      return badRequest("This scheduled fixture accepts only a clearly titled preview video.");
     }
 
     /*

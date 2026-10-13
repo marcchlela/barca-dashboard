@@ -196,6 +196,7 @@ export async function runScheduledMatchMediaJob(input: {
       eventRefresh,
       result,
       goalMedia,
+      heatmapSync,
     };
   } catch (error) {
     errorText = `Official media stage: ${message(error)}`.slice(0, 500);

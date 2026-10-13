@@ -56,7 +56,8 @@ export default function AccountScreen({ viewer, next, signupOpen }: { viewer: Vi
       {viewer ? <>
         <h1 className="mt-4 text-3xl">Welcome back, {viewer.username}.</h1>
         <p className="mt-3 text-sm" style={{ color: theme.colors.textMuted }}>{viewer.email} · {viewer.role === "admin" ? "Admin" : "Supporter"}</p>
-        <div className="mt-8 flex flex-wrap gap-3"><Link href="/my-barca" className="border px-5 py-3" style={{ borderColor: theme.colors.accent, color: theme.colors.accent }}>Open My Barça</Link>{viewer.role === "admin" && <Link href="/admin" className="border px-5 py-3" style={{ borderColor: theme.colors.border }}>Admin control</Link>}<button type="button" disabled={pending} onClick={logout} className="cursor-pointer border px-5 py-3 disabled:opacity-50" style={{ borderColor: theme.colors.border }}>Sign out</button></div>
+        <p className="mt-4 text-sm" style={{ color: theme.colors.textMuted }}>Your diary, ratings, favourites and watchlist stay with this account. Match and club data are shared with everyone.</p>
+        <div className="mt-8 flex flex-wrap gap-3"><Link href="/my-barca" className="border px-5 py-3" style={{ borderColor: theme.colors.accent, color: theme.colors.accent }}>Open My Barça</Link><Link href="/settings" className="border px-5 py-3" style={{ borderColor: theme.colors.border }}>Settings & security</Link>{viewer.role === "admin" && <Link href="/admin" className="border px-5 py-3" style={{ borderColor: theme.colors.border }}>Admin control</Link>}<button type="button" disabled={pending} onClick={logout} className="cursor-pointer border px-5 py-3 disabled:opacity-50" style={{ borderColor: theme.colors.border }}>Sign out</button></div>
       </> : <>
         <h1 className="mt-4 text-3xl tracking-tight md:text-5xl">{mode === "login" ? "Welcome back." : "Make it yours."}</h1>
         <p className="mt-3 max-w-xl leading-7" style={{ color: theme.colors.textMuted }}>The club archive is open to everyone. An account keeps your diary, ratings, favourites and watchlist separate.</p>
@@ -77,7 +78,8 @@ export default function AccountScreen({ viewer, next, signupOpen }: { viewer: Vi
               </button>
             </div>
           </div>
-          {mode === "signup" && <p className="text-xs" style={{ color: theme.colors.textMuted }}>Use at least 8 characters; a longer, unique password is safer. Email verification and password recovery are not available yet, so use an address and password you can keep access to.</p>}
+          {mode === "signup" && <p className="text-xs" style={{ color: theme.colors.textMuted }}>Use at least 8 characters and an email you control. Email verification is not required; password recovery uses this address.</p>}
+          {mode === "login" && <Link href="/account/forgot-password" className="w-fit text-sm underline underline-offset-4" style={{ color: theme.colors.accent }}>Forgot password?</Link>}
           {error && <p role="alert" className="text-sm" style={{ color: theme.colors.danger }}>{error}</p>}
           <button type="submit" disabled={pending} className="mt-2 cursor-pointer border px-5 py-3 text-left disabled:opacity-50" style={{ borderColor: theme.colors.accent, color: theme.colors.accent }}>{pending ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"}</button>
         </form>

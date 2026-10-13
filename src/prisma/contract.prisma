@@ -560,6 +560,7 @@ model AppUser {
   updatedAt     temporal.updatedAt()
 
   sessions      UserSession[]
+  passwordResets PasswordResetToken[]
   mediaSaves    MediaSave[]
   favouritePlayers FavouritePlayer[]
   favouriteMatches FavouriteMatch[]
@@ -580,6 +581,35 @@ model UserSession {
   @@index([userId])
   @@index([expiresAt])
   @@map("user_session")
+}
+
+model PasswordResetToken {
+  id        Uuid     @id @default(uuid())
+  userId    Uuid
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt temporal.createdAt()
+
+  user      AppUser  @relation(fields:[userId], references:[id])
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("password_reset_token")
+}
+
+model EmailDeliveryAttempt {
+  id                Uuid     @id @default(uuid())
+  kind              String
+  recipientMasked   String
+  status            String
+  errorCode         String?
+  providerMessageId String?
+  createdAt         temporal.createdAt()
+
+  @@index([createdAt])
+  @@index([status, createdAt])
+  @@map("email_delivery_attempt")
 }
 
 model AuthThrottle {

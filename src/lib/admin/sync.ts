@@ -114,6 +114,11 @@ export async function getAdminSyncData() {
   const latestScheduledJob = goalRuns.find((run) => run.mode === "scheduled-job") ?? null;
   const latestFixtureRefresh = goalRuns.find((run) => run.mode === "fixture-refresh") ?? null;
   const latestEventRefresh = goalRuns.find((run) => run.mode === "event-refresh") ?? null;
+  const latestPrematchJob = goalRuns.find((run) => run.mode === "pregame-job") ?? null;
+  const latestLiveMatchRun = goalRuns.find((run) => run.mode === "live-match-sync") ?? null;
+  const liveResult = latestLiveMatchRun?.result && typeof latestLiveMatchRun.result === "object" && !Array.isArray(latestLiveMatchRun.result)
+    ? latestLiveMatchRun.result as Record<string, unknown>
+    : null;
   const jobResult = latestScheduledJob?.result;
   const jobFields = jobResult && typeof jobResult === "object" && !Array.isArray(jobResult) ? jobResult : null;
   const currentMatchIds = new Set(finishedMatches.map((match) => match.id));
@@ -195,9 +200,24 @@ export async function getAdminSyncData() {
 
     goalMedia: {
       schedulingActive: process.env.GOAL_MEDIA_SCHEDULE_ENABLED === "true",
+      liveSchedulingActive: process.env.LIVE_MATCH_SYNC_ENABLED === "true",
+      lastLiveMatchRun: latestLiveMatchRun ? {
+        at: latestLiveMatchRun.startedAt.toString(),
+        status: latestLiveMatchRun.status,
+        error: latestLiveMatchRun.error,
+        providerStatus: typeof liveResult?.providerStatus === "string" ? liveResult.providerStatus : null,
+        eventStatus: typeof liveResult?.eventStatus === "string" ? liveResult.eventStatus : null,
+        statisticsStatus: typeof liveResult?.statisticsStatus === "string" ? liveResult.statisticsStatus : null,
+        eventsCreated: typeof liveResult?.eventsCreated === "number" ? liveResult.eventsCreated : 0,
+        eventsUpdated: typeof liveResult?.eventsUpdated === "number" ? liveResult.eventsUpdated : 0,
+        statsSaved: typeof liveResult?.statsSaved === "number" ? liveResult.statsSaved : 0,
+        requests: typeof liveResult?.requests === "number" ? liveResult.requests : 0,
+        retryAt: typeof liveResult?.retryAt === "string" ? liveResult.retryAt : null,
+      } : null,
       lastFixtureRefresh: latestFixtureRefresh ? { at: latestFixtureRefresh.startedAt.toString(), status: latestFixtureRefresh.status,
         error: latestFixtureRefresh.error, nextAt: latestFixtureRefresh.finishedAt ? new Date(Date.parse(latestFixtureRefresh.finishedAt.toString()) + (latestFixtureRefresh.status === "blocked" ? 24 : latestFixtureRefresh.status === "success" ? 6 : 3) * 3_600_000).toISOString() : null } : null,
       lastEventRefresh: latestEventRefresh ? { at: latestEventRefresh.startedAt.toString(), status: latestEventRefresh.status, error: latestEventRefresh.error } : null,
+      lastPrematchJob: latestPrematchJob ? { at: latestPrematchJob.startedAt.toString(), status: latestPrematchJob.status, error: latestPrematchJob.error } : null,
       awaitingGoalEvents: finishedMatches.filter((match) => match.homeScore !== null && match.awayScore !== null &&
         currentGoalEvents.filter((event) => event.matchId === match.id).length < match.homeScore + match.awayScore).length,
       lastScheduledJob: latestScheduledJob ? { at: latestScheduledJob.startedAt.toString(), status: latestScheduledJob.status,

@@ -231,7 +231,7 @@ function emptyTeamStatistic(
   };
 }
 
-function normalizeStatistics(value: JsonObject) {
+export function normalizeGoalStatistics(value: JsonObject) {
   const data = asObject(value.data);
   const match = asObject(data?.match);
   const rows = asArray(match?.fullTime)
@@ -323,6 +323,6 @@ export function normalizeGoalBundle(input: {
     home: lineupSide(detail, lineupData, "home"),
     away: lineupSide(detail, lineupData, "away"),
     events,
-    statistics: normalizeStatistics(input.statisticsBody),
+    statistics: normalizeGoalStatistics(input.statisticsBody),
   };
 }
