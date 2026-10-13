@@ -188,7 +188,11 @@ export async function runScheduledMatchMediaJob(input: {
     resultData = { fixtureStatus: fixtureRefresh.status, fixtureFetched: fixtureRefresh.fetched, fixtureNextAt: fixtureRefresh.nextAt,
       eventStatus: eventRefresh.status, eventMatchId: eventRefresh.matchId, officialFailed: result.counts.failed, officialEligible: result.counts.eligible,
       goalStatus: goalMedia.status, goalsPublished: goalMedia.result && "goalsPublished" in goalMedia.result ? goalMedia.result.goalsPublished : 0,
-      goalsQueued: goalMedia.result && "goalsQueued" in goalMedia.result ? goalMedia.result.goalsQueued : 0 , standingsStatus: standingsRefresh.status,standingsSynced: standingsRefresh.synced,standingsNextAt: standingsRefresh.nextAt};
+      goalsQueued: goalMedia.result && "goalsQueued" in goalMedia.result ? goalMedia.result.goalsQueued : 0,
+      standingsStatus: standingsRefresh.status,
+      standingsSynced: standingsRefresh.synced,
+      standingsNextAt: standingsRefresh.nextAt,
+    };
     return {
       status: "completed" as const,
       fixtureRefresh,
