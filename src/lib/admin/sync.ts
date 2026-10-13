@@ -3,6 +3,7 @@ import "server-only";
 import {
   db,
 } from "../../prisma/db";
+import { adminExecutionEnabled } from "./write-policy";
 
 export async function getAdminSyncData() {
   const season =
@@ -135,9 +136,10 @@ export async function getAdminSyncData() {
       process.env.NODE_ENV ??
       "development",
 
-    executionEnabled:
-      process.env.NODE_ENV !==
-      "production",
+    executionEnabled: adminExecutionEnabled(
+      process.env.NODE_ENV,
+      process.env.BARCA_ADMIN_EDITING_ENABLED,
+    ),
 
     season: {
       id:
