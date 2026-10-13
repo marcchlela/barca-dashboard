@@ -488,10 +488,16 @@ export async function syncLaLigaCurrentSeason() {
     standingsResponse.competition.code !== "PD" ||
     totalStanding.table.length !== 20 ||
     new Set(totalStanding.table.map((row) => row.team.id)).size !== 20 ||
-    new Set(totalStanding.table.map((row) => row.position)).size !== 20 ||
-    totalStanding.table.some((row) => row.position < 1 || row.position > 20)
+    totalStanding.table.some(
+      (row) =>
+        !Number.isInteger(row.position) ||
+        row.position < 1 ||
+        row.position > 20,
+    )
   ) {
-    throw new Error("The current La Liga standings failed 20-team validation.");
+    throw new Error(
+      "The current La Liga standings failed 20-team validation.",
+    );
   }
 
   const dataSource =

@@ -40,6 +40,14 @@ test("isolated account migration, per-user ownership and explicit legacy claim",
       assert.deepEqual(preserved, { id: legacyFavourite, userId: null });
       await client.query(`INSERT INTO app_user (id,email,username,"passwordHash","updatedAt") VALUES
         ($1,'owner@example.test','owner','hash',now()), ($2,'other@example.test','other','hash',now())`, [first, second]);
+      const resetId = randomUUID();
+      const resetHash = randomBytes(32).toString("hex");
+      await client.query(`INSERT INTO password_reset_token (id,"userId","tokenHash","expiresAt") VALUES ($1,$2,$3,now()+interval '30 minutes')`, [resetId, first, resetHash]);
+      await assert.rejects(client.query(`INSERT INTO password_reset_token (id,"userId","tokenHash","expiresAt") VALUES ($1,$2,$3,now()+interval '30 minutes')`, [randomUUID(), first, resetHash]), /duplicate key/);
+      assert.equal((await client.query(`UPDATE password_reset_token SET "usedAt"=now() WHERE id=$1 AND "usedAt" IS NULL AND "expiresAt">now() RETURNING id`, [resetId])).rowCount, 1);
+      assert.equal((await client.query(`UPDATE password_reset_token SET "usedAt"=now() WHERE id=$1 AND "usedAt" IS NULL AND "expiresAt">now() RETURNING id`, [resetId])).rowCount, 0);
+      await client.query(`INSERT INTO email_delivery_attempt (id,kind,"recipientMasked",status) VALUES ($1,'admin_test','ow***@e***','accepted'),($2,'password_reset','ow***@e***','failed')`, [randomUUID(), randomUUID()]);
+      assert.equal((await client.query(`SELECT count(*)::int AS n FROM email_delivery_attempt WHERE status='failed'`)).rows[0].n, 1);
       await client.query('INSERT INTO user_session (id,"userId","tokenHash","expiresAt") VALUES ($1,$2,$3,now()+interval \'1 day\')',
         [randomUUID(), first, randomBytes(32).toString("hex")]);
       await client.query(`INSERT INTO player (id,"displayName","updatedAt") VALUES ($1,'Test Player',now())`, [player]);

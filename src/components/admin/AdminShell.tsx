@@ -15,6 +15,7 @@ import {
   ArrowLeft,
   Database,
   LayoutDashboard,
+  Mail,
   RefreshCw,
   ShieldCheck,
   TriangleAlert,
@@ -64,6 +65,17 @@ const navigation = [
 
     icon:
       Database,
+  },
+
+  {
+    label:
+      "Email",
+
+    href:
+      "/admin/email",
+
+    icon:
+      Mail,
   },
 
   {

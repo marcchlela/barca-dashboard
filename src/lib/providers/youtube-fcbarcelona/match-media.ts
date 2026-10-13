@@ -40,6 +40,9 @@ const DATA_SOURCE = {
 const WINDOW_BEFORE_HOURS =
   24;
 
+const PREVIEW_WINDOW_BEFORE_HOURS =
+  24 * 7;
+
 const WINDOW_AFTER_HOURS =
   72;
 
@@ -188,6 +191,9 @@ type MatchContext = {
   id:
     string;
 
+  status:
+    string;
+
   seasonId:
     string;
 
@@ -241,10 +247,10 @@ type MatchContext = {
 
   score: {
     home:
-      number;
+      number | null;
 
     away:
-      number;
+      number | null;
   };
 };
 
@@ -448,19 +454,17 @@ export async function syncOfficialMatchMedia(
     );
 
   if (
-    match.status !==
-    "finished"
+    match.status !== "finished" &&
+    match.status !== "scheduled"
   ) {
     throw new Error(
-      `Match media sync currently accepts finished matches only. Match status is "${match.status}".`,
+      `Match media sync accepts finished matches and scheduled previews only. Match status is "${match.status}".`,
     );
   }
 
   if (
-    match.homeScore ===
-      null ||
-    match.awayScore ===
-      null
+    match.status === "finished" &&
+    (match.homeScore === null || match.awayScore === null)
   ) {
     throw new Error(
       "Finished match is missing its final score.",
@@ -498,7 +502,7 @@ export async function syncOfficialMatchMedia(
   const start =
     new Date(
       kickoffMs -
-        WINDOW_BEFORE_HOURS *
+        (context.status === "scheduled" ? PREVIEW_WINDOW_BEFORE_HOURS : WINDOW_BEFORE_HOURS) *
           60 *
           60 *
           1000,
@@ -720,17 +724,15 @@ export async function syncOfficialMatchMediaBatch(
       );
 
     if (
-      match.status !==
-      "finished"
+      match.status !== "finished" &&
+      match.status !== "scheduled"
     ) {
       continue;
     }
 
     if (
-      match.homeScore ===
-        null ||
-      match.awayScore ===
-        null
+      match.status === "finished" &&
+      (match.homeScore === null || match.awayScore === null)
     ) {
       continue;
     }
@@ -764,12 +766,9 @@ export async function syncOfficialMatchMediaBatch(
   const rangeStart =
     new Date(
       Math.min(
-        ...kickoffTimes,
-      ) -
-        WINDOW_BEFORE_HOURS *
-          60 *
-          60 *
-          1000,
+        ...contexts.map((context) => new Date(context.kickoff).getTime() -
+          (context.status === "scheduled" ? PREVIEW_WINDOW_BEFORE_HOURS : WINDOW_BEFORE_HOURS) * 60 * 60 * 1000),
+      ),
     ).toISOString();
 
   const rangeEnd =
@@ -842,7 +841,7 @@ export async function syncOfficialMatchMediaBatch(
 
     const matchWindowStart =
       kickoffMs -
-      WINDOW_BEFORE_HOURS *
+      (context.status === "scheduled" ? PREVIEW_WINDOW_BEFORE_HOURS : WINDOW_BEFORE_HOURS) *
         60 *
         60 *
         1000;
@@ -1127,20 +1126,12 @@ function makeMatchContext(
       >
     >,
 ): MatchContext {
-  if (
-    match.homeScore ===
-      null ||
-    match.awayScore ===
-      null
-  ) {
-    throw new Error(
-      "Finished match is missing its final score.",
-    );
-  }
-
   return {
     id:
       match.id,
+
+    status:
+      match.status,
 
     seasonId:
       match.seasonId,
@@ -1232,7 +1223,9 @@ function fixtureSummary(
         .name,
 
     score:
-      `${context.score.home}-${context.score.away}`,
+      context.score.home !== null && context.score.away !== null
+        ? `${context.score.home}-${context.score.away}`
+        : "upcoming",
   };
 }
 
@@ -1892,13 +1885,21 @@ function evaluateVideo(
     );
   }
 
+  const previewEligible =
+    match.status === "scheduled" &&
+    mediaType === "match_preview" &&
+    deltaHours < 0 &&
+    deltaHours >= -PREVIEW_WINDOW_BEFORE_HOURS;
+
   const accepted =
     isSafeAutomaticMatch({
       score,
       mediaType,
       opponentMention,
+      barcelonaMention,
       exactScore,
       embeddable,
+      previewEligible,
     });
 
   reasons.push(
@@ -1929,10 +1930,16 @@ function isSafeAutomaticMatch(
     opponentMention:
       boolean;
 
+    barcelonaMention:
+      boolean;
+
     exactScore:
       boolean;
 
     embeddable:
+      boolean;
+
+    previewEligible:
       boolean;
   },
 ) {
@@ -1942,17 +1949,14 @@ function isSafeAutomaticMatch(
     return false;
   }
 
-    /*
-  * Match previews are intentionally human-reviewed.
-  *
-  * They are related to the fixture, but they're pre-match content and should
-  * never be attached automatically as post-match media.
-  */
   if (
     input.mediaType ===
     "match_preview"
   ) {
-    return false;
+    return input.previewEligible &&
+      input.opponentMention &&
+      input.barcelonaMention &&
+      input.score >= 45;
   }
 
   if (
@@ -2178,6 +2182,8 @@ function hasExactFixtureScore(
   match:
     MatchContext,
 ) {
+  if (match.score.home === null || match.score.away === null) return false;
+
   const normalizedTitle =
     normalize(
       title,

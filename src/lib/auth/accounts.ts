@@ -23,7 +23,7 @@ export async function register(input: { email: string; username: string; passwor
   const passwordHash = await hashPassword(input.password);
   try {
     const user = await db.orm.public.AppUser.create({ email, username, passwordHash, role: "user" });
-    return { ok: true as const, userId: user.id };
+    return { ok: true as const, userId: user.id, email, username };
   } catch (error) {
     // Unique constraints are authoritative when two registrations race.
     if (String(error).toLowerCase().includes("unique")) return { ok: false as const, error: "That email or username is already in use." };

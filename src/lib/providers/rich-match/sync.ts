@@ -66,6 +66,7 @@ function changed(
 
 async function loadMatchContext(
   matchId: string,
+  options: { allowScheduledLineup?: boolean } = {},
 ) {
   const match =
     await db.orm.public.Match
@@ -92,17 +93,19 @@ async function loadMatchContext(
     );
   }
 
-  if (
-    match.status !== "finished"
-  ) {
+  const scheduledLineup = options.allowScheduledLineup === true &&
+    match.status === "scheduled" &&
+    Date.parse(match.kickoff.toString()) > Date.now();
+
+  if (match.status !== "finished" && !scheduledLineup) {
     throw new Error(
       `Rich-match ingestion currently accepts finished matches only. Match ${matchId} has status "${match.status}".`,
     );
   }
 
   if (
-    match.homeScore === null ||
-    match.awayScore === null
+    match.status === "finished" &&
+    (match.homeScore === null || match.awayScore === null)
   ) {
     throw new Error(
       `Finished match ${matchId} is missing its final score.`,
@@ -2394,7 +2397,7 @@ for (
 
 /** Recover only missing confirmed lineups, leaving existing events, media and stats untouched. */
 export async function syncGoalLineups(input: { matchId: string; dryRun: boolean }) {
-  const { match, internal } = await loadMatchContext(input.matchId);
+  const { match, internal } = await loadMatchContext(input.matchId, { allowScheduledLineup: true });
   const existing = await db.orm.public.Lineup.where({ matchId: match.id }).include("players").all();
   const initial = lineupNeedsBackfill(match.homeTeamId, match.awayTeamId, existing);
   if (initial.home === "partial" || initial.away === "partial") {

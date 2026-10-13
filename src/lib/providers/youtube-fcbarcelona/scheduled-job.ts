@@ -3,6 +3,7 @@ import "server-only";
 import { Temporal } from "temporal-polyfill";
 import { db } from "../../../prisma/db";
 import { runScheduledFixtureRefresh } from "../football-data/scheduled-refresh";
+import { runScheduledStandingsRefresh } from "../football-data/scheduled-standings";
 import { runScheduledGoalEventRefresh } from "../rich-match/scheduled-events";
 import { runGoalMediaBackgroundWorker } from "../dailygoal/background-worker";
 import { runAutomaticMatchMediaWorker } from "./automatic-worker";
@@ -14,6 +15,7 @@ const LOCK_LEASE_MS = 45 * 60_000;
 type OfficialWorker = typeof runAutomaticMatchMediaWorker;
 type GoalWorker = typeof runGoalMediaBackgroundWorker;
 type FixtureWorker = typeof runScheduledFixtureRefresh;
+type StandingsWorker = typeof runScheduledStandingsRefresh;
 type EventWorker = typeof runScheduledGoalEventRefresh;
 
 export function goalMediaJobEnabled() {
@@ -37,6 +39,7 @@ function skipAfterLockFailure(error: unknown) {
 /** The existing authenticated job owns this sequence; no second scheduler is needed. */
 export async function runScheduledMatchMediaJob(input: {
   fixtureWorker?: FixtureWorker;
+  standingsWorker?: StandingsWorker;
   eventWorker?: EventWorker;
   officialWorker?: OfficialWorker;
   goalWorker?: GoalWorker;
@@ -91,6 +94,36 @@ export async function runScheduledMatchMediaJob(input: {
     } catch (error) {
       fixtureRefresh = { status: "failed", nextAt: new Date(Date.now() + 3 * 3_600_000).toISOString(), fetched: 0, error: message(error).slice(0, 500) };
       console.error("FIXTURE REFRESH STAGE FAILED:", error);
+    }
+    let standingsRefresh: {
+      status: string;
+      nextAt: string | null;
+      synced: number;
+      error: string | null;
+    } = {
+      status: "disabled",
+      nextAt: null,
+      synced: 0,
+      error: null,
+    };
+
+    if (enabled) {
+      try {
+        standingsRefresh = await (
+          input.standingsWorker ?? runScheduledStandingsRefresh
+        )();
+      } catch (error) {
+        standingsRefresh = {
+          status: "failed",
+          nextAt: new Date(
+            Date.now() + 3 * 3_600_000,
+          ).toISOString(),
+          synced: 0,
+          error: message(error).slice(0, 500),
+        };
+
+        console.error("STANDINGS REFRESH STAGE FAILED:", error);
+      }
     }
     let eventRefresh: { status: string; matchId: string | null; nextAt: string | null; error: string | null };
     if (!enabled) eventRefresh = { status: "disabled", matchId: null, nextAt: null, error: null };
@@ -150,19 +183,26 @@ export async function runScheduledMatchMediaJob(input: {
     }
     status = result.counts.failed > 0 ? "primary-partial" : goalMedia.status === "failed" ? "goal-failed" :
       fixtureRefresh.status === "failed" || fixtureRefresh.status === "blocked" || fixtureRefresh.status === "unconfigured" ? "fixture-partial" :
+      standingsRefresh.status === "failed" || standingsRefresh.status === "blocked" || standingsRefresh.status === "unconfigured" ? "standings-partial" :
       eventRefresh.status === "failed" || eventRefresh.status === "blocked" || eventRefresh.status === "unconfigured" ? "events-partial" : "success";
     resultData = { fixtureStatus: fixtureRefresh.status, fixtureFetched: fixtureRefresh.fetched, fixtureNextAt: fixtureRefresh.nextAt,
       eventStatus: eventRefresh.status, eventMatchId: eventRefresh.matchId, officialFailed: result.counts.failed, officialEligible: result.counts.eligible,
       goalStatus: goalMedia.status, goalsPublished: goalMedia.result && "goalsPublished" in goalMedia.result ? goalMedia.result.goalsPublished : 0,
-      goalsQueued: goalMedia.result && "goalsQueued" in goalMedia.result ? goalMedia.result.goalsQueued : 0 };
+      goalsQueued: goalMedia.result && "goalsQueued" in goalMedia.result ? goalMedia.result.goalsQueued : 0,
+      standingsStatus: standingsRefresh.status,
+      standingsSynced: standingsRefresh.synced,
+      standingsNextAt: standingsRefresh.nextAt,
+    };
     return {
       status: "completed" as const,
       fixtureRefresh,
+      standingsRefresh,
       eventRefresh,
       result,
       goalMedia,
       heatmapSync,
-    };  } catch (error) {
+    };
+  } catch (error) {
     errorText = `Official media stage: ${message(error)}`.slice(0, 500);
     throw error;
   } finally {

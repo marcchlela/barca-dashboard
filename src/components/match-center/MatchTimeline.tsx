@@ -157,20 +157,17 @@ export default function MatchTimeline({
   const rows:
     ReactNode[] = [];
 
-  rows.push(
-    <MatchPhase
-      key="kickoff"
-      type="kickoff"
-      title="Kick Off"
-      detail={
-        kickoffLabel(
-          data.match
-            .kickoff,
-        )
-      }
-      theme={theme}
-    />,
-  );
+  if (data.match.status !== "scheduled" && data.match.status !== "postponed" && data.match.status !== "cancelled") {
+    rows.push(
+      <MatchPhase
+        key="kickoff"
+        type="kickoff"
+        title="Kick Off"
+        detail={kickoffLabel(data.match.kickoff)}
+        theme={theme}
+      />,
+    );
+  }
 
   for (
     const event
@@ -259,9 +256,7 @@ export default function MatchTimeline({
     );
   }
 
-  if (
-    !halfTimeInserted
-  ) {
+  if (!halfTimeInserted && ["halftime", "finished", "extra_time", "penalties"].includes(data.match.status)) {
     halfTimeScore = {
       ...runningScore,
     };
@@ -277,24 +272,21 @@ export default function MatchTimeline({
     );
   }
 
-  rows.push(
-    <MatchPhase
-      key="full-time"
-      type="full-time"
-      title="Full Time"
-      detail={
-        data.match
-          .score.home !==
-            null &&
-        data.match
-          .score.away !==
-            null
-          ? `${data.match.score.home} – ${data.match.score.away}`
-          : "Match ended"
-      }
-      theme={theme}
-    />,
-  );
+  if (data.match.status === "finished") {
+    rows.push(
+      <MatchPhase
+        key="full-time"
+        type="full-time"
+        title="Full Time"
+        detail={
+          data.match.score.home !== null && data.match.score.away !== null
+            ? `${data.match.score.home} – ${data.match.score.away}`
+            : "Match ended"
+        }
+        theme={theme}
+      />,
+    );
+  }
 
   return (
     <div className="relative">
@@ -986,6 +978,7 @@ function eventTitle(
     return (
       event.primaryPlayer
         ?.name ??
+      event.scorerName ??
       "Yellow card"
     );
   }
@@ -998,6 +991,7 @@ function eventTitle(
     return (
       event.primaryPlayer
         ?.name ??
+      event.scorerName ??
       "Red card"
     );
   }
@@ -1005,6 +999,7 @@ function eventTitle(
   return (
     event.primaryPlayer
       ?.name ??
+    event.scorerName ??
     eventTypeLabel(
       event.type,
     )
@@ -1022,6 +1017,8 @@ function eventDetail(
     return event
       .relatedPlayer
       ? `Penalty · Assist: ${event.relatedPlayer.name}`
+      : event.assistName
+        ? `Penalty · Assist: ${event.assistName}`
       : "Penalty";
   }
 
@@ -1039,6 +1036,8 @@ function eventDetail(
     return event
       .relatedPlayer
       ? `Assist: ${event.relatedPlayer.name}`
+      : event.assistName
+        ? `Assist: ${event.assistName}`
       : "Goal";
   }
 

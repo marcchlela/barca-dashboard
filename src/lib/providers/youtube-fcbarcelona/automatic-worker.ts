@@ -15,6 +15,8 @@ const DEFAULT_MISSING_HIGHLIGHT_LOOKBACK_DAYS =
   14;
 
 type WorkerReason =
+  | "upcoming-preview"
+  | "preview-already-found"
   | "missing-highlight"
   | "collecting-extra-media"
   | "complete-window-expired"
@@ -27,6 +29,9 @@ export async function runAutomaticMatchMediaWorker(
       boolean;
 
     forceAllFinished?:
+      boolean;
+
+    previewOnly?:
       boolean;
 
     extraMediaWindowHours?:
@@ -69,9 +74,6 @@ export async function runAutomaticMatchMediaWorker(
       .where({
         seasonId:
           season.id,
-
-        status:
-          "finished",
       })
       .include(
         "homeTeam",
@@ -153,6 +155,9 @@ export async function runAutomaticMatchMediaWorker(
     const match
     of barcelonaMatches
   ) {
+    if (input.previewOnly && match.status !== "scheduled") continue;
+    if (match.status !== "finished" && match.status !== "scheduled") continue;
+
     const media =
       await db.orm.public.MediaItem
         .where({
@@ -177,6 +182,10 @@ export async function runAutomaticMatchMediaWorker(
           item.type ===
           "match_highlight",
       );
+
+    const hasOfficialPreview = officialMedia.some(
+      (item) => item.type === "match_preview",
+    );
 
     const kickoff =
       match.kickoff
@@ -204,7 +213,15 @@ export async function runAutomaticMatchMediaWorker(
     let reason:
       WorkerReason;
 
-    if (
+    if (match.status === "scheduled") {
+      const hoursUntilKickoff = -((now - new Date(kickoff).getTime()) / (60 * 60 * 1000));
+      if (!hasOfficialPreview && hoursUntilKickoff > 0 && hoursUntilKickoff <= 24 * 7) {
+        eligible = true;
+        reason = "upcoming-preview";
+      } else {
+        reason = hasOfficialPreview ? "preview-already-found" : "complete-window-expired";
+      }
+    } else if (
       input.forceAllFinished
     ) {
       eligible =
@@ -265,7 +282,9 @@ export async function runAutomaticMatchMediaWorker(
           .name,
 
       score:
-        `${match.homeScore ?? "?"}-${match.awayScore ?? "?"}`,
+        match.status === "finished"
+          ? `${match.homeScore ?? "?"}-${match.awayScore ?? "?"}`
+          : "upcoming",
 
       competition:
         match.competition
@@ -417,11 +436,17 @@ export async function runAutomaticMatchMediaWorker(
       forceAllFinished:
         input.forceAllFinished ??
         false,
+
+      previewOnly:
+        input.previewOnly ?? false,
     },
 
     counts: {
       finishedBarcelonaMatches:
-        barcelonaMatches.length,
+        barcelonaMatches.filter((match) => match.status === "finished").length,
+
+      scheduledBarcelonaMatches:
+        barcelonaMatches.filter((match) => match.status === "scheduled").length,
 
       eligible:
         eligibleMatches.length,
@@ -438,6 +463,9 @@ export async function runAutomaticMatchMediaWorker(
             decision.reason ===
             "missing-highlight",
         ).length,
+
+      upcomingPreview:
+        decisions.filter((decision) => decision.reason === "upcoming-preview").length,
 
       collectingExtraMedia:
         decisions.filter(

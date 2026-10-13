@@ -1,6 +1,8 @@
 import { register } from "../../../../lib/auth/accounts";
 import { requireSameOrigin, createSession } from "../../../../lib/auth/session";
 import { allowSignupAttempt } from "../../../../lib/auth/signup-limiter";
+import { getSmtpConfig, sendDashboardEmail } from "../../../../lib/email/smtp";
+import { renderDashboardEmail } from "../../../../lib/email/templates";
 
 export async function POST(request: Request) {
   const denied = requireSameOrigin(request);
@@ -23,6 +25,19 @@ export async function POST(request: Request) {
     const result = await register({ email: body.email, username: body.username, password: body.password });
     if (!result.ok) return Response.json(result, { status: 400 });
     await createSession(result.userId);
+    const smtp = getSmtpConfig();
+    if (smtp) {
+      try {
+        await sendDashboardEmail({
+          kind: "welcome",
+          to: result.email,
+          ...renderDashboardEmail("welcome", { origin: smtp.origin, username: result.username }),
+        });
+      } catch (error) {
+        // Account creation and sign-in must succeed even if the welcome message cannot be delivered.
+        console.error("WELCOME EMAIL FAILED", error);
+      }
+    }
     return Response.json({ ok: true }, { headers: { "cache-control": "no-store" } });
   } catch (error) {
     if (error instanceof SyntaxError) return Response.json({ ok: false, error: "Invalid JSON." }, { status: 400 });

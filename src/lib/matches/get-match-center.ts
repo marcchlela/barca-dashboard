@@ -3,6 +3,12 @@ import "server-only";
 import {
   db,
 } from "../../prisma/db";
+import { asObject } from "../providers/shared/json";
+
+function eventRawString(value: unknown, key: string) {
+  const candidate = asObject(value)?.[key];
+  return typeof candidate === "string" ? candidate : null;
+}
 
 function sortLineupPlayers<
   T extends {
@@ -876,6 +882,12 @@ export async function getMatchCenter(
                     .portraitUrl,
               }
             : null,
+
+        scorerName:
+          eventRawString(event.rawData, "scorerName"),
+
+        assistName:
+          eventRawString(event.rawData, "assistName"),
 
         xG:
           event.xG,
