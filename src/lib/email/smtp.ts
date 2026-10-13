@@ -3,7 +3,7 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import nodemailer from "nodemailer";
 import pg from "pg";
-import { validEmail } from "../auth/policy";
+import { parseDashboardMailFrom } from "./sender";
 import { maskEmailAddress, type DashboardEmailKind } from "./templates";
 
 export function getSmtpConfig() {
@@ -13,12 +13,14 @@ export function getSmtpConfig() {
   const password = process.env.BARCA_SMTP_PASSWORD;
   const from = process.env.BARCA_MAIL_FROM;
   const origin = process.env.BARCA_PUBLIC_ORIGIN;
-  if (!host || !Number.isInteger(port) || port < 1 || port > 65535 || !user || !password || !from || !validEmail(from) || !origin) return null;
+  if (!host || !Number.isInteger(port) || port < 1 || port > 65535 || !user || !password || !from || !origin) return null;
+  const parsedFrom = parseDashboardMailFrom(from);
+  if (!parsedFrom) return null;
   try {
     const url = new URL(origin);
     if (url.origin !== origin || (process.env.NODE_ENV === "production" && url.protocol !== "https:")) return null;
   } catch { return null; }
-  return { host, port, user, password, from, origin };
+  return { host, port, user, password, from: from.trim(), fromHeader: parsedFrom, origin };
 }
 
 export function smtpPublicStatus() {
@@ -50,7 +52,7 @@ export async function sendDashboardEmail(input: { kind: DashboardEmailKind; to: 
   });
   let result: { accepted: boolean; errorCode?: string; messageId?: string };
   try {
-    const info = await transporter.sendMail({ from: config.from, to: input.to, subject: input.subject, text: input.text, html: input.html });
+    const info = await transporter.sendMail({ from: config.fromHeader, to: input.to, subject: input.subject, text: input.text, html: input.html });
     const accepted = info.accepted.map(String).some((recipient) => recipient.toLowerCase() === input.to.toLowerCase());
     result = accepted ? { accepted: true, messageId: info.messageId } : { accepted: false, errorCode: "NO_ACCEPTED_RECIPIENT" };
   } catch (error) {
