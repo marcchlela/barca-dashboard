@@ -2,6 +2,7 @@ import "server-only";
 
 import { notFound } from "next/navigation";
 import { getViewer, requireSameOrigin, type Viewer } from "../auth/session";
+import { productionAdminEditingEnabled } from "./write-policy";
 
 export function isAllowlistedAdmin(viewer: Viewer | null, allowedSubjects: readonly string[]): boolean {
   return Boolean(viewer && viewer.role === "admin" && allowedSubjects.includes(viewer.id));
@@ -26,8 +27,8 @@ export async function guardAdminRequest(request: Request): Promise<Response | nu
   if (!["GET", "HEAD", "OPTIONS"].includes(request.method.toUpperCase())) {
     const denied = requireSameOrigin(request);
     if (denied) return denied;
-    if (process.env.NODE_ENV === "production") {
-      return Response.json({ ok: false, error: "Production admin editing is not activated yet." }, { status: 503, headers: { "cache-control": "no-store" } });
+    if (process.env.NODE_ENV === "production" && !productionAdminEditingEnabled(process.env.BARCA_ADMIN_EDITING_ENABLED)) {
+      return Response.json({ ok: false, error: "Production admin editing is disabled." }, { status: 503, headers: { "cache-control": "no-store" } });
     }
   }
   return null;
