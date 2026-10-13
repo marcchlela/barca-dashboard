@@ -69,24 +69,6 @@ export async function POST(
 ) {
   const denied = await guardAdminRequest(request);
   if (denied) return denied;
-  if (
-    process.env.NODE_ENV ===
-    "production"
-  ) {
-    return NextResponse.json(
-      {
-        ok:
-          false,
-
-        error:
-          "Admin sync execution is disabled in production.",
-      },
-      {
-        status:
-          404,
-      },
-    );
-  }
 
   try {
     const body =
