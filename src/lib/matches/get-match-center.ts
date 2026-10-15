@@ -4,6 +4,7 @@ import {
   db,
 } from "../../prisma/db";
 import { asObject } from "../providers/shared/json";
+import { getCuratedMatchdaySquad } from "./curated-matchday-squads";
 
 function eventRawString(value: unknown, key: string) {
   const candidate = asObject(value)?.[key];
@@ -889,6 +890,12 @@ export async function getMatchCenter(
         assistName:
           eventRawString(event.rawData, "assistName"),
 
+        offName:
+          eventRawString(event.rawData, "offName"),
+
+        onName:
+          eventRawString(event.rawData, "onName"),
+
         xG:
           event.xG,
 
@@ -1369,6 +1376,8 @@ export async function getMatchCenter(
       away:
         awayLineup,
     },
+
+    matchdaySquad: getCuratedMatchdaySquad(matchId),
 
     events,
 

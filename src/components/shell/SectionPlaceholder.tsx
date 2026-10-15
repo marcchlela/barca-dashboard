@@ -30,7 +30,7 @@ export default function SectionPlaceholder({
         </Link>
 
         <div className="mt-16 border-y border-[#23344D] py-8">
-          <p className="text-[10px] uppercase tracking-[0.28em] text-[#8D9AAF]">
+          <p className="text-xs uppercase tracking-[0.28em] text-[#8D9AAF]">
             {eyebrow}
           </p>
 
@@ -43,7 +43,7 @@ export default function SectionPlaceholder({
           </p>
         </div>
 
-        <p className="mt-7 text-[10px] uppercase tracking-[0.18em] text-[#8D9AAF]">
+        <p className="mt-7 text-xs uppercase tracking-[0.18em] text-[#8D9AAF]">
           This section will be built after Overview is locked.
         </p>
       </div>

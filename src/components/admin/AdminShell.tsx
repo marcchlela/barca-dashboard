@@ -235,7 +235,7 @@ export default function AdminShell({
               flex
               items-center
               gap-2
-              text-[10px]
+              text-xs
               uppercase
               tracking-[0.18em]
             "
@@ -280,7 +280,7 @@ export default function AdminShell({
             <p
               className="
                 mt-4
-                text-[9px]
+                text-xs
                 uppercase
                 tracking-[0.24em]
               "
@@ -357,7 +357,7 @@ export default function AdminShell({
 
                     <span
                       className="
-                        text-[11px]
+                        text-xs
                         uppercase
                         tracking-[0.09em]
                       "
@@ -394,7 +394,7 @@ export default function AdminShell({
                 flex
                 items-center
                 gap-2
-                text-[9px]
+                text-xs
                 uppercase
                 tracking-[0.14em]
               "
@@ -413,7 +413,7 @@ export default function AdminShell({
             <p
               className="
                 mt-2
-                text-[9px]
+                text-xs
                 leading-4
               "
               style={{
@@ -460,7 +460,7 @@ export default function AdminShell({
               <div>
                 <p
                   className="
-                    text-[8px]
+                    text-xs
                     uppercase
                     tracking-[0.22em]
                   "
@@ -559,7 +559,7 @@ export default function AdminShell({
 
                       <span
                         className="
-                          text-[9px]
+                          text-xs
                           uppercase
                           tracking-[0.1em]
                         "

@@ -123,7 +123,7 @@ export default function MediaSectionNav({
                 gap-2
                 border-r
                 px-4
-                text-[8px]
+                text-xs
                 uppercase
                 tracking-[0.12em]
               "
@@ -164,7 +164,7 @@ export default function MediaSectionNav({
                     border
                     px-1
                     py-0.5
-                    text-[7px]
+                    text-xs
                     tabular-nums
                   "
                   style={{

@@ -404,7 +404,7 @@ export default function CountryFlag({
             justify-center
             border
             px-1
-            text-[7px]
+            text-xs
             font-semibold
           "
         >

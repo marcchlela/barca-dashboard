@@ -114,7 +114,9 @@ export async function getAdminSyncData() {
   const lastGoalSuccess = goalRuns.find((run) => run.mode === "apply" && run.status === "success") ?? null;
   const latestScheduledJob = goalRuns.find((run) => run.mode === "scheduled-job") ?? null;
   const latestFixtureRefresh = goalRuns.find((run) => run.mode === "fixture-refresh") ?? null;
+  const latestChampionsRefresh = goalRuns.find((run) => run.mode === "champions-refresh") ?? null;
   const latestEventRefresh = goalRuns.find((run) => run.mode === "event-refresh") ?? null;
+  const latestPlayerRatingRefresh = goalRuns.find((run) => run.mode === "player-rating-refresh") ?? null;
   const latestPrematchJob = goalRuns.find((run) => run.mode === "pregame-job") ?? null;
   const latestLiveMatchRun = goalRuns.find((run) => run.mode === "live-match-sync") ?? null;
   const liveResult = latestLiveMatchRun?.result && typeof latestLiveMatchRun.result === "object" && !Array.isArray(latestLiveMatchRun.result)
@@ -212,13 +214,18 @@ export async function getAdminSyncData() {
         statisticsStatus: typeof liveResult?.statisticsStatus === "string" ? liveResult.statisticsStatus : null,
         eventsCreated: typeof liveResult?.eventsCreated === "number" ? liveResult.eventsCreated : 0,
         eventsUpdated: typeof liveResult?.eventsUpdated === "number" ? liveResult.eventsUpdated : 0,
+        eventsPreserved: typeof liveResult?.eventsPreserved === "number" ? liveResult.eventsPreserved : 0,
+        eventsAmbiguous: typeof liveResult?.eventsAmbiguous === "number" ? liveResult.eventsAmbiguous : 0,
         statsSaved: typeof liveResult?.statsSaved === "number" ? liveResult.statsSaved : 0,
         requests: typeof liveResult?.requests === "number" ? liveResult.requests : 0,
         retryAt: typeof liveResult?.retryAt === "string" ? liveResult.retryAt : null,
       } : null,
       lastFixtureRefresh: latestFixtureRefresh ? { at: latestFixtureRefresh.startedAt.toString(), status: latestFixtureRefresh.status,
         error: latestFixtureRefresh.error, nextAt: latestFixtureRefresh.finishedAt ? new Date(Date.parse(latestFixtureRefresh.finishedAt.toString()) + (latestFixtureRefresh.status === "blocked" ? 24 : latestFixtureRefresh.status === "success" ? 6 : 3) * 3_600_000).toISOString() : null } : null,
+      lastChampionsRefresh: latestChampionsRefresh ? { at: latestChampionsRefresh.startedAt.toString(), status: latestChampionsRefresh.status,
+        error: latestChampionsRefresh.error, nextAt: latestChampionsRefresh.finishedAt ? new Date(Date.parse(latestChampionsRefresh.finishedAt.toString()) + (latestChampionsRefresh.status === "blocked" ? 24 : latestChampionsRefresh.status === "success" ? 6 : 3) * 3_600_000).toISOString() : null } : null,
       lastEventRefresh: latestEventRefresh ? { at: latestEventRefresh.startedAt.toString(), status: latestEventRefresh.status, error: latestEventRefresh.error } : null,
+      lastPlayerRatingRefresh: latestPlayerRatingRefresh ? { at: latestPlayerRatingRefresh.startedAt.toString(), status: latestPlayerRatingRefresh.status, error: latestPlayerRatingRefresh.error } : null,
       lastPrematchJob: latestPrematchJob ? { at: latestPrematchJob.startedAt.toString(), status: latestPrematchJob.status, error: latestPrematchJob.error } : null,
       awaitingGoalEvents: finishedMatches.filter((match) => match.homeScore !== null && match.awayScore !== null &&
         currentGoalEvents.filter((event) => event.matchId === match.id).length < match.homeScore + match.awayScore).length,

@@ -62,5 +62,8 @@ export async function POST(request: Request) {
     result,
     error: result.ok ? null : "One or more pre-match sync stages failed.",
   });
-  return NextResponse.json(result, { status: result.ok ? 200 : 207 });
+  // BusyBox wget treats 207 as a transport error and discards the JSON body in
+  // scheduler logs. Stage failures are represented by `ok: false` and the
+  // persisted run status, so return 200 for an authenticated, handled run.
+  return NextResponse.json(result);
 }

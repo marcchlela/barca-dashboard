@@ -44,7 +44,7 @@ export default function AdminMediaReviewQueue({
     <div>
       <p
         className="
-          text-[9px]
+          text-xs
           uppercase
           tracking-[0.24em]
         "
@@ -81,7 +81,7 @@ export default function AdminMediaReviewQueue({
             className="
               mt-2
               max-w-2xl
-              text-[11px]
+              text-xs
               leading-5
             "
             style={{
@@ -116,7 +116,7 @@ export default function AdminMediaReviewQueue({
         >
           <p
             className="
-              text-[7px]
+              text-xs
               uppercase
               tracking-[0.14em]
             "
@@ -187,7 +187,7 @@ export default function AdminMediaReviewQueue({
               className="
                 mt-2
                 max-w-sm
-                text-[9px]
+                text-xs
                 leading-4
               "
               style={{
@@ -421,7 +421,7 @@ function ReviewCard({
           >
             <span
               className="
-                text-[7px]
+                text-xs
                 uppercase
                 tracking-[0.15em]
               "
@@ -474,7 +474,7 @@ function ReviewCard({
               inline-flex
               items-center
               gap-1.5
-              text-[7px]
+              text-xs
               uppercase
               tracking-[0.12em]
             "
@@ -529,7 +529,7 @@ function ReviewCard({
                     border
                     px-2
                     py-1
-                    text-[7px]
+                    text-xs
                     font-mono
                   "
                   style={{
@@ -637,7 +637,7 @@ function ReviewCard({
               justify-center
               gap-2
               border
-              text-[8px]
+              text-xs
               uppercase
               tracking-[0.12em]
               disabled:opacity-40
@@ -676,7 +676,7 @@ function ReviewCard({
               justify-center
               gap-2
               border
-              text-[8px]
+              text-xs
               uppercase
               tracking-[0.12em]
               disabled:opacity-40
@@ -708,7 +708,7 @@ function ReviewCard({
           <p
             className="
               mt-3
-              text-[8px]
+              text-xs
             "
             style={{
               color:
@@ -757,7 +757,7 @@ function ReviewSelect({
     <label>
       <span
         className="
-          text-[7px]
+          text-xs
           uppercase
           tracking-[0.13em]
         "
@@ -801,7 +801,7 @@ function ReviewSelect({
             bg-transparent
             px-3
             pr-8
-            text-[8px]
+            text-xs
             outline-none
           "
           style={{

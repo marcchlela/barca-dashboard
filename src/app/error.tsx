@@ -21,7 +21,7 @@ export default function ErrorPage({
           className="text-[#D39C43]"
         />
 
-        <p className="mt-5 text-[10px] uppercase tracking-[0.24em] text-[#8D9AAF]">
+        <p className="mt-5 text-xs uppercase tracking-[0.24em] text-[#8D9AAF]">
           Command Center
         </p>
 
@@ -37,7 +37,7 @@ export default function ErrorPage({
         <button
           type="button"
           onClick={reset}
-          className="mt-7 flex items-center gap-3 border border-[#6B1D2F] bg-[#6B1D2F] px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.16em]"
+          className="mt-7 flex items-center gap-3 border border-[#6B1D2F] bg-[#6B1D2F] px-5 py-3 text-xs font-semibold uppercase tracking-[0.16em]"
         >
           <RefreshCw
             size={14}

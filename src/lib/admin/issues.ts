@@ -762,6 +762,7 @@ export async function getAdminDataIssues() {
     if (
       !player ||
       !player.isActive ||
+      (membership.leftAt && new Date(membership.leftAt.toString()).getTime() <= Date.now()) ||
       seenPlayers.has(
         player.id,
       )

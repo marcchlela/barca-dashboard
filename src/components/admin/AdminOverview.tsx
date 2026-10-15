@@ -62,7 +62,7 @@ export default function AdminOverview({
         <div>
           <p
             className="
-              text-[9px]
+              text-xs
               uppercase
               tracking-[0.25em]
             "
@@ -91,7 +91,7 @@ export default function AdminOverview({
             className="
               mt-2
               max-w-2xl
-              text-[11px]
+              text-xs
               leading-5
             "
             style={{
@@ -124,7 +124,7 @@ export default function AdminOverview({
         >
           <p
             className="
-              text-[8px]
+              text-xs
               uppercase
               tracking-[0.18em]
             "
@@ -384,7 +384,7 @@ export default function AdminOverview({
 
                       <span
                         className="
-                          text-[8px]
+                          text-xs
                           uppercase
                           tracking-[0.16em]
                         "
@@ -416,7 +416,7 @@ export default function AdminOverview({
                     <p
                       className="
                         mt-1
-                        text-[9px]
+                        text-xs
                         leading-4
                       "
                       style={{
@@ -505,7 +505,7 @@ export default function AdminOverview({
                       >
                         <TableCell>
                           <div>
-                            <p className="text-[11px]">
+                            <p className="text-xs">
                               {
                                 source.name
                               }
@@ -515,7 +515,7 @@ export default function AdminOverview({
                               <p
                                 className="
                                   mt-1
-                                  text-[7px]
+                                  text-xs
                                   uppercase
                                   tracking-[0.15em]
                                 "
@@ -631,7 +631,7 @@ export default function AdminOverview({
               border
               px-4
               py-3
-              text-[9px]
+              text-xs
               uppercase
               tracking-[0.12em]
               transition-opacity
@@ -796,7 +796,7 @@ export default function AdminOverview({
                           <p
                             className="
                               line-clamp-2
-                              text-[10px]
+                              text-xs
                               leading-4
                             "
                           >
@@ -808,7 +808,7 @@ export default function AdminOverview({
                           <p
                             className="
                               mt-1
-                              text-[8px]
+                              text-xs
                               uppercase
                               tracking-[0.1em]
                             "
@@ -831,7 +831,7 @@ export default function AdminOverview({
                 )
               ) : (
                 <div
-                  className="p-5 text-[10px]"
+                  className="p-5 text-xs"
                   style={{
                     color:
                       theme.colors.textMuted,
@@ -853,7 +853,7 @@ export default function AdminOverview({
                 border
                 px-4
                 py-3
-                text-[9px]
+                text-xs
                 uppercase
                 tracking-[0.12em]
                 transition-opacity
@@ -934,7 +934,7 @@ export default function AdminOverview({
       <p
         className="
           mt-7
-          text-[8px]
+          text-xs
           uppercase
           tracking-[0.13em]
         "
@@ -1004,7 +1004,7 @@ function Metric({
       <p
         className="
           mt-5
-          text-[8px]
+          text-xs
           uppercase
           tracking-[0.15em]
         "
@@ -1028,7 +1028,7 @@ function Metric({
       </p>
 
       <p
-        className="mt-1 text-[8px]"
+        className="mt-1 text-xs"
         style={{
           color:
             theme.colors.textMuted,
@@ -1057,7 +1057,7 @@ function SectionHeader({
     <div>
       <p
         className="
-          text-[8px]
+          text-xs
           uppercase
           tracking-[0.2em]
         "
@@ -1142,13 +1142,13 @@ function CoverageRow({
           gap-4
         "
       >
-        <span className="text-[10px]">
+        <span className="text-xs">
           {label}
         </span>
 
         <span
           className="
-            text-[9px]
+            text-xs
             tabular-nums
           "
           style={{
@@ -1261,14 +1261,14 @@ function IssueRow({
           />
         )}
 
-        <span className="text-[10px]">
+        <span className="text-xs">
           {label}
         </span>
       </div>
 
       <span
         className="
-          text-[10px]
+          text-xs
           font-medium
           tabular-nums
         "
@@ -1327,7 +1327,7 @@ function StatusLine({
       }}
     >
       <span
-        className="text-[9px]"
+        className="text-xs"
         style={{
           color:
             theme.colors.textMuted,
@@ -1358,7 +1358,7 @@ function StatusLine({
 
         <span
           className="
-            text-[8px]
+            text-xs
             uppercase
             tracking-[0.12em]
           "
@@ -1458,7 +1458,7 @@ function ModuleLink({
         className="
           mt-2
           max-w-xs
-          text-[9px]
+          text-xs
           leading-4
         "
         style={{
@@ -1486,7 +1486,7 @@ function TableHead({
       className="
         px-4
         py-3
-        text-[8px]
+        text-xs
         font-medium
         uppercase
         tracking-[0.15em]
@@ -1515,7 +1515,7 @@ function TableCell({
       className="
         px-4
         py-3
-        text-[9px]
+        text-xs
       "
       style={{
         color:

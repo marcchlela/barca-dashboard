@@ -103,7 +103,7 @@ function NavigationSlot({
       >
         <p
           className="
-            text-[9px]
+            text-xs
             uppercase
             tracking-[0.18em]
           "
@@ -197,7 +197,7 @@ function NavigationSlot({
       >
         <p
           className="
-            text-[8px]
+            text-xs
             uppercase
             tracking-[0.2em]
           "
@@ -235,7 +235,7 @@ function NavigationSlot({
               className="
                 mt-1
                 truncate
-                text-[9px]
+                text-xs
                 uppercase
                 tracking-[0.13em]
               "
@@ -332,7 +332,7 @@ function OpponentCrest({
         items-center
         justify-center
         border
-        text-[10px]
+        text-xs
         font-semibold
       "
       style={{

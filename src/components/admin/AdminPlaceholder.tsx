@@ -36,7 +36,7 @@ export default function AdminPlaceholder({
     <div>
       <p
         className="
-          text-[9px]
+          text-xs
           uppercase
           tracking-[0.24em]
         "
@@ -63,7 +63,7 @@ export default function AdminPlaceholder({
         className="
           mt-3
           max-w-2xl
-          text-[11px]
+          text-xs
           leading-5
         "
         style={{
@@ -111,7 +111,7 @@ export default function AdminPlaceholder({
 
           <span
             className="
-              text-[9px]
+              text-xs
               uppercase
               tracking-[0.15em]
             "
@@ -147,7 +147,7 @@ export default function AdminPlaceholder({
               >
                 <span
                   className="
-                    text-[9px]
+                    text-xs
                     tabular-nums
                   "
                   style={{
@@ -164,7 +164,7 @@ export default function AdminPlaceholder({
                   )}
                 </span>
 
-                <span className="text-[10px]">
+                <span className="text-xs">
                   {item}
                 </span>
               </div>
@@ -180,7 +180,7 @@ export default function AdminPlaceholder({
           inline-flex
           items-center
           gap-2
-          text-[9px]
+          text-xs
           uppercase
           tracking-[0.12em]
         "

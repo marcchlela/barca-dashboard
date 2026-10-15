@@ -51,6 +51,7 @@ function sameTeam(left: string, right: string) {
     ["rayo vallecano", "rayo vallecano madrid", "rayo vallecano de madrid"],
     ["feyenoord", "feyenoord rotterdam"],
     ["levante", "levante ud"],
+    ["galatasaray", "galatasaray sk"],
   ];
   return aliases.some((group) => {
     const normalized = group.map(normalizedTeam);
@@ -58,7 +59,7 @@ function sameTeam(left: string, right: string) {
   });
 }
 
-export type LiveEventType = "goal" | "own_goal" | "penalty_goal" | "yellow_card" | "red_card";
+export type LiveEventType = "goal" | "own_goal" | "penalty_goal" | "yellow_card" | "red_card" | "substitution";
 export type LiveMatchStatus = "live" | "halftime" | "extra_time" | "penalties" | "finished";
 
 export type LiveEventCandidate = {
@@ -103,6 +104,9 @@ function sideFrom(row: JsonObject, homeTeam: string, awayTeam: string): "home" |
   const hasHomeScorer = Boolean(stringValue(row, "homeScorer", "home_scorer", "homeScorerId", "home_scorer_id"));
   const hasAwayScorer = Boolean(stringValue(row, "awayScorer", "away_scorer", "awayScorerId", "away_scorer_id"));
   if (hasHomeScorer !== hasAwayScorer) return hasHomeScorer ? "home" : "away";
+  const hasHomeCard = Boolean(stringValue(row, "homeFault", "homePlayerId"));
+  const hasAwayCard = Boolean(stringValue(row, "awayFault", "awayPlayerId"));
+  if (hasHomeCard !== hasAwayCard) return hasHomeCard ? "home" : "away";
   const explicit = stringValue(row, "side", "teamSide", "team_side")?.toLowerCase();
   return explicit === "home" || explicit === "away" ? explicit : null;
 }
@@ -116,7 +120,7 @@ export function normalizeLiveEvents(value: JsonObject, homeTeam: string, awayTea
       if (!providerId) return [];
       const player = asObject(row.player) ?? asObject(row.scorer);
       const names = [
-        stringValue(row, "type", "eventType", "event_type", "info", "description", "detail"),
+        stringValue(row, "type", "card", "eventType", "event_type", "info", "description", "detail"),
         stringValue(asObject(row.type), "name", "label"),
       ].filter(Boolean).join(" ").toLowerCase();
       let type: LiveEventType | null = null;
@@ -129,7 +133,7 @@ export function normalizeLiveEvents(value: JsonObject, homeTeam: string, awayTea
       const side = sideFrom(row, homeTeam, awayTeam);
       if (!side) return [];
       const prefix = side === "home" ? "home" : "away";
-      const scorer = stringValue(row, `${prefix}Scorer`, `${prefix}_scorer`, "scorerName", "scorer_name", "playerName", "player_name") ??
+      const scorer = stringValue(row, `${prefix}Scorer`, `${prefix}_scorer`, `${prefix}Fault`, "scorerName", "scorer_name", "playerName", "player_name") ??
         stringValue(player, "name", "displayName", "display_name");
       const assistObject = asObject(row.assist) ?? asObject(row.assistedBy) ?? asObject(row.assisted_by);
       const assistValue = stringValue(row, `${prefix}Assist`, `${prefix}_assist`, "assistName", "assist_name", "assistedBy", "assisted_by", "assist") ??
@@ -144,10 +148,24 @@ export function normalizeLiveEvents(value: JsonObject, homeTeam: string, awayTea
         side,
         scorerName: scorer ? cleanName(scorer) : null,
         assistName: assistValue ? cleanName(assistValue) : null,
-        providerPlayerId: stringValue(row, `${prefix}ScorerId`, `${prefix}_scorer_id`, "playerId", "player_id") ?? stringValue(player, "id", "apiId"),
+        providerPlayerId: stringValue(row, `${prefix}ScorerId`, `${prefix}_scorer_id`, `${prefix}PlayerId`, "playerId", "player_id") ?? stringValue(player, "id", "apiId"),
         raw: row,
       }];
     });
+}
+
+/** GOAL publishes substitutions separately as "player off | player on". */
+export function normalizeLiveSubstitutions(value: JsonObject): LiveEventCandidate[] {
+  return asArray(value.data, "substitutions", "items").map(asObject).filter((row): row is JsonObject => Boolean(row)).flatMap((row, index) => {
+    const providerId = stringValue(row, "id", "apiId");
+    const side = stringValue(row, "team", "side")?.toLowerCase();
+    const names = stringValue(row, "substitution")?.split("|").map((name) => name.trim()) ?? [];
+    const ids = stringValue(row, "substitutionPlayerId")?.split("|").map((id) => id.trim()) ?? [];
+    const minute = eventMinute(row);
+    if (!providerId || (side !== "home" && side !== "away") || names.length !== 2 || !names[0] || !names[1] || minute === null) return [];
+    return [{ providerId, order: index + 1, type: "substitution" as const, minute, period: minute > 45 ? 2 : 1,
+      side, scorerName: cleanName(names[0]), assistName: cleanName(names[1]), providerPlayerId: ids[0] || null, raw: row }];
+  });
 }
 
 export function normalizeLiveStatus(value: JsonObject): LiveMatchStatus | null {
@@ -199,6 +217,32 @@ export function liveRetryDelayMs(input: { status: string; consecutiveFailures: n
   return 0;
 }
 
+/** Catch-up checks must not spend the free provider quota at live-match frequency. */
+export function postMatchPollDelayMs(status: string, kickoff: string, now: number) {
+  const age = now - Date.parse(kickoff);
+  if (status === "finished") return 30 * 60_000;
+  // Canonical status can lag behind a provider's full-time update.
+  if (Number.isFinite(age) && age >= 4 * 60 * 60_000) return 30 * 60_000;
+  return 0;
+}
+
 export function shouldFetchLiveStatistics(lastFetchedAt: string | null, now: number) {
   return !lastFetchedAt || now - Date.parse(lastFetchedAt) >= 5 * 60_000;
+}
+
+export function finishedCoverageIncomplete(input: {
+  kickoff: string;
+  now: number;
+  homeScore: number | null;
+  awayScore: number | null;
+  goalCount: number;
+  statisticSides: number;
+}) {
+  const age = input.now - Date.parse(input.kickoff);
+  if (!Number.isFinite(age) || age < 0 || age > 24 * 60 * 60_000) return false;
+  const expectedGoals = (input.homeScore ?? 0) + (input.awayScore ?? 0);
+  // Cards and substitutions can arrive well after goals and team stats. Give
+  // every recent fixture a bounded reconciliation window even when the score
+  // already appears complete; post-match polls are spaced 30 minutes apart.
+  return age <= 12 * 60 * 60_000 || input.goalCount < expectedGoals || input.statisticSides < 2;
 }

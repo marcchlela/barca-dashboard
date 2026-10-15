@@ -108,7 +108,7 @@ async function fetchCup(code: "CDR" | "SSC", seasonLabel: string) {
 
 export async function syncCompetitionFixtures(code: Code, dryRun: boolean) {
   const season = await db.orm.public.Season.where({ isCurrent: true }).first();
-  if (!season || season.startYear !== 2026) throw new Error("Expected current 2026/27 season.");
+  if (!season) throw new Error("A current season is required.");
   let fixtures: Fixture[];
   let requests = 0;
   let providerTotal = 0;
@@ -118,8 +118,9 @@ export async function syncCompetitionFixtures(code: Code, dryRun: boolean) {
     const [matches, standings] = await Promise.all([
       getChampionsLeagueMatches(season.startYear), getChampionsLeagueStandings(season.startYear),
     ]);
-    if (matches.competition?.code !== "CL" || matches.matches.some((m) => m.season.startDate.slice(0, 4) !== "2026") ||
-      standings.competition.code !== "CL" || standings.season.startDate.slice(0, 4) !== "2026") {
+    const startYear = String(season.startYear);
+    if (matches.competition?.code !== "CL" || matches.matches.some((m) => m.season.startDate.slice(0, 4) !== startYear) ||
+      standings.competition.code !== "CL" || standings.season.startDate.slice(0, 4) !== startYear) {
       throw new Error("Champions League provider season or competition mismatch.");
     }
     fixtures = matches.matches.map(footballFixture);

@@ -148,7 +148,7 @@ function DesktopRail({
       <Link
         href="/"
         aria-label="Go to Barça overview"
-        className="group relative block pl-4"
+        className="group relative flex items-center gap-3 pl-4"
       >
         <div
           className="absolute bottom-0 left-0 top-0 w-px"
@@ -158,21 +158,14 @@ function DesktopRail({
           }}
         />
 
-        <p className="text-[11px] font-semibold uppercase leading-[1.25] tracking-[0.28em]">
-          FC
-          <br />
-          Barcelona
-        </p>
-
-        <p
-          className="mt-3 text-[9px] uppercase tracking-[0.22em]"
-          style={{
-            color:
-              theme.colors.textMuted,
-          }}
-        >
-          Més que un club
-        </p>
+        <div>
+          <p className="text-xs font-semibold uppercase leading-[1.25] tracking-[0.22em]">
+            FC<br />Barcelona
+          </p>
+          <p className="mt-2 text-xs uppercase tracking-[0.16em]" style={{ color: theme.colors.textMuted }}>
+            Més que un club
+          </p>
+        </div>
 
         <div
           className="mt-4 h-px w-0 transition-all duration-200 group-hover:w-10"
@@ -294,7 +287,7 @@ function DesktopRail({
         </Link>
 
         <p
-          className="mt-5 text-[8px] uppercase leading-4 tracking-[0.22em]"
+          className="mt-5 text-xs uppercase leading-4 tracking-[0.22em]"
           style={{
             color:
               theme.colors.textMuted,
@@ -331,6 +324,9 @@ function CompactRail({
       }}
     >
       <div className="flex items-center justify-between gap-3">
+        <Link href="/" aria-label="Go to Barça overview" className="flex h-10 w-10 shrink-0 items-center justify-center border-r" style={{ borderColor: theme.colors.border }}>
+          <Home size={18} strokeWidth={1.6} aria-hidden="true" />
+        </Link>
         <nav className="flex min-w-0 flex-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {navigation.map(
             ({
@@ -378,7 +374,7 @@ function CompactRail({
                   />
 
                   <span
-                    className="text-[10px] uppercase tracking-[0.12em]"
+                    className="text-xs uppercase tracking-[0.12em]"
                     style={{
                       color:
                         active

@@ -229,7 +229,7 @@ export default function AdminMediaAddForm({
 
       <p
         className="
-          text-[9px]
+          text-xs
           uppercase
           tracking-[0.24em]
         "
@@ -256,7 +256,7 @@ export default function AdminMediaAddForm({
         className="
           mt-2
           max-w-2xl
-          text-[11px]
+          text-xs
           leading-5
         "
         style={{
@@ -327,7 +327,7 @@ export default function AdminMediaAddForm({
               bg-transparent
               pl-9
               pr-3
-              text-[10px]
+              text-xs
               outline-none
             "
             style={{
@@ -390,7 +390,7 @@ export default function AdminMediaAddForm({
                 />
               ) : (
                 <span
-                  className="text-[10px]"
+                  className="text-xs"
                   style={{
                     color:
                       theme.colors.textMuted,
@@ -499,7 +499,7 @@ export default function AdminMediaAddForm({
                           <p
                             className="
                               mt-2
-                              text-[7px]
+                              text-xs
                               uppercase
                               tracking-[0.12em]
                             "
@@ -543,7 +543,7 @@ export default function AdminMediaAddForm({
           <p
             className="
               mt-2
-              text-[8px]
+              text-xs
               leading-4
             "
             style={{
@@ -592,7 +592,7 @@ export default function AdminMediaAddForm({
                 bg-transparent
                 px-3
                 pr-9
-                text-[10px]
+                text-xs
                 outline-none
               "
               style={{
@@ -650,7 +650,7 @@ export default function AdminMediaAddForm({
             justify-center
             gap-2
             border
-            text-[8px]
+            text-xs
             font-semibold
             uppercase
             tracking-[0.14em]
@@ -692,7 +692,7 @@ export default function AdminMediaAddForm({
               gap-2
               border
               p-3
-              text-[9px]
+              text-xs
             "
             style={{
               borderColor:
@@ -722,7 +722,7 @@ export default function AdminMediaAddForm({
               mt-4
               border
               p-3
-              text-[9px]
+              text-xs
             "
             style={{
               borderColor:
@@ -791,7 +791,7 @@ function MatchVisual({
         className="
           min-w-0
           truncate
-          text-[11px]
+          text-xs
           font-medium
 
           sm:text-xs
@@ -824,7 +824,7 @@ function MatchVisual({
           <span
             className="
               shrink-0
-              text-[7px]
+              text-xs
               uppercase
               tracking-[0.13em]
             "
@@ -857,7 +857,7 @@ function MatchVisual({
         <span
           className="
             shrink-0
-            text-[7px]
+            text-xs
             uppercase
             tracking-[0.13em]
           "
@@ -874,7 +874,7 @@ function MatchVisual({
         className="
           min-w-0
           truncate
-          text-[11px]
+          text-xs
           font-medium
 
           sm:text-xs
@@ -975,7 +975,7 @@ function FieldLabel({
   return (
     <span
       className="
-        text-[8px]
+        text-xs
         uppercase
         tracking-[0.14em]
       "

@@ -94,6 +94,7 @@ export async function POST(
         result,
         fixtureRefresh: job.fixtureRefresh,
         eventRefresh: job.eventRefresh,
+        beinHighlights: job.beinHighlights,
         goalMedia: job.goalMedia,
         heatmapSync: job.heatmapSync,
       },

@@ -139,7 +139,7 @@ export default function CurrentMatchWindow({
       >
         <p
           className="
-            text-[8px]
+            text-xs
             uppercase
             tracking-[0.18em]
           "
@@ -251,7 +251,7 @@ function FocusMatch({
       >
         <span
           className="
-            text-[8px]
+            text-xs
             uppercase
             tracking-[0.12em]
           "
@@ -348,7 +348,7 @@ function FocusMatch({
 
             <p
               className="
-                text-[8px]
+                text-xs
                 font-medium
                 uppercase
                 tracking-[0.15em]
@@ -397,7 +397,7 @@ function FocusMatch({
 
             <span
               className="
-                text-[8px]
+                text-xs
               "
               style={{
                 color:
@@ -490,7 +490,7 @@ function FocusMatch({
       >
         <span
           className="
-            text-[8px]
+            text-xs
             tabular-nums
           "
           style={{
@@ -519,7 +519,7 @@ function FocusMatch({
               items-center
               justify-center
               border
-              text-[9px]
+              text-xs
               font-semibold
             "
             style={{
@@ -598,7 +598,7 @@ function FocusTeam({
           min-w-0
           flex-1
           truncate
-          text-[11px]
+          text-xs
           font-medium
         "
       >
@@ -657,7 +657,7 @@ function TeamCrest({
           items-center
           justify-center
           border
-          text-[7px]
+          text-xs
           uppercase
         "
         style={{

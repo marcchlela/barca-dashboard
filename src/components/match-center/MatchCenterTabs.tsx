@@ -263,7 +263,7 @@ export default function MatchCenterTabs({
                   border-r
                   px-5
                   py-3.5
-                  text-[9px]
+                  text-xs
                   font-medium
                   uppercase
                   tracking-[0.16em]

@@ -2,9 +2,12 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   liveFixtureMatches,
+  finishedCoverageIncomplete,
   liveRetryDelayMs,
   normalizeLiveEvents,
+  normalizeLiveSubstitutions,
   normalizeLiveStatus,
+  postMatchPollDelayMs,
   shouldFetchLiveStatistics,
 } from "../src/lib/providers/goal-api/live-refresh-core.ts";
 
@@ -24,6 +27,29 @@ test("live event adapter extracts goals, assists, own goals and cards from publi
   assert.equal(events[2].side, "home");
 });
 
+test("the separate cards feed resolves the correct side and player without a lineup", () => {
+  const cards = normalizeLiveEvents({ data: [
+    { id: "card-home", card: "yellow card", timeNum: 64, homeFault: "R. Leao", homePlayerId: "3613754290" },
+    { id: "card-away", card: "red card", timeNum: 86, awayFault: "Player B", awayPlayerId: "123" },
+  ] }, "Galatasaray SK", "FC Barcelona");
+  assert.deepEqual(cards.map(({ type, side, scorerName, minute }) => ({ type, side, scorerName, minute })), [
+    { type: "yellow_card", side: "home", scorerName: "R. Leao", minute: 64 },
+    { type: "red_card", side: "away", scorerName: "Player B", minute: 86 },
+  ]);
+});
+
+test("the separate substitutions feed preserves off/on order and rejects ambiguous rows", () => {
+  const substitutions = normalizeLiveSubstitutions({ data: [
+    { id: "s1", team: "home", timeNum: 58, substitution: "M. Lemina | L. Ugochukwu", substitutionPlayerId: "870571787 | 2725297698" },
+    { id: "s2", team: "away", timeNum: 71, substitution: "Gavi | Pedri" },
+    { id: "bad", team: "unknown", timeNum: 72, substitution: "A | B" },
+  ] });
+  assert.deepEqual(substitutions.map(({ type, side, minute, scorerName, assistName }) => ({ type, side, minute, scorerName, assistName })), [
+    { type: "substitution", side: "home", minute: 58, scorerName: "M. Lemina", assistName: "L. Ugochukwu" },
+    { type: "substitution", side: "away", minute: 71, scorerName: "Gavi", assistName: "Pedri" },
+  ]);
+});
+
 test("fixture matching requires both teams, exact kickoff proximity and the competition", () => {
   const canonical = { kickoff: "2026-10-13T19:00:00Z", home: "Galatasaray", away: "FC Barcelona", competition: "UEFA Champions League" };
   const provider = { kickoff: "2026-10-13T19:05:00Z", home: "Galatasaray", away: "Barcelona", competition: "Champions League" };
@@ -32,6 +58,7 @@ test("fixture matching requires both teams, exact kickoff proximity and the comp
   assert.equal(liveFixtureMatches({ canonical, provider: { ...provider, kickoff: "2026-10-14T19:00:00Z" } }), false);
   assert.equal(liveFixtureMatches({ canonical, provider: { ...provider, competition: "La Liga" } }), false);
   assert.equal(liveFixtureMatches({ canonical, provider: { ...provider, kickoff: null } }), false);
+  assert.equal(liveFixtureMatches({ canonical: { ...canonical, home: "Galatasaray SK" }, provider }), true);
 });
 
 test("provider status and five-minute stats interval are normalized", () => {
@@ -49,4 +76,21 @@ test("provider failures back off; 403 and 429 pause polling safely", () => {
   assert.equal(liveRetryDelayMs({ status: "failed", consecutiveFailures: 4, error: "timeout" }), 8 * 60_000);
   assert.equal(liveRetryDelayMs({ status: "blocked", consecutiveFailures: 4, error: "HTTP 429" }), 15 * 60_000);
   assert.equal(liveRetryDelayMs({ status: "blocked", consecutiveFailures: 4, error: "HTTP 403" }), 24 * 60 * 60_000);
+});
+
+test("recent finished matches reconcile delayed cards and substitutions, then retry missing goals or statistics only", () => {
+  const kickoff = "2026-10-13T19:00:00Z";
+  const input = { kickoff, now: Date.parse("2026-10-13T23:00:00Z"), homeScore: 1, awayScore: 4, goalCount: 0, statisticSides: 0 };
+  assert.equal(finishedCoverageIncomplete(input), true);
+  assert.equal(finishedCoverageIncomplete({ ...input, goalCount: 5, statisticSides: 1 }), true);
+  assert.equal(finishedCoverageIncomplete({ ...input, goalCount: 5, statisticSides: 2 }), true);
+  assert.equal(finishedCoverageIncomplete({ ...input, now: Date.parse("2026-10-14T10:00:00Z"), goalCount: 5, statisticSides: 2 }), false);
+  assert.equal(finishedCoverageIncomplete({ ...input, now: Date.parse("2026-10-15T00:00:00Z") }), false);
+});
+
+test("post-match catch-up is spaced out to protect the free provider quota", () => {
+  const kickoff = "2026-10-13T19:00:00Z";
+  assert.equal(postMatchPollDelayMs("live", kickoff, Date.parse("2026-10-13T20:00:00Z")), 0);
+  assert.equal(postMatchPollDelayMs("finished", kickoff, Date.parse("2026-10-13T21:00:00Z")), 30 * 60_000);
+  assert.equal(postMatchPollDelayMs("scheduled", kickoff, Date.parse("2026-10-13T23:01:00Z")), 30 * 60_000);
 });

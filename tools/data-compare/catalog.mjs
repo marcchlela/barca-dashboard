@@ -14,7 +14,13 @@ export const CATEGORIES = {
 export const TABLES = Object.values(CATEGORIES).flat();
 // Never export credentials, session tokens, or login-throttle identifiers.
 // Account-era snapshots remain comparison-only until ownership mapping is designed.
-export const EXCLUDED_AUTH_TABLES = ["app_user", "user_session", "auth_throttle"];
+export const EXCLUDED_AUTH_TABLES = [
+  "app_user",
+  "user_session",
+  "auth_throttle",
+  "password_reset_token",
+  "email_delivery_attempt",
+];
 export const CATEGORY_QUESTIONS = {
   "Football calendar": "Which local-only or different fixtures, scores, standings and competition snapshots (if any) should be considered for a future change? Which production-only records must remain?",
   "Players and squad": "Which roster memberships and portrait URL differences reflect intended curation, and which are provider updates?",

@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 
 import FormationPitch from "./FormationPitch";
+import MatchdaySquad from "./MatchdaySquad";
 import MatchCenterTabs from "./MatchCenterTabs";
 import MatchNavigation from "./MatchNavigation";
 import MatchTimeline from "./MatchTimeline";
@@ -32,6 +33,7 @@ import {
 } from "./PlayerPerformanceContext";
 
 import StadiumRail from "../shell/StadiumRail";
+import BrandHomeLink from "../shell/BrandHomeLink";
 
 import ThemeScrollbarSync from "../theme/ThemeScrollbarSync";
 
@@ -143,7 +145,10 @@ export default function MatchCenterClient({
     const refresh = () => {
       if (document.visibilityState === "visible") router.refresh();
     };
-    const timer = window.setInterval(refresh, 60_000);
+    // The free provider is polled server-side once a minute. Revalidating the
+    // RSC payload more frequently makes a newly persisted goal/status appear
+    // without the supporter manually refreshing the page.
+    const timer = window.setInterval(refresh, 15_000);
     return () => window.clearInterval(timer);
   }, [data.match.kickoff, data.match.status, router]);
 
@@ -174,6 +179,9 @@ export default function MatchCenterClient({
     data.lineups[
       lineupSide
     ];
+  const announcedSquad = data.matchdaySquad?.teamSide === lineupSide && activeLineup?.confirmationStatus !== "confirmed"
+    ? data.matchdaySquad
+    : null;
 
   return (
     <main
@@ -219,13 +227,16 @@ export default function MatchCenterClient({
           "
         >
           <div>
+            <div className="mb-4">
+              <BrandHomeLink title="Match Center" />
+            </div>
             <Link
               href="/matches"
               className="
                 inline-flex
                 items-center
                 gap-2
-                text-[10px]
+                text-xs
                 uppercase
                 tracking-[0.2em]
               "
@@ -241,34 +252,6 @@ export default function MatchCenterClient({
 
               Matches
             </Link>
-
-            <p
-              className="
-                mt-5
-                text-[10px]
-                uppercase
-                tracking-[0.3em]
-              "
-              style={{
-                color:
-                  theme.colors
-                    .textMuted,
-              }}
-            >
-              FC Barcelona
-            </p>
-
-            <h1
-              className="
-                mt-2
-                text-2xl
-                font-medium
-                tracking-[-0.04em]
-                sm:text-3xl
-              "
-            >
-              Match Center
-            </h1>
           </div>
 
           <KitSelector
@@ -350,10 +333,10 @@ export default function MatchCenterClient({
                 }}
               >
                 <SectionHeader
-                  eyebrow="Tactical View"
-                  title="Starting XI"
+                  eyebrow={announcedSquad ? "Official Selection" : "Tactical View"}
+                  title={announcedSquad ? "Matchday Squad" : "Starting XI"}
                   right={
-                    activeLineup
+                    announcedSquad ? `${announcedSquad.names.length} players` : activeLineup
                       ?.formation ??
                     "—"
                   }
@@ -398,7 +381,7 @@ export default function MatchCenterClient({
                             flex-1
                             px-4
                             py-3
-                            text-[10px]
+                            text-xs
                             uppercase
                             tracking-[0.16em]
                           "
@@ -447,12 +430,7 @@ export default function MatchCenterClient({
                 </div>
 
                 <div className="p-4 sm:p-5">
-                  <FormationPitch
-                    lineup={
-                      activeLineup
-                    }
-                    theme={theme}
-                  />
+                  {announcedSquad ? <MatchdaySquad squad={announcedSquad} theme={theme} /> : <FormationPitch lineup={activeLineup} theme={theme} />}
                 </div>
               </section>
 
@@ -668,9 +646,9 @@ function ScoreHero({
         .kickoff,
     );
 
-  const finished =
-    data.match.status ===
-    "finished";
+  const hasActiveScore =
+    ["live", "halftime", "extra_time", "penalties", "finished"].includes(data.match.status) &&
+    data.match.score.home !== null && data.match.score.away !== null;
 
   return (
     <section
@@ -768,7 +746,7 @@ function ScoreHero({
             <p
               className="
                 mt-1
-                text-[9px]
+                text-xs
                 uppercase
                 tracking-[0.18em]
               "
@@ -787,7 +765,7 @@ function ScoreHero({
 
         <div
           className="
-            text-[9px]
+            text-xs
             uppercase
             tracking-[0.2em]
           "
@@ -832,7 +810,7 @@ function ScoreHero({
             sm:min-w-37.5
           "
         >
-          {finished ? (
+          {hasActiveScore ? (
             <>
               <div
                 className="
@@ -871,7 +849,7 @@ function ScoreHero({
               <p
                 className="
                   mt-3
-                  text-[9px]
+                  text-xs
                   uppercase
                   tracking-[0.25em]
                 "
@@ -881,7 +859,7 @@ function ScoreHero({
                       .textMuted,
                 }}
               >
-                Full Time
+                {statusLabel(data.match.status)}
               </p>
             </>
           ) : (
@@ -1075,7 +1053,7 @@ function HeroTeam({
       <p
         className="
           mt-1
-          text-[9px]
+          text-xs
           uppercase
           tracking-[0.16em]
         "
@@ -1145,7 +1123,7 @@ function MetaItem({
       <div>
         <p
           className="
-            text-[8px]
+            text-xs
             uppercase
             tracking-[0.2em]
           "
@@ -1315,7 +1293,7 @@ function TeamComparison({
           grid-cols-[64px_minmax(0,1fr)_64px]
           items-center
           gap-5
-          text-[9px]
+          text-xs
           uppercase
           tracking-[0.16em]
         "
@@ -1450,7 +1428,7 @@ function ComparisonRow({
         <p
           className="
             text-center
-            text-[9px]
+            text-xs
             uppercase
             tracking-[0.16em]
           "
@@ -1560,7 +1538,7 @@ function PlayerPerformances({
             border-b
             px-5
             py-3
-            text-[8px]
+            text-xs
             uppercase
             tracking-[0.16em]
           "
@@ -1677,7 +1655,7 @@ function PlayerPerformances({
                     <p
                       className="
                         mt-0.5
-                        text-[8px]
+                        text-xs
                         uppercase
                         tracking-[0.13em]
                       "
@@ -1825,7 +1803,7 @@ function PlayerPortrait({
         items-center
         justify-center
         border
-        text-[9px]
+        text-xs
       "
       style={{
         borderColor:
@@ -1882,7 +1860,7 @@ function RatingCell({
           py-1
           text-center
           font-mono
-          text-[11px]
+          text-xs
           font-semibold
           tabular-nums
         "
@@ -1978,7 +1956,7 @@ function SectionHeader({
       <div>
         <p
           className="
-            text-[8px]
+            text-xs
             uppercase
             tracking-[0.24em]
           "
@@ -1998,7 +1976,7 @@ function SectionHeader({
 
       <span
         className="
-          text-[9px]
+          text-xs
           uppercase
           tracking-[0.16em]
         "
@@ -2061,7 +2039,7 @@ function KitSelector({
               border-r
               px-3
               py-2
-              text-[8px]
+              text-xs
               uppercase
               tracking-[0.16em]
               last:border-r-0

@@ -586,8 +586,9 @@ export default function SquadOverview({
                 flex
                 items-center
                 gap-4
-                px-6
+                px-4
                 py-5
+                sm:px-6
               "
             >
               <div
@@ -615,10 +616,10 @@ export default function SquadOverview({
                 />
               </div>
 
-              <div>
+              <div className="min-w-0">
                 <p
                   className="
-                    text-[8px]
+                    text-xs
                     uppercase
                     tracking-[0.2em]
                   "
@@ -643,7 +644,7 @@ export default function SquadOverview({
                 <p
                   className="
                     mt-1
-                    text-[9px]
+                    text-xs
                   "
                   style={{
                     color:
@@ -764,7 +765,7 @@ export default function SquadOverview({
 
           <p
             className="
-              text-[8px]
+              text-xs
               leading-4
             "
             style={{
@@ -789,7 +790,7 @@ export default function SquadOverview({
               border
               px-4
               py-3
-              text-[8px]
+              text-xs
             "
             style={{
               borderColor:
@@ -880,7 +881,7 @@ export default function SquadOverview({
                   bg-transparent
                   pl-9
                   pr-3
-                  text-[10px]
+                  text-xs
                   outline-none
                 "
                 style={{
@@ -1142,7 +1143,7 @@ export default function SquadOverview({
               className="
                 ml-auto
                 self-center
-                text-[7px]
+                text-xs
               "
               style={{
                 color:
@@ -1187,7 +1188,7 @@ export default function SquadOverview({
                   >
                     <p
                       className="
-                        text-[9px]
+                        text-xs
                         font-medium
                         uppercase
                         tracking-[0.17em]
@@ -1206,7 +1207,7 @@ export default function SquadOverview({
 
                     <span
                       className="
-                        text-[7px]
+                        text-xs
                       "
                       style={{
                         color:
@@ -1611,7 +1612,7 @@ function PlayerCard({
               border
               px-2
               py-1.5
-              text-[6px]
+              text-xs
               uppercase
             "
             style={{
@@ -1740,7 +1741,7 @@ function PlayerCard({
       >
         <p
           className="
-            text-[7px]
+            text-xs
             uppercase
             tracking-[0.13em]
           "
@@ -1781,7 +1782,7 @@ function PlayerCard({
             flex
             flex-wrap
             gap-x-3
-            text-[7px]
+            text-xs
           "
           style={{
             color:
@@ -1940,7 +1941,7 @@ function PitchView({
     >
       <p
         className="
-          text-[8px]
+          text-xs
           uppercase
           tracking-[0.17em]
         "
@@ -1955,7 +1956,7 @@ function PitchView({
       <p
         className="
           mt-1
-          text-[8px]
+          text-xs
         "
         style={{
           color:
@@ -2040,7 +2041,7 @@ function PitchView({
                     className="
                       mb-3
                       text-center
-                      text-[7px]
+                      text-xs
                       uppercase
                     "
                     style={{
@@ -2150,7 +2151,7 @@ function PitchView({
                           >
                             <p
                               className="
-                                text-[6px]
+                                text-xs
                               "
                               style={{
                                 color:
@@ -2167,7 +2168,7 @@ function PitchView({
                             <p
                               className="
                                 truncate
-                                text-[8px]
+                                text-xs
                                 font-medium
                               "
                             >
@@ -2258,7 +2259,7 @@ function AvailabilityBadge({
         border
         px-2
         py-1
-        text-[6px]
+        text-xs
         uppercase
       "
       style={{
@@ -2325,7 +2326,7 @@ function PlayerMetric({
     >
       <p
         className="
-          text-[6px]
+          text-xs
           uppercase
         "
         style={{
@@ -2339,7 +2340,7 @@ function PlayerMetric({
       <p
         className="
           mt-1
-          text-[10px]
+          text-xs
           font-medium
         "
       >
@@ -2397,7 +2398,7 @@ function HeaderMetric({
     >
       <p
         className="
-          text-[7px]
+          text-xs
           uppercase
         "
         style={{
@@ -2458,7 +2459,7 @@ function FilterButton({
         border
         px-3
         py-1.5
-        text-[7px]
+        text-xs
         uppercase
       "
       style={{
@@ -2523,7 +2524,7 @@ function AvailabilityFilterButton({
         border
         px-3
         py-1.5
-        text-[7px]
+        text-xs
         uppercase
       "
       style={{
@@ -2586,7 +2587,7 @@ function ViewButton({
         gap-2
         border-r
         px-3
-        text-[7px]
+        text-xs
         uppercase
         last:border-r-0
       "

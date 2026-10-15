@@ -76,7 +76,7 @@ export default function BarcaPulse({
       <header className="flex items-start justify-between pb-6">
         <div>
           <p
-            className="text-[10px] uppercase tracking-[0.24em]"
+            className="text-xs uppercase tracking-[0.24em]"
             style={{
               color:
                 theme.colors.textMuted,
@@ -303,7 +303,7 @@ function NormalPulse({
             />
 
             <div
-              className="mt-3 flex items-center justify-between text-[9px] uppercase tracking-[0.15em]"
+              className="mt-3 flex items-center justify-between text-xs uppercase tracking-[0.15em]"
               style={{
                 color:
                   theme.colors.textMuted,
@@ -480,7 +480,33 @@ function MatchdayPulse({
         theme={theme}
         label="Open Pre-Match"
       />
+
+      <PreviousMatch theme={theme} match={overview.previousMatch} />
     </div>
+  );
+}
+
+function PreviousMatch({
+  theme,
+  match,
+}: {
+  theme: KitTheme;
+  match: DashboardOverview["previousMatch"];
+}) {
+  if (!match) return null;
+
+  return (
+    <Section title="Previous Match">
+      <Link href={`/matches/${match.id}`} className="group block border-y py-3 transition-opacity hover:opacity-80" style={{ borderColor: theme.colors.border }}>
+        <TeamResultRow name={match.homeTeam.shortName ?? match.homeTeam.name} crestUrl={match.homeTeam.crestUrl} score={match.score.home} />
+        <div className="my-2 h-px" style={{ backgroundColor: theme.colors.border }} />
+        <TeamResultRow name={match.awayTeam.shortName ?? match.awayTeam.name} crestUrl={match.awayTeam.crestUrl} score={match.score.away} />
+        <div className="mt-3 flex items-center justify-between text-xs uppercase tracking-[0.08em]" style={{ color: theme.colors.textMuted }}>
+          <span>{match.competition.shortName ?? match.competition.name}</span>
+          <span>{formatMatchDate(match.kickoff)}</span>
+        </div>
+      </Link>
+    </Section>
   );
 }
 
@@ -689,7 +715,7 @@ function Section({
 }) {
   return (
     <section>
-      <p className="mb-4 text-[10px] uppercase tracking-[0.22em] opacity-45">
+      <p className="mb-4 text-xs uppercase tracking-[0.22em] opacity-45">
         {title}
       </p>
 
@@ -720,7 +746,7 @@ function Metric({
       </p>
 
       <p
-        className="mt-2 text-[9px] uppercase tracking-[0.17em]"
+        className="mt-2 text-xs uppercase tracking-[0.17em]"
         style={{
           color:
             theme.colors.textMuted,
@@ -754,7 +780,7 @@ function MiniMetric({
       </p>
 
       <p
-        className="mt-1 text-[8px] uppercase tracking-[0.15em]"
+        className="mt-1 text-xs uppercase tracking-[0.15em]"
         style={{
           color:
             theme.colors.textMuted,
@@ -841,7 +867,7 @@ function TeamVsRow({
         align="right"
       />
 
-      <span className="text-[9px] uppercase tracking-[0.2em] opacity-40">
+      <span className="text-xs uppercase tracking-[0.2em] opacity-40">
         VS
       </span>
 
@@ -925,7 +951,7 @@ function InfoRow({
   return (
     <div className="flex items-center justify-between gap-4 py-2">
       <span
-        className="text-[9px] uppercase tracking-[0.15em]"
+        className="text-xs uppercase tracking-[0.15em]"
         style={{
           color:
             theme.colors.textMuted,

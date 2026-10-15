@@ -68,7 +68,7 @@ function MediaUnavailable() {
     >
       <p
         className="
-          text-[8px]
+          text-xs
           uppercase
           tracking-[0.2em]
         "
@@ -88,7 +88,7 @@ function MediaUnavailable() {
         className="
           mt-2
           max-w-lg
-          text-[10px]
+          text-xs
           leading-5
         "
         style={{

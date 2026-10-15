@@ -455,7 +455,7 @@ function PlayerMarker({
           px-1.5
           py-0.5
           text-center
-          text-[9px]
+          text-xs
           font-medium
           leading-4
           text-white
@@ -528,7 +528,7 @@ function PlayerStatus({
           <span className="h-2.5 w-1.5 rounded-[1px] bg-[#F2CA45]" />
 
           {yellowCards > 1 ? (
-            <span className="text-[7px] text-white/70">
+            <span className="text-xs text-white/70">
               ×{yellowCards}
             </span>
           ) : null}
@@ -548,7 +548,7 @@ function PlayerStatus({
             flex
             items-center
             gap-0.5
-            text-[7px]
+            text-xs
             font-semibold
             text-[#E56B73]
           "
@@ -597,7 +597,7 @@ function Bench({
       <div className="flex items-center justify-between gap-4">
         <div>
           <p
-            className="text-[9px] uppercase tracking-[0.24em]"
+            className="text-xs uppercase tracking-[0.24em]"
             style={{
               color:
                 theme.colors
@@ -619,7 +619,7 @@ function Bench({
         {lineup.coachName ? (
           <div className="text-right">
             <p
-              className="text-[9px] uppercase tracking-[0.22em]"
+              className="text-xs uppercase tracking-[0.22em]"
               style={{
                 color:
                   theme.colors
@@ -702,7 +702,7 @@ function Bench({
                     shrink-0
                     text-right
                     font-mono
-                    text-[10px]
+                    text-xs
                   "
                   style={{
                     color:
@@ -714,7 +714,7 @@ function Bench({
                     "—"}
                 </span>
 
-                <span className="min-w-0 flex-1 truncate text-[11px]">
+                <span className="min-w-0 flex-1 truncate text-xs">
                   {
                     player.player
                       .name
@@ -738,7 +738,7 @@ function Bench({
                         flex
                         items-center
                         gap-0.5
-                        text-[8px]
+                        text-xs
                         font-semibold
                         text-[#58C98D]
                       "
@@ -790,7 +790,7 @@ function UnknownFormation({
         }}
       >
         <p
-          className="text-[9px] uppercase tracking-[0.24em]"
+          className="text-xs uppercase tracking-[0.24em]"
           style={{
             color:
               theme.colors
@@ -822,7 +822,7 @@ function UnknownFormation({
                 }}
               >
                 <span
-                  className="w-5 font-mono text-[10px]"
+                  className="w-5 font-mono text-xs"
                   style={{
                     color:
                       theme.colors
@@ -833,7 +833,7 @@ function UnknownFormation({
                 </span>
 
                 <span
-                  className="w-6 text-right font-mono text-[10px]"
+                  className="w-6 text-right font-mono text-xs"
                   style={{
                     color:
                       theme.colors
@@ -852,7 +852,7 @@ function UnknownFormation({
                 </span>
 
                 <span
-                  className="text-[9px] uppercase tracking-[0.12em]"
+                  className="text-xs uppercase tracking-[0.12em]"
                   style={{
                     color:
                       theme.colors

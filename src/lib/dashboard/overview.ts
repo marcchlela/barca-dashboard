@@ -107,7 +107,7 @@ export async function getDashboardOverview() {
   |--------------------------------------------------------------------------
   */
 
-  const nextMatch =
+  const activeMatch =
     await db.orm.public.Match
       .where((match) =>
         or(
@@ -120,15 +120,16 @@ export async function getDashboardOverview() {
         ),
       )
       .where((match) =>
-        match.kickoff.gte(now),
-      )
-      .where((match) =>
         match.status.in([
-          "scheduled",
           "live",
           "halftime",
+          "extra_time",
+          "penalties",
         ]),
       )
+      // Ignore a stale provider status from an older fixture.
+      .where((match) => match.kickoff.lte(now))
+      .where((match) => match.kickoff.gte(now.subtract({ hours: 12 })))
       .include("homeTeam")
       .include("awayTeam")
       .include("competition")
@@ -136,6 +137,18 @@ export async function getDashboardOverview() {
         match.kickoff.asc(),
       )
       .first();
+
+  const nextMatch = activeMatch ?? await db.orm.public.Match
+    .where((match) => or(match.homeTeamId.eq(barcelonaId), match.awayTeamId.eq(barcelonaId)))
+    // Keep today's fixture on the stage briefly after kickoff even if a
+    // delayed provider still calls it scheduled. Do not jump to next week.
+    .where((match) => match.kickoff.gte(now.subtract({ hours: 4 })))
+    .where({ status: "scheduled" })
+    .include("homeTeam")
+    .include("awayTeam")
+    .include("competition")
+    .orderBy((match) => match.kickoff.asc())
+    .first();
 
   /*
   |--------------------------------------------------------------------------

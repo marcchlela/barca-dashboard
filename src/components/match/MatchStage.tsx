@@ -94,7 +94,7 @@ export default function MatchStage({
       >
         <div>
           <p
-            className="text-[10px] font-semibold uppercase tracking-[0.28em]"
+            className="text-xs font-semibold uppercase tracking-[0.28em]"
             style={{
               color:
                 theme.colors.textMuted,
@@ -122,7 +122,7 @@ export default function MatchStage({
                       .competition
                       .name
                   }
-                  className="h-4 w-4 object-contain"
+                  className={`h-5 w-5 object-contain ${contextMatch.competition.code === "CL" ? "brightness-0 invert" : ""}`}
                 />
               </>
             ) : (
@@ -716,7 +716,7 @@ function MatchupHero({
 
         <div className="flex flex-col items-center">
           <span
-            className="text-[9px] font-semibold uppercase tracking-[0.4em]"
+            className="text-xs font-semibold uppercase tracking-[0.4em]"
             style={{
               color:
                 theme.colors.textMuted,
@@ -824,7 +824,7 @@ function TeamHero({
       </p>
 
       <p
-        className="mt-1 text-[9px] uppercase tracking-[0.18em]"
+        className="mt-1 text-xs uppercase tracking-[0.18em]"
         style={{
           color:
             isBarcelona
@@ -1062,7 +1062,7 @@ function MatchCountdown({
   ) {
     return (
       <div
-        className="mt-6 border-y px-6 py-3 text-[10px] font-semibold uppercase tracking-[0.25em]"
+        className="mt-6 border-y px-6 py-3 text-xs font-semibold uppercase tracking-[0.25em]"
         style={{
           borderColor:
             theme.colors.border,
@@ -1071,7 +1071,7 @@ function MatchCountdown({
             theme.colors.accent,
         }}
       >
-        Kickoff
+        {remaining < -5 * 60_000 ? "Awaiting live update" : "Kickoff"}
       </div>
     );
   }
@@ -1110,7 +1110,7 @@ function MatchCountdown({
   return (
     <div className="mt-6">
       <p
-        className="mb-3 text-center text-[8px] uppercase tracking-[0.24em]"
+        className="mb-3 text-center text-xs uppercase tracking-[0.24em]"
         style={{
           color:
             theme.colors.textMuted,
@@ -1201,7 +1201,7 @@ function CountdownUnit({
         {value}
       </p>
 
-      <p className="mt-1 text-[8px] uppercase tracking-[0.17em] opacity-45">
+      <p className="mt-1 text-xs uppercase tracking-[0.17em] opacity-45">
         {label}
       </p>
     </div>
@@ -1256,7 +1256,7 @@ function MatchMeta({
     >
       <div className="px-3 py-4 text-right sm:px-5">
         <div
-          className="flex items-center justify-end gap-2 text-[9px] uppercase tracking-[0.18em]"
+          className="flex items-center justify-end gap-2 text-xs uppercase tracking-[0.18em]"
           style={{
             color:
               theme.colors.textMuted,
@@ -1296,7 +1296,7 @@ function MatchMeta({
 
       <div className="px-3 py-4 text-left sm:px-5">
         <p
-          className="text-[9px] uppercase tracking-[0.18em]"
+          className="text-xs uppercase tracking-[0.18em]"
           style={{
             color:
               theme.colors.textMuted,
@@ -1313,7 +1313,7 @@ function MatchMeta({
       </div>
 
       <div
-        className="col-span-3 border-t px-5 py-3 text-center text-[10px] uppercase tracking-[0.16em]"
+        className="col-span-3 border-t px-5 py-3 text-center text-xs uppercase tracking-[0.16em]"
         style={{
           borderColor:
             theme.colors.border,
@@ -1362,7 +1362,7 @@ function MatchStatusStrip({
         }}
       >
         <p
-          className="text-[9px] uppercase tracking-[0.17em]"
+          className="text-xs uppercase tracking-[0.17em]"
           style={{
             color:
               theme.colors.textMuted,
@@ -1381,7 +1381,7 @@ function MatchStatusStrip({
 
       <div className="px-4 py-4">
         <p
-          className="text-[9px] uppercase tracking-[0.17em]"
+          className="text-xs uppercase tracking-[0.17em]"
           style={{
             color:
               theme.colors.textMuted,
@@ -1419,7 +1419,7 @@ function StatusLabel({
 }) {
   return (
     <div
-      className="mb-5 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.24em]"
+      className="mb-5 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.24em]"
       style={{
         color,
       }}
@@ -1544,7 +1544,7 @@ function PrimaryButton({
   return (
     <Link
       href={href}
-      className="mt-7 flex items-center gap-3 border px-6 py-3 text-[11px] font-semibold uppercase tracking-[0.15em] transition-transform hover:translate-x-1"
+      className="mt-7 flex items-center gap-3 border px-6 py-3 text-xs font-semibold uppercase tracking-[0.15em] transition-transform hover:translate-x-1"
       style={{
         backgroundColor:
           theme.colors.primary,
@@ -1573,7 +1573,7 @@ function EmptyState({
   return (
     <div className="max-w-md py-12">
       <p
-        className="text-[10px] uppercase tracking-[0.22em]"
+        className="text-xs uppercase tracking-[0.22em]"
         style={{
           color:
             theme.colors.textMuted,

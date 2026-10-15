@@ -182,6 +182,11 @@ const TEAM_ALIAS_GROUPS = [
     "levante",
     "levante ud",
   ],
+
+  [
+    "galatasaray",
+    "galatasaray sk",
+  ],
 ] as const;
 
 const COMPETITION_ALIAS_GROUPS = [

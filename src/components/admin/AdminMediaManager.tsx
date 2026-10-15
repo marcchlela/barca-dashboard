@@ -396,7 +396,7 @@ export default function AdminMediaManager({
         <div>
           <p
             className="
-              text-[9px]
+              text-xs
               uppercase
               tracking-[0.24em]
             "
@@ -425,7 +425,7 @@ export default function AdminMediaManager({
             className="
               mt-2
               max-w-2xl
-              text-[11px]
+              text-xs
               leading-5
             "
             style={{
@@ -578,7 +578,7 @@ export default function AdminMediaManager({
                 min-w-0
                 flex-1
                 bg-transparent
-                text-[11px]
+                text-xs
                 outline-none
                 placeholder:text-current
                 placeholder:opacity-45
@@ -816,7 +816,7 @@ export default function AdminMediaManager({
             <div>
               <p
                 className="
-                  text-[8px]
+                  text-xs
                   uppercase
                   tracking-[0.17em]
                 "
@@ -831,7 +831,7 @@ export default function AdminMediaManager({
               <p
                 className="
                   mt-1
-                  text-[8px]
+                  text-xs
                 "
                 style={{
                   color:
@@ -847,7 +847,7 @@ export default function AdminMediaManager({
 
             <p
               className="
-                text-[8px]
+                text-xs
                 tabular-nums
               "
               style={{
@@ -947,7 +947,7 @@ export default function AdminMediaManager({
                 <p
                   className="
                     mt-2
-                    text-[9px]
+                    text-xs
                   "
                   style={{
                     color:
@@ -1049,7 +1049,7 @@ function SegmentControl({
       >
         <span
           className="
-            text-[7px]
+            text-xs
             uppercase
             tracking-[0.16em]
           "
@@ -1175,7 +1175,7 @@ function MediaGroupSection({
                   items-center
                   gap-x-2
                   gap-y-1
-                  text-[7px]
+                  text-xs
                   uppercase
                   tracking-[0.14em]
                 "
@@ -1301,7 +1301,7 @@ function MediaGroupSection({
                     <span
                       className="
                         shrink-0
-                        text-[7px]
+                        text-xs
                         uppercase
                         tracking-[0.14em]
                       "
@@ -1334,7 +1334,7 @@ function MediaGroupSection({
                   <span
                     className="
                       shrink-0
-                      text-[7px]
+                      text-xs
                       uppercase
                       tracking-[0.14em]
                     "
@@ -1394,7 +1394,7 @@ function MediaGroupSection({
                     inline-flex
                     items-center
                     gap-1.5
-                    text-[7px]
+                    text-xs
                     uppercase
                     tracking-[0.13em]
                   "
@@ -1415,7 +1415,7 @@ function MediaGroupSection({
               0 ? (
                 <span
                   className="
-                    text-[7px]
+                    text-xs
                     uppercase
                     tracking-[0.13em]
                   "
@@ -1437,7 +1437,7 @@ function MediaGroupSection({
                   border
                   px-2.5
                   py-1.5
-                  text-[7px]
+                  text-xs
                   uppercase
                   tracking-[0.12em]
                 "
@@ -1478,7 +1478,7 @@ function MediaGroupSection({
             <div>
               <p
                 className="
-                  text-[7px]
+                  text-xs
                   uppercase
                   tracking-[0.15em]
                 "
@@ -1497,7 +1497,7 @@ function MediaGroupSection({
               <p
                 className="
                   mt-1
-                  text-[8px]
+                  text-xs
                 "
                 style={{
                   color:
@@ -1515,7 +1515,7 @@ function MediaGroupSection({
                 border
                 px-2.5
                 py-1.5
-                text-[7px]
+                text-xs
                 uppercase
                 tracking-[0.12em]
               "
@@ -1830,7 +1830,7 @@ function MediaRow({
                 inline-flex
                 items-center
                 gap-1
-                text-[7px]
+                text-xs
                 uppercase
                 tracking-[0.13em]
               "
@@ -1852,7 +1852,7 @@ function MediaRow({
           className="
             mt-2
             line-clamp-2
-            text-[11px]
+            text-xs
             font-medium
             leading-4
 
@@ -1873,7 +1873,7 @@ function MediaRow({
             items-center
             gap-x-3
             gap-y-1
-            text-[8px]
+            text-xs
             uppercase
             tracking-[0.09em]
           "
@@ -2313,7 +2313,7 @@ function MediaInspector({
       >
         <p
           className="
-            text-[8px]
+            text-xs
             uppercase
             tracking-[0.18em]
           "
@@ -2423,7 +2423,7 @@ function MediaInspector({
                   inline-flex
                   items-center
                   gap-1
-                  text-[7px]
+                  text-xs
                   uppercase
                   tracking-[0.13em]
                 "
@@ -2467,7 +2467,7 @@ function MediaInspector({
             inline-flex
             items-center
             gap-2
-            text-[8px]
+            text-xs
             uppercase
             tracking-[0.12em]
             transition-opacity
@@ -2565,7 +2565,7 @@ function MediaInspector({
         >
           <p
             className="
-              text-[8px]
+              text-xs
               uppercase
               tracking-[0.17em]
             "
@@ -2580,7 +2580,7 @@ function MediaInspector({
           <label className="mt-4 block">
             <span
               className="
-                text-[8px]
+                text-xs
                 uppercase
                 tracking-[0.13em]
               "
@@ -2616,7 +2616,7 @@ function MediaInspector({
                   bg-transparent
                   px-3
                   pr-9
-                  text-[10px]
+                  text-xs
                   outline-none
                 "
                 style={{
@@ -2670,7 +2670,7 @@ function MediaInspector({
           <label className="mt-4 block">
             <span
               className="
-                text-[8px]
+                text-xs
                 uppercase
                 tracking-[0.13em]
               "
@@ -2705,7 +2705,7 @@ function MediaInspector({
                   bg-transparent
                   px-3
                   pr-9
-                  text-[10px]
+                  text-xs
                   outline-none
                 "
                 style={{
@@ -2784,7 +2784,7 @@ function MediaInspector({
               justify-center
               gap-2
               border
-              text-[8px]
+              text-xs
               font-semibold
               uppercase
               tracking-[0.14em]
@@ -2832,7 +2832,7 @@ function MediaInspector({
         >
           <p
             className="
-              text-[8px]
+              text-xs
               uppercase
               tracking-[0.17em]
             "
@@ -2866,7 +2866,7 @@ function MediaInspector({
               justify-between
               border
               px-3
-              text-[8px]
+              text-xs
               uppercase
               tracking-[0.12em]
               disabled:cursor-not-allowed
@@ -2909,7 +2909,7 @@ function MediaInspector({
               justify-between
               border
               px-3
-              text-[8px]
+              text-xs
               uppercase
               tracking-[0.12em]
               disabled:cursor-not-allowed
@@ -2951,7 +2951,7 @@ function MediaInspector({
               justify-between
               border
               px-3
-              text-[8px]
+              text-xs
               uppercase
               tracking-[0.12em]
               disabled:cursor-not-allowed
@@ -2983,7 +2983,7 @@ function MediaInspector({
               gap-2
               border
               p-3
-              text-[9px]
+              text-xs
               leading-4
             "
             style={{
@@ -3014,7 +3014,7 @@ function MediaInspector({
               gap-2
               border
               p-3
-              text-[9px]
+              text-xs
               leading-4
             "
             style={{
@@ -3082,7 +3082,7 @@ function HeaderMetric({
     >
       <p
         className="
-          text-[7px]
+          text-xs
           uppercase
           tracking-[0.14em]
         "
@@ -3155,7 +3155,7 @@ function FilterButton({
         cursor-pointer
         px-4
         py-3
-        text-[8px]
+        text-xs
         uppercase
         tracking-[0.11em]
 
@@ -3253,7 +3253,7 @@ function StyledSelect({
           absolute
           left-3
           top-1.5
-          text-[6px]
+          text-xs
           uppercase
           tracking-[0.14em]
         "
@@ -3289,7 +3289,7 @@ function StyledSelect({
           pb-1
           pt-3
           pr-8
-          text-[9px]
+          text-xs
           outline-none
         "
         style={{
@@ -3367,7 +3367,7 @@ function MediaTypeBadge({
         inline-flex
         items-center
         gap-1.5
-        text-[7px]
+        text-xs
         font-semibold
         uppercase
         tracking-[0.13em]
@@ -3443,7 +3443,7 @@ function InspectorDetail({
     >
       <p
         className="
-          text-[7px]
+          text-xs
           uppercase
           tracking-[0.12em]
         "
@@ -3459,7 +3459,7 @@ function InspectorDetail({
         className={`
           mt-1
           break-all
-          text-[8px]
+          text-xs
           leading-4
 
           ${
@@ -3510,7 +3510,7 @@ function EmptyInspector() {
           className="mx-auto"
         />
 
-        <p className="mt-4 text-[10px]">
+        <p className="mt-4 text-xs">
           Select a media item
           to inspect it.
         </p>
