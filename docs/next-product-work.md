@@ -29,6 +29,6 @@ This list records requested follow-up work. It does not activate any service or 
 
 ## Additional match coverage
 
-- Add verified beIN SPORTS Arabic highlights as an optional external broadcaster link, alongside (not in place of) official FC Barcelona YouTube media. The current GOAL video endpoint returned no Galatasaray–Barça videos, and the beIN website does not expose a stable permitted feed that the app can safely ingest. Use a manually verified official link or a future authorized feed; do not scrape/guess URLs or treat it as the YouTube highlight required for goal timestamps.
-- Monitor the automatic Big Balls post-match ratings recovery on a newly finished real fixture. It retries absent Barça ratings with persisted cooldowns and protects existing canonical/manual rows; team statistics and lineups alone are not treated as ratings.
+- Monitor the official beIN SPORTS Arabic YouTube ingestion on later fixtures. The bounded worker checks only the verified channel, fixture publication window and highlight titles; GOAL video metadata remains a fallback. It does not replace official FC Barcelona media used for goal timestamps.
+- Monitor automatic post-match player-performance recovery on a newly finished real fixture. Big Balls ratings remain preferred, while StatsHawk safely fills minutes, goals, assists, shots, passing and defensive fields when ratings are unavailable.
 - If local development needs hands-free polling, add an explicit opt-in runner with the same cooldowns and free-tier limits; `next dev` currently runs the web app only.
