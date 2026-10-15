@@ -13,6 +13,7 @@ import { syncCompetitionFixtures } from "../../../../lib/analytics/competition-s
 import {
   syncRichMatch,
 } from "../../../../lib/providers/rich-match/sync";
+import { persistCanonicalPlayerStatistics } from "../../../../lib/providers/rich-match/persist-canonical-player-stats";
 
 import {
   richMatchQa,
@@ -51,6 +52,24 @@ type RequestBody = {
     unknown;
   competitionCode?: unknown;
 };
+
+async function syncCompleteRichMatch(matchId: string, dryRun: boolean) {
+  const richMatch = await syncRichMatch({ matchId, dryRun });
+  try {
+    const playerStatistics = await persistCanonicalPlayerStatistics({ matchId, dryRun });
+    return { richMatch, playerStatistics: { status: "success" as const, result: playerStatistics } };
+  } catch (error) {
+    // Lineups/events remain useful when a free player-stat provider has not
+    // published its box score yet. The automatic worker will retry this stage.
+    return {
+      richMatch,
+      playerStatistics: {
+        status: "unavailable" as const,
+        error: error instanceof Error ? error.message : String(error),
+      },
+    };
+  }
+}
 
 const MATCH_ACTIONS =
   new Set<
@@ -158,25 +177,13 @@ export async function POST(
 
       case "rich_match_preview":
         result =
-          await syncRichMatch({
-            matchId:
-              matchId!,
-
-            dryRun:
-              true,
-          });
+          await syncCompleteRichMatch(matchId!, true);
 
         break;
 
       case "rich_match_sync":
         result =
-          await syncRichMatch({
-            matchId:
-              matchId!,
-
-            dryRun:
-              false,
-          });
+          await syncCompleteRichMatch(matchId!, false);
 
         break;
 
