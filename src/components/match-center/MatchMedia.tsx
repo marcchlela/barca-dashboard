@@ -128,7 +128,7 @@ export default function MatchMedia({
         <div>
           <p
             className="
-              text-[8px]
+              text-xs
               uppercase
               tracking-[0.24em]
             "
@@ -151,7 +151,7 @@ export default function MatchMedia({
             flex
             items-center
             gap-2
-            text-[8px]
+            text-xs
             uppercase
             tracking-[0.15em]
           "
@@ -201,7 +201,7 @@ export default function MatchMedia({
             >
               <p
                 className="
-                  text-[8px]
+                  text-xs
                   font-semibold
                   uppercase
                   tracking-[0.2em]
@@ -454,7 +454,7 @@ function FeaturedMedia({
                     inline-flex
                     items-center
                     gap-1.5
-                    text-[8px]
+                    text-xs
                     font-semibold
                     uppercase
                     tracking-[0.15em]
@@ -492,7 +492,7 @@ function FeaturedMedia({
               <p
                 className="
                   mt-3
-                  text-[11px]
+                  text-xs
                   leading-5
                 "
                 style={{
@@ -547,7 +547,7 @@ function FeaturedMedia({
                 <div>
                   <p
                     className="
-                      text-[8px]
+                      text-xs
                       uppercase
                       tracking-[0.15em]
                     "
@@ -595,7 +595,7 @@ function FeaturedMedia({
                 inline-flex
                 items-center
                 gap-2
-                text-[8px]
+                text-xs
                 font-semibold
                 uppercase
                 tracking-[0.14em]
@@ -814,7 +814,7 @@ function MediaCard({
           className="
             mt-2
             line-clamp-2
-            text-[11px]
+            text-xs
             font-medium
             leading-4
           "
@@ -867,7 +867,7 @@ function EmptyMedia({
       >
         <p
           className="
-            text-[8px]
+            text-xs
             uppercase
             tracking-[0.24em]
           "
@@ -929,7 +929,7 @@ function EmptyMedia({
           <p
             className="
               mt-2
-              text-[10px]
+              text-xs
               leading-5
             "
             style={{
@@ -963,7 +963,7 @@ function MediaTypeBadge({
         inline-flex
         items-center
         gap-1.5
-        text-[7px]
+        text-xs
         font-semibold
         uppercase
         tracking-[0.16em]
@@ -1008,7 +1008,7 @@ function PublishedDate({
     return (
       <span
         className="
-          text-[8px]
+          text-xs
           uppercase
           tracking-[0.12em]
         "
@@ -1031,7 +1031,7 @@ function PublishedDate({
   return (
     <span
       className="
-        text-[8px]
+        text-xs
         uppercase
         tracking-[0.12em]
       "

@@ -509,7 +509,7 @@ export default function IntroGate({
       <button
         type="button"
         onClick={finish}
-        className="absolute right-4 top-4 z-30 border px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.2em] backdrop-blur-sm sm:right-6 sm:top-6"
+        className="absolute right-4 top-4 z-30 border px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] backdrop-blur-sm sm:right-6 sm:top-6"
         style={{
           backgroundColor: `${displayedTheme.background}CC`,
           borderColor:
@@ -544,11 +544,11 @@ export default function IntroGate({
             borderColor: `${displayedTheme.border}B8`,
           }}
         >
-          <p className="text-[9px] font-semibold uppercase tracking-[0.3em] opacity-55">
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] opacity-55">
             FC Barcelona
           </p>
 
-          <p className="mt-1.5 text-[11px] uppercase tracking-[0.2em]">
+          <p className="mt-1.5 text-xs uppercase tracking-[0.2em]">
             The Threshold
           </p>
         </div>

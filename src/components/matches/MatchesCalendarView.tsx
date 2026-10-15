@@ -376,7 +376,7 @@ export default function MatchesCalendarView({
         <div>
           <p
             className="
-              text-[7px]
+              text-xs
               uppercase
               tracking-[0.16em]
             "
@@ -428,7 +428,7 @@ export default function MatchesCalendarView({
               cursor-pointer
               border
               px-3
-              text-[7px]
+              text-xs
               uppercase
               tracking-[0.11em]
             "
@@ -583,7 +583,7 @@ export default function MatchesCalendarView({
                     px-2
                     py-2.5
                     text-center
-                    text-[7px]
+                    text-xs
                     font-medium
                     uppercase
                     tracking-[0.12em]
@@ -764,7 +764,7 @@ export default function MatchesCalendarView({
                           absolute
                           bottom-1.5
                           right-2
-                          text-[6px]
+                          text-xs
                           uppercase
                           tracking-[0.08em]
                         "
@@ -913,7 +913,7 @@ function CalendarMatchTile({
 
         <span
           className="
-            text-[6px]
+            text-xs
             uppercase
             tracking-[0.08em]
           "
@@ -959,7 +959,7 @@ function CalendarMatchTile({
             min-w-0
             flex-1
             truncate
-            text-[8px]
+            text-xs
             font-medium
           "
         >
@@ -989,7 +989,7 @@ function CalendarMatchTile({
               flex
               items-center
               gap-1
-              text-[6px]
+              text-xs
               font-medium
               uppercase
               tracking-[0.08em]
@@ -1008,7 +1008,7 @@ function CalendarMatchTile({
         ) : finished ? (
           <span
             className="
-              text-[7px]
+              text-xs
               font-semibold
             "
             style={{
@@ -1023,7 +1023,7 @@ function CalendarMatchTile({
         ) : (
           <span
             className="
-              text-[7px]
+              text-xs
               tabular-nums
             "
             style={{
@@ -1047,7 +1047,7 @@ function CalendarMatchTile({
           null ? (
           <span
             className="
-              text-[8px]
+              text-xs
               font-semibold
               tabular-nums
             "
@@ -1115,7 +1115,7 @@ function SelectedMatchPanel({
           <p
             className="
               mt-3
-              text-[10px]
+              text-xs
               font-medium
             "
           >
@@ -1125,7 +1125,7 @@ function SelectedMatchPanel({
           <p
             className="
               mt-1
-              text-[7px]
+              text-xs
               leading-4
             "
             style={{
@@ -1253,7 +1253,7 @@ function SelectedMatchPanel({
             <span
               className="
                 truncate
-                text-[8px]
+                text-xs
                 uppercase
                 tracking-[0.1em]
               "
@@ -1277,7 +1277,7 @@ function SelectedMatchPanel({
                 flex
                 items-center
                 gap-1
-                text-[7px]
+                text-xs
                 uppercase
                 tracking-[0.1em]
               "
@@ -1301,7 +1301,7 @@ function SelectedMatchPanel({
                 items-center
                 justify-center
                 border
-                text-[9px]
+                text-xs
                 font-semibold
               "
               style={{
@@ -1334,7 +1334,7 @@ function SelectedMatchPanel({
         >
           <p
             className="
-              text-[11px]
+              text-xs
               font-medium
             "
           >
@@ -1348,7 +1348,7 @@ function SelectedMatchPanel({
           <p
             className="
               mt-1
-              text-[8px]
+              text-xs
             "
             style={{
               color:
@@ -1484,7 +1484,7 @@ function SelectedMatchPanel({
           >
             <p
               className="
-                text-[7px]
+                text-xs
                 uppercase
                 tracking-[0.12em]
               "
@@ -1511,7 +1511,7 @@ function SelectedMatchPanel({
                     flex
                     items-center
                     gap-1.5
-                    text-[7px]
+                    text-xs
                     uppercase
                     tracking-[0.08em]
                   "
@@ -1534,7 +1534,7 @@ function SelectedMatchPanel({
                       flex
                       items-center
                       gap-1.5
-                      text-[8px]
+                      text-xs
                       font-medium
                     "
                   >
@@ -1557,7 +1557,7 @@ function SelectedMatchPanel({
               <p
                 className="
                   mt-2
-                  text-[8px]
+                  text-xs
                 "
                 style={{
                   color:
@@ -1583,7 +1583,7 @@ function SelectedMatchPanel({
             justify-between
             border
             px-3
-            text-[7px]
+            text-xs
             uppercase
             tracking-[0.11em]
           "
@@ -1664,7 +1664,7 @@ function DetailTeam({
           min-w-0
           flex-1
           truncate
-          text-[11px]
+          text-xs
           font-medium
         "
       >
@@ -1746,7 +1746,7 @@ function ContextLine({
       >
         <p
           className="
-            text-[6px]
+            text-xs
             uppercase
             tracking-[0.11em]
           "
@@ -1762,7 +1762,7 @@ function ContextLine({
           className="
             mt-1
             truncate
-            text-[8px]
+            text-xs
           "
         >
           {value}
@@ -1808,7 +1808,7 @@ function DayNumber({
           items-center
           justify-center
           px-1
-          text-[8px]
+          text-xs
           font-medium
           tabular-nums
         "
@@ -1929,7 +1929,7 @@ function Crest({
           items-center
           justify-center
           border
-          text-[6px]
+          text-xs
           font-medium
           uppercase
         "

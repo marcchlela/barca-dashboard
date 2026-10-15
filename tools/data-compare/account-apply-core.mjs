@@ -45,7 +45,13 @@ async function readSchema(client) {
            is_nullable AS "nullable"
     FROM information_schema.columns
     WHERE table_schema = 'public'
-      AND table_name NOT IN ('app_user', 'user_session', 'auth_throttle')
+      AND table_name NOT IN (
+        'app_user',
+        'user_session',
+        'auth_throttle',
+        'password_reset_token',
+        'email_delivery_attempt'
+      )
     ORDER BY table_name, ordinal_position
   `)).rows;
 }

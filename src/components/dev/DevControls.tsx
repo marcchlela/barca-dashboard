@@ -41,12 +41,12 @@ export default function DevControls({
 }: DevControlsProps) {
   return (
     <aside className="fixed bottom-5 right-5 z-50 w-[250px] border border-white/10 bg-[#05080c] p-4 text-white">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/45">
+      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/45">
         Dev Controls
       </p>
 
       <div className="mt-4">
-        <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/45">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-white/45">
           Match State
         </p>
 
@@ -131,7 +131,7 @@ export default function DevControls({
       </div>
 
       <div className="mt-5">
-        <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/45">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-white/45">
           Kit Theme
         </p>
 
@@ -175,7 +175,7 @@ export default function DevControls({
       </div>
 
       <div className="mt-5 border-t border-white/10 pt-4">
-        <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/45">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-white/45">
           Signature Entry
         </p>
 

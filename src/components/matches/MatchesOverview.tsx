@@ -324,7 +324,7 @@ export default function MatchesOverview({
             <div>
               <p
                 className="
-                  text-[8px]
+                  text-xs
                   uppercase
                   tracking-[0.2em]
                 "
@@ -356,7 +356,7 @@ export default function MatchesOverview({
               <p
                 className="
                   mt-1
-                  text-[9px]
+                  text-xs
                   leading-4
                 "
                 style={{
@@ -528,7 +528,7 @@ export default function MatchesOverview({
                 bg-transparent
                 pl-9
                 pr-3
-                text-[10px]
+                text-xs
                 outline-none
               "
               style={{
@@ -724,7 +724,7 @@ export default function MatchesOverview({
           <div>
             <p
               className="
-                text-[8px]
+                text-xs
                 uppercase
                 tracking-[0.18em]
               "
@@ -817,7 +817,7 @@ export default function MatchesOverview({
 
             <p
               className="
-                text-[8px]
+                text-xs
                 tabular-nums
               "
               style={{
@@ -933,7 +933,7 @@ function MonthGroup({
       >
         <span
           className="
-            text-[9px]
+            text-xs
             font-medium
             uppercase
             tracking-[0.17em]
@@ -950,7 +950,7 @@ function MonthGroup({
 
         <span
           className="
-            text-[7px]
+            text-xs
             tabular-nums
           "
           style={{
@@ -1135,7 +1135,7 @@ function MatchRow({
       >
         <p
           className="
-            text-[11px]
+            text-xs
             font-medium
             tabular-nums
           "
@@ -1150,7 +1150,7 @@ function MatchRow({
         <p
           className="
             mt-1.5
-            text-[7px]
+            text-xs
             uppercase
             tracking-[0.1em]
           "
@@ -1223,7 +1223,7 @@ function MatchRow({
             <p
               className="
                 truncate
-                text-[9px]
+                text-xs
                 font-medium
               "
             >
@@ -1238,7 +1238,7 @@ function MatchRow({
             <p
               className="
                 mt-1.5
-                text-[7px]
+                text-xs
               "
               style={{
                 color:
@@ -1329,7 +1329,7 @@ function MatchRow({
                 items-center
                 justify-center
                 border
-                text-[10px]
+                text-xs
                 font-semibold
               "
               style={{
@@ -1354,7 +1354,7 @@ function MatchRow({
                 shrink-0
                 items-center
                 gap-1.5
-                text-[7px]
+                text-xs
                 uppercase
                 tracking-[0.1em]
               "
@@ -1391,7 +1391,7 @@ function MatchRow({
               inline-flex
               items-center
               gap-1.5
-              text-[7px]
+              text-xs
               uppercase
               tracking-[0.09em]
             "
@@ -1432,7 +1432,7 @@ function MatchRow({
           {match.matchday ? (
             <span
               className="
-                text-[7px]
+                text-xs
               "
               style={{
                 color:
@@ -1471,7 +1471,7 @@ function MatchRow({
                 flex
                 items-center
                 gap-1.5
-                text-[7px]
+                text-xs
                 uppercase
                 tracking-[0.1em]
               "
@@ -1507,7 +1507,7 @@ function MatchRow({
 
                 <span
                   className="
-                    text-[9px]
+                    text-xs
                     font-medium
                     tabular-nums
                   "
@@ -1523,7 +1523,7 @@ function MatchRow({
         ) : finished ? (
           <p
             className="
-              text-[7px]
+              text-xs
               uppercase
               tracking-[0.1em]
             "
@@ -1537,7 +1537,7 @@ function MatchRow({
         ) : (
           <p
             className="
-              text-[7px]
+              text-xs
               uppercase
               tracking-[0.1em]
             "
@@ -1555,7 +1555,7 @@ function MatchRow({
             className="
               mt-3
               truncate
-              text-[7px]
+              text-xs
             "
             style={{
               color:
@@ -1664,7 +1664,7 @@ function TeamLine({
           min-w-0
           flex-1
           truncate
-          text-[11px]
+          text-xs
         "
         style={{
           fontWeight:
@@ -1729,7 +1729,7 @@ function TeamCrest({
           items-center
           justify-center
           border
-          text-[7px]
+          text-xs
           font-medium
           uppercase
         "
@@ -1816,7 +1816,7 @@ function ScopeButton({
         border
         px-3
         py-2
-        text-[7px]
+        text-xs
         uppercase
         tracking-[0.1em]
         transition-colors
@@ -1895,7 +1895,7 @@ function CompetitionButton({
         border
         px-3
         py-1.5
-        text-[7px]
+        text-xs
         uppercase
         tracking-[0.1em]
         transition-colors
@@ -1994,7 +1994,7 @@ function ViewButton({
         gap-2
         border-r
         px-3
-        text-[7px]
+        text-xs
         uppercase
         tracking-[0.1em]
         last:border-r-0
@@ -2063,7 +2063,7 @@ function HeaderMetric({
     >
       <p
         className="
-          text-[7px]
+          text-xs
           uppercase
           tracking-[0.14em]
         "
@@ -2140,7 +2140,7 @@ function EmptyState({
       <p
         className="
           mt-3
-          text-[11px]
+          text-xs
           font-medium
         "
       >
@@ -2151,7 +2151,7 @@ function EmptyState({
         className="
           mt-1
           max-w-sm
-          text-[8px]
+          text-xs
           leading-4
         "
         style={{

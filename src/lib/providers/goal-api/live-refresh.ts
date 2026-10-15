@@ -5,11 +5,15 @@ import { db } from "../../../prisma/db";
 import { asArray, asObject, type JsonObject } from "../shared/json";
 import { normalizeGoalStatistics, goalCandidate } from "./normalize";
 import { GoalApiClient, GoalApiHttpError } from "./client";
+import { goalFixtureListingPath } from "./fixture-search-path";
 import {
   liveFixtureMatches,
+  finishedCoverageIncomplete,
   liveRetryDelayMs,
   normalizeLiveEvents,
+  normalizeLiveSubstitutions,
   normalizeLiveStatus,
+  postMatchPollDelayMs,
   shouldFetchLiveStatistics,
 } from "./live-refresh-core";
 
@@ -17,7 +21,7 @@ const RUN_MODE = "live-match-sync";
 const LOCK_KEY = "scheduled-live-match-sync";
 const LEASE_MS = 2 * 60_000;
 const MATCH_WINDOW_BEFORE_MS = 10 * 60_000;
-const MATCH_WINDOW_AFTER_MS = 4 * 60 * 60_000;
+const MATCH_WINDOW_AFTER_MS = 24 * 60 * 60_000;
 type JsonValue = null | boolean | number | string | JsonValue[] | { [key: string]: JsonValue };
 
 type TeamName = { id: string; name: string; isBarcelona: boolean };
@@ -28,6 +32,11 @@ function instant(value = Date.now()) {
 
 function personKey(value: string | null | undefined) {
   return value?.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim() ?? "";
+}
+
+function rawName(value: unknown, field: string) {
+  const data = asObject(value);
+  return typeof data?.[field] === "string" ? data[field] as string : null;
 }
 
 function matchStatusForWrite(current: string, incoming: string | null) {
@@ -63,7 +72,26 @@ async function boundedCanonicalFixture(now: number) {
     return kickoff <= now + MATCH_WINDOW_BEFORE_MS && kickoff >= now - MATCH_WINDOW_AFTER_MS;
   });
   if (candidates.length > 1) return { status: "ambiguous-canonical-fixtures" as const, match: null };
-  return { status: candidates.length ? "candidate" as const : "no-fixture-in-live-window" as const, match: candidates[0] ?? null };
+  if (candidates.length) return { status: "candidate" as const, match: candidates[0] };
+
+  // A delayed provider can publish goals and statistics after the canonical
+  // fixture has already reached full time. Catch up only incomplete recent games.
+  const recentFinished = matches.filter((match) => {
+    if (match.status !== "finished" || (!match.homeTeam.isBarcelona && !match.awayTeam.isBarcelona)) return false;
+    const age = now - Date.parse(match.kickoff.toString());
+    return age >= 0 && age <= MATCH_WINDOW_AFTER_MS;
+  });
+  for (const match of recentFinished.reverse()) {
+    const [events, statistics] = await Promise.all([
+      db.orm.public.MatchEvent.where({ matchId: match.id }).all(),
+      db.orm.public.MatchStatistic.where({ matchId: match.id }).all(),
+    ]);
+    const goals = events.filter((event) => ["goal", "penalty_goal", "own_goal"].includes(event.type)).length;
+    if (finishedCoverageIncomplete({ kickoff: match.kickoff.toString(), now, homeScore: match.homeScore, awayScore: match.awayScore, goalCount: goals, statisticSides: statistics.length })) {
+      return { status: "candidate" as const, match };
+    }
+  }
+  return { status: "no-fixture-in-live-window" as const, match: null };
 }
 
 function makeIdentity(match: {
@@ -108,8 +136,23 @@ async function findLiveFixture(client: GoalApiClient, match: NonNullable<Awaited
     return [{ providerId: candidate.providerMatchId, body: { data: detail }, detail }];
   });
   if (matches.length > 1) throw new Error("More than one live GOAL fixture matched the canonical Barça fixture; refusing to choose.");
-  if (!matches.length) return null;
-  return matches[0];
+  if (matches.length) return matches[0];
+
+  // The dated listing may include the fixture even when /fixtures/live does not.
+  const date = match.kickoff.toString().slice(0, 10);
+  const listing = await client.get(goalFixtureListingPath(match.competition.name, date, 0));
+  const listed = asArray(listing.data).flatMap((value) => {
+    const detail = asObject(value);
+    const candidate = goalCandidate(detail);
+    return detail && candidate?.providerMatchId && makeIdentity(match, candidate)
+      ? [{ providerId: candidate.providerMatchId }] : [];
+  });
+  if (listed.length > 1) throw new Error("More than one dated GOAL fixture matched the canonical Barça fixture.");
+  if (!listed.length) return null;
+  const detailBody = await client.get(`/fixtures/${encodeURIComponent(listed[0].providerId)}`);
+  const detail = asObject(detailBody.data);
+  if (!detail || !makeIdentity(match, goalCandidate(detail))) throw new Error("Dated GOAL fixture detail failed identity validation.");
+  return { providerId: listed[0].providerId, body: detailBody, detail };
 }
 
 async function ensureMatchMapping(sourceId: string, matchId: string, providerId: string) {
@@ -161,7 +204,12 @@ async function upsertLiveEvent(input: {
   const nearby = mappedEvent ? [mappedEvent] : input.existingEvents.filter((row) =>
     row.teamId === teamId && row.minute === event.minute &&
     (row.type === event.type || (goalTypes.has(row.type) && goalTypes.has(event.type))) &&
-    (!scorer || !row.primaryPlayerId || row.primaryPlayerId === scorer.playerId));
+    (event.type === "substitution"
+      ? (scorer && row.primaryPlayerId === scorer.playerId) ||
+        (personKey(rawName(row.rawData, "offName")) === personKey(event.scorerName) &&
+         personKey(rawName(row.rawData, "onName")) === personKey(event.assistName) &&
+         Boolean(event.scorerName && event.assistName))
+      : (!scorer || !row.primaryPlayerId || row.primaryPlayerId === scorer.playerId)));
   if (nearby.length > 1) return "ambiguous" as const;
   const existing = nearby[0];
   if (existing && existing.matchId !== input.matchId) throw new Error("Matched event belongs to another fixture.");
@@ -181,14 +229,16 @@ async function upsertLiveEvent(input: {
     second: null,
     eventOrder: event.order,
     xG: null,
-    outcome: event.type === "yellow_card" || event.type === "red_card" ? null : "goal",
+    outcome: event.type === "yellow_card" || event.type === "red_card" || event.type === "substitution" ? null : "goal",
     sequenceId: `goal-api-live:${event.providerId}`,
     coordinateSystem: null,
     confidence: "exact_provider" as const,
     rawData: {
       providerEventId: event.providerId,
-      scorerName: event.scorerName,
-      assistName: event.assistName,
+      scorerName: event.type === "substitution" ? null : event.scorerName,
+      assistName: event.type === "substitution" ? null : event.assistName,
+      offName: event.type === "substitution" ? event.scorerName : null,
+      onName: event.type === "substitution" ? event.assistName : null,
       providerPlayerId: event.providerPlayerId,
       liveImport: true,
       sourcePayload: JSON.parse(JSON.stringify(event.raw)) as JsonValue,
@@ -277,6 +327,10 @@ export async function runLiveMatchRefresh(input: { now?: number; client?: GoalAp
     if (Number.isFinite(persistedRetryAt) && now < persistedRetryAt) {
       return { status: "cooldown" as const, matchId: match.id, nextAt: new Date(persistedRetryAt).toISOString() };
     }
+    const postMatchDelay = postMatchPollDelayMs(match.status, match.kickoff.toString(), now);
+    if (postMatchDelay && now < Date.parse(latest.finishedAt.toString()) + postMatchDelay) {
+      return { status: "cooldown" as const, matchId: match.id, nextAt: new Date(Date.parse(latest.finishedAt.toString()) + postMatchDelay).toISOString() };
+    }
     const delay = liveRetryDelayMs({ status: latest.status, consecutiveFailures: failures, error: latest.error });
     if (delay && now < Date.parse(latest.finishedAt.toString()) + delay) {
       return { status: "cooldown" as const, matchId: match.id, nextAt: new Date(Date.parse(latest.finishedAt.toString()) + delay).toISOString() };
@@ -311,6 +365,7 @@ export async function runLiveMatchRefresh(input: { now?: number; client?: GoalAp
     statsProtected: 0,
     requests: 0,
     statsFetchedAt: sameMatch && typeof latestResult?.statsFetchedAt === "string" ? latestResult.statsFetchedAt : null,
+    substitutionsFetchedAt: sameMatch && typeof latestResult?.substitutionsFetchedAt === "string" ? latestResult.substitutionsFetchedAt : null,
     notLiveChecks: sameMatch && typeof latestResult?.notLiveChecks === "number" ? latestResult.notLiveChecks : 0,
   };
   try {
@@ -322,14 +377,14 @@ export async function runLiveMatchRefresh(input: { now?: number; client?: GoalAp
     }
     const fixtureCandidate = goalCandidate(fixture.detail);
     if (!makeIdentity(match, fixtureCandidate)) throw new Error("Live fixture detail failed immutable identity validation.");
+    const source = await getGoalDataSource();
+    await ensureMatchMapping(source.id, match.id, fixture.providerId);
     const status = normalizeLiveStatus(fixture.detail);
     if (!status) {
       const notLiveChecks = Number(result.notLiveChecks) + 1;
       await db.orm.public.GoalMediaSyncRun.where({ id: run.id }).update({ lockKey: null, status: "success", finishedAt: instant(), fixturesChecked: 1, result: { ...result, status: "no-provider-live-fixture", notLiveChecks, requests: client.requestCount } });
       return { status: "no-provider-live-fixture" as const, matchId: match.id };
     }
-    const source = await getGoalDataSource();
-    await ensureMatchMapping(source.id, match.id, fixture.providerId);
     const newStatus = matchStatusForWrite(match.status, status);
     const homeScore = fixtureCandidate?.homeScore;
     const awayScore = fixtureCandidate?.awayScore;
@@ -340,7 +395,17 @@ export async function runLiveMatchRefresh(input: { now?: number; client?: GoalAp
     if (Object.keys(matchUpdate).length) await db.orm.public.Match.where({ id: match.id }).update(matchUpdate);
 
     const eventBody = await client.get(`/fixtures/${encodeURIComponent(fixture.providerId)}/events`);
-    const liveEvents = normalizeLiveEvents(eventBody, match.homeTeam.name, match.awayTeam.name);
+    const cardBody = await client.get(`/fixtures/${encodeURIComponent(fixture.providerId)}/cards`);
+    const previousSubstitutionsAt = typeof result.substitutionsFetchedAt === "string" ? result.substitutionsFetchedAt : null;
+    const substitutionBody = shouldFetchLiveStatistics(previousSubstitutionsAt, now)
+      ? await client.get(`/fixtures/${encodeURIComponent(fixture.providerId)}/substitutions`)
+      : null;
+    if (substitutionBody) result.substitutionsFetchedAt = new Date(now).toISOString();
+    const liveEvents = [...new Map([
+      ...normalizeLiveEvents(eventBody, match.homeTeam.name, match.awayTeam.name),
+      ...normalizeLiveEvents(cardBody, match.homeTeam.name, match.awayTeam.name),
+      ...(substitutionBody ? normalizeLiveSubstitutions(substitutionBody) : []),
+    ].map((event) => [event.providerId, event] as const)).values()];
     const [players, existingEvents] = await Promise.all([
       resolveLineupPlayers(match.id),
       db.orm.public.MatchEvent.where({ matchId: match.id }).all(),

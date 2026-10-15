@@ -399,7 +399,7 @@ export default function MyMatchDiary({
           <div>
             <p
               className="
-                text-[8px]
+                text-xs
                 uppercase
                 tracking-[0.24em]
               "
@@ -423,7 +423,7 @@ export default function MyMatchDiary({
               className="
                 mt-1
                 max-w-xl
-                text-[11px]
+                text-xs
                 leading-5
               "
               style={{
@@ -443,7 +443,7 @@ export default function MyMatchDiary({
         initial ? (
           <p
             className="
-              text-[8px]
+              text-xs
               uppercase
               tracking-[0.15em]
             "
@@ -571,7 +571,7 @@ export default function MyMatchDiary({
                     className="
                       mt-1
                       block
-                      text-[9px]
+                      text-xs
                     "
                     style={{
                       color:
@@ -682,7 +682,7 @@ export default function MyMatchDiary({
                     }
                   />
                 </div>
-                {watchType === "live" ? <p className="mt-3 text-[10px]" style={{ color: theme.colors.textMuted }}>Watched date follows the match day automatically.</p> : watchType ? <label className="mt-4 block text-[10px]" style={{ color: theme.colors.textMuted }}>Date watched
+                {watchType === "live" ? <p className="mt-3 text-xs" style={{ color: theme.colors.textMuted }}>Watched date follows the match day automatically.</p> : watchType ? <label className="mt-4 block text-xs" style={{ color: theme.colors.textMuted }}>Date watched
                   <input type="date" value={watchedOn} onChange={(event) => setWatchedOn(event.target.value)} className="mt-2 block w-full border px-3 py-2 text-xs outline-none focus-visible:outline-2" style={{ borderColor: theme.colors.border, background: theme.colors.background, color: theme.colors.text, colorScheme: "dark" }} />
                   {!watchedOn && <span className="mt-1 block">Date not set. Choose one if this is an older replay or highlights entry.</span>}
                 </label> : null}
@@ -695,7 +695,7 @@ export default function MyMatchDiary({
               </FieldLabel>
 
               <p
-                className="mt-1 text-[9px]"
+                className="mt-1 text-xs"
                 style={{
                   color:
                     theme.colors
@@ -823,7 +823,7 @@ export default function MyMatchDiary({
                   flex
                   justify-end
                   font-mono
-                  text-[8px]
+                  text-xs
                 "
                 style={{
                   color:
@@ -845,7 +845,7 @@ export default function MyMatchDiary({
                   border
                   px-4
                   py-3
-                  text-[10px]
+                  text-xs
                 "
                 style={{
                   borderColor:
@@ -880,7 +880,7 @@ export default function MyMatchDiary({
             >
               <p
                 className="
-                  text-[9px]
+                  text-xs
                   leading-4
                 "
                 style={{
@@ -911,7 +911,7 @@ export default function MyMatchDiary({
                   border
                   px-5
                   py-3
-                  text-[9px]
+                  text-xs
                   font-semibold
                   uppercase
                   tracking-[0.16em]
@@ -1027,7 +1027,7 @@ function LockedDiary({
         <p
           className="
             mt-5
-            text-[8px]
+            text-xs
             font-semibold
             uppercase
             tracking-[0.22em]
@@ -1048,7 +1048,7 @@ function LockedDiary({
         <p
           className="
             mt-3
-            text-[11px]
+            text-xs
             leading-5
           "
           style={{
@@ -1066,7 +1066,7 @@ function LockedDiary({
           className="
             mt-5
             font-mono
-            text-[10px]
+            text-xs
             tabular-nums
           "
           style={{
@@ -1278,7 +1278,7 @@ function StarRating({
           className="
             mt-3
             cursor-pointer
-            text-[8px]
+            text-xs
             uppercase
             tracking-[0.16em]
           "
@@ -1395,7 +1395,7 @@ function PlayerPicker({
             className="
               mt-0.5
               truncate
-              text-[8px]
+              text-xs
               uppercase
               tracking-[0.12em]
             "
@@ -1487,7 +1487,7 @@ function PlayerPicker({
                 size={13}
               />
 
-              <span className="text-[10px]">
+              <span className="text-xs">
                 Clear selection
               </span>
             </button>
@@ -1541,7 +1541,7 @@ function PlayerPicker({
                 />
 
                 <div className="min-w-0">
-                  <p className="truncate text-[11px]">
+                  <p className="truncate text-xs">
                     {
                       player.name
                     }
@@ -1550,7 +1550,7 @@ function PlayerPicker({
                   <p
                     className="
                       mt-0.5
-                      text-[8px]
+                      text-xs
                       uppercase
                       tracking-[0.12em]
                     "
@@ -1682,7 +1682,7 @@ function GoalPicker({
             className="
               mt-0.5
               truncate
-              text-[8px]
+              text-xs
               uppercase
               tracking-[0.12em]
             "
@@ -1781,7 +1781,7 @@ function GoalPicker({
                 size={13}
               />
 
-              <span className="text-[10px]">
+              <span className="text-xs">
                 Clear selection
               </span>
             </button>
@@ -1793,7 +1793,7 @@ function GoalPicker({
               className="
                 px-4
                 py-5
-                text-[10px]
+                text-xs
               "
               style={{
                 color:
@@ -1858,7 +1858,7 @@ function GoalPicker({
                   />
 
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-[11px]">
+                    <p className="truncate text-xs">
                       {goal
                         .primaryPlayer
                         ?.name ??
@@ -1868,7 +1868,7 @@ function GoalPicker({
                     <p
                       className="
                         mt-0.5
-                        text-[8px]
+                        text-xs
                         uppercase
                         tracking-[0.12em]
                       "
@@ -1941,7 +1941,7 @@ function Portrait({
         items-center
         justify-center
         border
-        text-[10px]
+        text-xs
         font-medium
       "
       style={{
@@ -2015,7 +2015,7 @@ function DiarySectionTitle({
       </h3>
 
       <p
-        className="mt-1 text-[9px]"
+        className="mt-1 text-xs"
         style={{
           color:
             theme.colors
@@ -2037,7 +2037,7 @@ function FieldLabel({
   return (
     <span
       className="
-        text-[8px]
+        text-xs
         font-semibold
         uppercase
         tracking-[0.18em]
@@ -2077,7 +2077,7 @@ function WatchButton({
         border
         px-2
         py-3
-        text-[8px]
+        text-xs
         font-semibold
         uppercase
         tracking-[0.13em]

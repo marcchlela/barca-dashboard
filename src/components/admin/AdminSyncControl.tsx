@@ -439,7 +439,7 @@ export default function AdminSyncControl({
         <div>
           <p
             className="
-              text-[9px]
+              text-xs
               uppercase
               tracking-[0.24em]
             "
@@ -468,7 +468,7 @@ export default function AdminSyncControl({
             className="
               mt-2
               max-w-2xl
-              text-[11px]
+              text-xs
               leading-5
             "
             style={{
@@ -588,7 +588,7 @@ export default function AdminSyncControl({
           <div>
             <p
               className="
-                text-[8px]
+                text-xs
                 font-medium
                 uppercase
                 tracking-[0.16em]
@@ -602,7 +602,7 @@ export default function AdminSyncControl({
               className="
                 mt-1
                 max-w-3xl
-                text-[8px]
+                text-xs
                 leading-4
               "
               style={{
@@ -627,7 +627,7 @@ export default function AdminSyncControl({
         <div
           className="
             shrink-0
-            text-[7px]
+            text-xs
             uppercase
             tracking-[0.13em]
           "
@@ -770,7 +770,7 @@ export default function AdminSyncControl({
             <div>
               <p
                 className="
-                  text-[9px]
+                  text-xs
                   font-medium
                   uppercase
                   tracking-[0.12em]
@@ -786,7 +786,7 @@ export default function AdminSyncControl({
               <p
                 className="
                   mt-1
-                  text-[10px]
+                  text-xs
                   font-medium
                 "
               >
@@ -799,7 +799,7 @@ export default function AdminSyncControl({
                 className="
                   mt-1
                   max-w-2xl
-                  text-[8px]
+                  text-xs
                   leading-4
                 "
                 style={{
@@ -834,7 +834,7 @@ export default function AdminSyncControl({
                 cursor-pointer
                 border
                 px-4
-                text-[7px]
+                text-xs
                 uppercase
                 tracking-[0.11em]
               "
@@ -859,7 +859,7 @@ export default function AdminSyncControl({
                 cursor-pointer
                 border
                 px-4
-                text-[7px]
+                text-xs
                 uppercase
                 tracking-[0.11em]
               "
@@ -922,7 +922,7 @@ export default function AdminSyncControl({
             >
               <p
                 className="
-                  text-[8px]
+                  text-xs
                   leading-4
                 "
                 style={{
@@ -1002,7 +1002,7 @@ export default function AdminSyncControl({
             icon={Film}
             description="Check recent finished fixtures for DailyGoal goal metadata, then reuse the existing official-video matcher and review queue. The scheduled stage is controlled by an off-by-default flag."
           >
-            <div className="mt-4 grid grid-cols-2 gap-px border text-[9px] sm:grid-cols-3" style={{ borderColor: theme.colors.border, background: theme.colors.border }}>
+            <div className="mt-4 grid grid-cols-2 gap-px border text-xs sm:grid-cols-3" style={{ borderColor: theme.colors.border, background: theme.colors.border }}>
               {[
                 ["Last successful", data.goalMedia.lastSuccessfulRun ? formatDateTime(data.goalMedia.lastSuccessfulRun) : "Never"],
                 ["Fixtures checked", String(data.goalMedia.lastRun?.fixturesChecked ?? 0)],
@@ -1010,24 +1010,30 @@ export default function AdminSyncControl({
                 ["Review queued", String(data.goalMedia.lastRun?.goalsQueued ?? 0)],
                 ["Missing fixtures", String(data.goalMedia.missingFixtures)],
                 ["Retry due / waiting", `${data.goalMedia.retryDue} / ${data.goalMedia.waiting}`],
-              ].map(([label, value]) => <div key={label} className="min-w-0 p-3" style={{ background: theme.colors.backgroundElevated }}><p className="text-[8px] uppercase tracking-wider" style={{ color: theme.colors.textMuted }}>{label}</p><p className="mt-1 break-words tabular-nums">{value}</p></div>)}
+              ].map(([label, value]) => <div key={label} className="min-w-0 p-3" style={{ background: theme.colors.backgroundElevated }}><p className="text-xs uppercase tracking-wider" style={{ color: theme.colors.textMuted }}>{label}</p><p className="mt-1 break-words tabular-nums">{value}</p></div>)}
             </div>
-            <p className="mt-3 text-[9px]" style={{ color: data.goalMedia.lastRun?.status === "blocked" || data.goalMedia.lastRun?.status === "failed" ? theme.colors.danger : theme.colors.textMuted }}>
+            <p className="mt-3 text-xs" style={{ color: data.goalMedia.lastRun?.status === "blocked" || data.goalMedia.lastRun?.status === "failed" ? theme.colors.danger : theme.colors.textMuted }}>
               Last run: {data.goalMedia.lastRun?.status ?? "none"}{data.goalMedia.lastRun?.error ? ` · ${data.goalMedia.lastRun.error}` : ""} · {data.goalMedia.lastRun?.missingCoverage ?? 0} fixtures not found in last scan · {data.goalMedia.review} queued for review · {data.goalMedia.exhausted} exhausted · {data.goalMedia.missingGoals} goals without footage.
             </p>
-            <p className="mt-2 text-[9px]" style={{ color: data.goalMedia.lastScheduledJob?.error ? theme.colors.danger : theme.colors.textMuted }}>
+            <p className="mt-2 text-xs" style={{ color: data.goalMedia.lastScheduledJob?.error ? theme.colors.danger : theme.colors.textMuted }}>
               Authenticated job: goal stage {data.goalMedia.schedulingActive ? "enabled" : "off"} · Last job {data.goalMedia.lastScheduledJob ? `${formatDateTime(data.goalMedia.lastScheduledJob.at)} · ${data.goalMedia.lastScheduledJob.status} · fixtures ${data.goalMedia.lastScheduledJob.fixtureStatus ?? "unknown"} · events ${data.goalMedia.lastScheduledJob.eventStatus ?? "unknown"} · official failures ${data.goalMedia.lastScheduledJob.officialFailed ?? "?"} · goal stage ${data.goalMedia.lastScheduledJob.goalStatus ?? "unknown"}` : "never run"}{data.goalMedia.lastScheduledJob?.error ? ` · ${data.goalMedia.lastScheduledJob.error}` : ""}.
             </p>
-            <p className="mt-2 text-[9px]" style={{ color: data.goalMedia.lastFixtureRefresh?.error ? theme.colors.danger : theme.colors.textMuted }}>
+            <p className="mt-2 text-xs" style={{ color: data.goalMedia.lastFixtureRefresh?.error ? theme.colors.danger : theme.colors.textMuted }}>
               Canonical fixture stage: {data.goalMedia.lastFixtureRefresh ? `${data.goalMedia.lastFixtureRefresh.status} · ${formatDateTime(data.goalMedia.lastFixtureRefresh.at)}${data.goalMedia.lastFixtureRefresh.nextAt ? ` · next eligible ${formatDateTime(data.goalMedia.lastFixtureRefresh.nextAt)}` : ""}` : "not run yet"}{data.goalMedia.lastFixtureRefresh?.error ? ` · ${data.goalMedia.lastFixtureRefresh.error}` : ""}.
             </p>
-            <p className="mt-2 text-[9px]" style={{ color: data.goalMedia.lastEventRefresh?.error ? theme.colors.danger : theme.colors.textMuted }}>
+            <p className="mt-2 text-xs" style={{ color: data.goalMedia.lastChampionsRefresh?.error ? theme.colors.danger : theme.colors.textMuted }}>
+              Champions League table and fixtures: {data.goalMedia.lastChampionsRefresh ? `${data.goalMedia.lastChampionsRefresh.status} · ${formatDateTime(data.goalMedia.lastChampionsRefresh.at)}${data.goalMedia.lastChampionsRefresh.nextAt ? ` · next eligible ${formatDateTime(data.goalMedia.lastChampionsRefresh.nextAt)}` : ""}` : "not run yet"}{data.goalMedia.lastChampionsRefresh?.error ? ` · ${data.goalMedia.lastChampionsRefresh.error}` : ""}.
+            </p>
+            <p className="mt-2 text-xs" style={{ color: data.goalMedia.lastEventRefresh?.error ? theme.colors.danger : theme.colors.textMuted }}>
               Canonical goal events: {data.goalMedia.lastEventRefresh ? `${data.goalMedia.lastEventRefresh.status} · ${formatDateTime(data.goalMedia.lastEventRefresh.at)}` : "not run yet"} · {data.goalMedia.awaitingGoalEvents} finished fixtures awaiting complete goal events{data.goalMedia.lastEventRefresh?.error ? ` · ${data.goalMedia.lastEventRefresh.error}` : ""}.
             </p>
-            <p className="mt-2 text-[9px]" style={{ color: data.goalMedia.lastPrematchJob?.error ? theme.colors.danger : theme.colors.textMuted }}>
+            <p className="mt-2 text-xs" style={{ color: data.goalMedia.lastPrematchJob?.error ? theme.colors.danger : theme.colors.textMuted }}>
               Pre-match refresh: {data.goalMedia.lastPrematchJob ? `${data.goalMedia.lastPrematchJob.status} · ${formatDateTime(data.goalMedia.lastPrematchJob.at)}` : "not run yet"}{data.goalMedia.lastPrematchJob?.error ? ` · ${data.goalMedia.lastPrematchJob.error}` : ""}.
             </p>
-            <p className="mt-2 text-[9px]" style={{ color: data.goalMedia.lastLiveMatchRun?.error ? theme.colors.danger : theme.colors.textMuted }}>
+            <p className="mt-2 text-xs" style={{ color: data.goalMedia.lastPlayerRatingRefresh?.error ? theme.colors.danger : theme.colors.textMuted }}>
+              Player ratings recovery: {data.goalMedia.lastPlayerRatingRefresh ? `${data.goalMedia.lastPlayerRatingRefresh.status} · ${formatDateTime(data.goalMedia.lastPlayerRatingRefresh.at)}` : "not run yet"}{data.goalMedia.lastPlayerRatingRefresh?.error ? ` · ${data.goalMedia.lastPlayerRatingRefresh.error}` : ""}.
+            </p>
+            <p className="mt-2 text-xs" style={{ color: data.goalMedia.lastLiveMatchRun?.error ? theme.colors.danger : theme.colors.textMuted }}>
               Live REST polling: {data.goalMedia.liveSchedulingActive ? "enabled" : "off"} · {data.goalMedia.lastLiveMatchRun ? `${data.goalMedia.lastLiveMatchRun.status} · ${formatDateTime(data.goalMedia.lastLiveMatchRun.at)} · provider ${data.goalMedia.lastLiveMatchRun.providerStatus ?? "waiting"} · events ${data.goalMedia.lastLiveMatchRun.eventStatus ?? "waiting"} (${data.goalMedia.lastLiveMatchRun.eventsCreated} new / ${data.goalMedia.lastLiveMatchRun.eventsUpdated} refreshed) · stats ${data.goalMedia.lastLiveMatchRun.statisticsStatus ?? "waiting"} (${data.goalMedia.lastLiveMatchRun.statsSaved} sides saved) · ${data.goalMedia.lastLiveMatchRun.requests} requests` : "not run yet"}{data.goalMedia.lastLiveMatchRun?.retryAt ? ` · retry ${formatDateTime(data.goalMedia.lastLiveMatchRun.retryAt)}` : ""}{data.goalMedia.lastLiveMatchRun?.error ? ` · ${data.goalMedia.lastLiveMatchRun.error}` : ""}.
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
@@ -1038,12 +1044,12 @@ export default function AdminSyncControl({
                 disabled={isBusy || !data.executionEnabled || !data.automation.youtubeConfigured}
                 onClick={() => requestWrite("goal_media_worker_run", "Run Goal Timestamp Worker", "This will inspect bounded recent DailyGoal pages, publish only high-confidence goal moments, queue uncertain timestamps, and save retry state. It does not enable scheduling.")} />
             </div>
-            <p className="mt-3 text-[8px] leading-4" style={{ color: theme.colors.textMuted }}>When GOAL_MEDIA_SCHEDULE_ENABLED=true, the existing authenticated job runs its normal bounded sync, while the same scheduler container calls a lightweight pre-match refresh every 10 minutes for previews and confirmed lineups. The flag is currently {data.goalMedia.schedulingActive ? "on" : "off"}; no additional service or recurring provider subscription is used.</p>
-            <p className="mt-2 text-[8px] leading-4" style={{ color: theme.colors.textMuted }}>LIVE_MATCH_SYNC_ENABLED is a separate opt-in. When enabled, the scheduler checks one active Barça fixture every 60 seconds, refreshes events each pass, and refreshes statistics every five minutes. It is currently {data.goalMedia.liveSchedulingActive ? "on" : "off"}; 403/429 responses and repeated failures trigger persisted cooldowns.</p>
+            <p className="mt-3 text-xs leading-4" style={{ color: theme.colors.textMuted }}>When GOAL_MEDIA_SCHEDULE_ENABLED=true, the existing authenticated job runs its normal bounded sync, while the same scheduler container calls a lightweight pre-match refresh every 10 minutes for previews and confirmed lineups. The flag is currently {data.goalMedia.schedulingActive ? "on" : "off"}; no additional service or recurring provider subscription is used.</p>
+            <p className="mt-2 text-xs leading-4" style={{ color: theme.colors.textMuted }}>LIVE_MATCH_SYNC_ENABLED is a separate opt-in. When enabled, the scheduler checks one active Barça fixture every 60 seconds, refreshes events each pass, and refreshes statistics every five minutes. It is currently {data.goalMedia.liveSchedulingActive ? "on" : "off"}; 403/429 responses and repeated failures trigger persisted cooldowns.</p>
             {data.goalMedia.fixtures.length > 0 && <details className="mt-4 border-t pt-3" style={{ borderColor: theme.colors.border }}>
-              <summary className="cursor-pointer text-[9px] uppercase tracking-wider" style={{ color: theme.colors.accent }}>Fixture retry details</summary>
+              <summary className="cursor-pointer text-xs uppercase tracking-wider" style={{ color: theme.colors.accent }}>Fixture retry details</summary>
               <div className="mt-3 max-h-56 overflow-y-auto border" style={{ borderColor: theme.colors.border }}>
-                {data.goalMedia.fixtures.map((fixture) => <div key={fixture.matchId} className="flex flex-wrap items-center justify-between gap-2 border-b px-3 py-2 text-[9px] last:border-b-0" style={{ borderColor: theme.colors.border }}>
+                {data.goalMedia.fixtures.map((fixture) => <div key={fixture.matchId} className="flex flex-wrap items-center justify-between gap-2 border-b px-3 py-2 text-xs last:border-b-0" style={{ borderColor: theme.colors.border }}>
                   <span>{fixture.fixture}</span>
                   <span className="tabular-nums" style={{ color: fixture.error ? theme.colors.danger : theme.colors.textMuted }}>{fixture.status} · {fixture.covered}/{fixture.total} goals · attempt {fixture.attempts}{fixture.nextRetryAt ? ` · retry ${formatDateTime(fixture.nextRetryAt)}` : ""}{fixture.error ? ` · ${fixture.error}` : ""}</span>
                 </div>)}
@@ -1152,7 +1158,7 @@ export default function AdminSyncControl({
             <p
               className="
                 mt-3
-                text-[7px]
+                text-xs
                 leading-4
               "
               style={{
@@ -1185,7 +1191,7 @@ export default function AdminSyncControl({
             <label
               htmlFor="sync-match"
               className="
-                text-[7px]
+                text-xs
                 uppercase
                 tracking-[0.12em]
               "
@@ -1220,7 +1226,7 @@ export default function AdminSyncControl({
                 border
                 bg-transparent
                 px-3
-                text-[10px]
+                text-xs
                 outline-none
               "
               style={{
@@ -1522,7 +1528,7 @@ export default function AdminSyncControl({
             <div>
               <p
                 className="
-                  text-[8px]
+                  text-xs
                   uppercase
                   tracking-[0.15em]
                 "
@@ -1533,7 +1539,7 @@ export default function AdminSyncControl({
               <p
                 className="
                   mt-0.5
-                  text-[7px]
+                  text-xs
                 "
                 style={{
                   color:
@@ -1557,7 +1563,7 @@ export default function AdminSyncControl({
               }
               className="
                 cursor-pointer
-                text-[7px]
+                text-xs
                 uppercase
                 tracking-[0.11em]
               "
@@ -1595,7 +1601,7 @@ export default function AdminSyncControl({
             <p
               className="
                 mt-3
-                text-[11px]
+                text-xs
                 font-medium
               "
             >
@@ -1606,7 +1612,7 @@ export default function AdminSyncControl({
               className="
                 mt-1
                 max-w-md
-                text-[8px]
+                text-xs
                 leading-4
               "
               style={{
@@ -1724,7 +1730,7 @@ function OperationCard({
         <div>
           <p
             className="
-              text-[7px]
+              text-xs
               uppercase
               tracking-[0.15em]
             "
@@ -1751,7 +1757,7 @@ function OperationCard({
             className="
               mt-2
               max-w-2xl
-              text-[8px]
+              text-xs
               leading-4
             "
             style={{
@@ -1800,7 +1806,7 @@ function OperationSection({
     >
       <p
         className="
-          text-[9px]
+          text-xs
           font-medium
         "
       >
@@ -1810,7 +1816,7 @@ function OperationSection({
       <p
         className="
           mt-1
-          text-[7px]
+          text-xs
           leading-4
         "
         style={{
@@ -1904,7 +1910,7 @@ function ActionButton({
         border
         px-3
         text-left
-        text-[7px]
+        text-xs
         uppercase
         tracking-[0.1em]
 
@@ -1974,7 +1980,7 @@ function HeaderMetric({
     >
       <p
         className="
-          text-[7px]
+          text-xs
           uppercase
           tracking-[0.14em]
         "
@@ -2062,7 +2068,7 @@ function StatusMetric({
 
         <p
           className="
-            text-[7px]
+            text-xs
             uppercase
             tracking-[0.14em]
           "
@@ -2078,7 +2084,7 @@ function StatusMetric({
       <p
         className="
           mt-3
-          text-[11px]
+          text-xs
           font-medium
         "
       >
@@ -2088,7 +2094,7 @@ function StatusMetric({
       <p
         className="
           mt-1
-          text-[7px]
+          text-xs
           uppercase
           tracking-[0.1em]
         "
@@ -2133,7 +2139,7 @@ function MatchMetric({
     >
       <p
         className="
-          text-[7px]
+          text-xs
           uppercase
           tracking-[0.11em]
         "
@@ -2148,7 +2154,7 @@ function MatchMetric({
       <p
         className="
           mt-1.5
-          text-[9px]
+          text-xs
           font-medium
           tabular-nums
         "
@@ -2219,7 +2225,7 @@ function ExecutionRecord({
                 border
                 px-2
                 py-1
-                text-[7px]
+                text-xs
                 uppercase
                 tracking-[0.1em]
               "
@@ -2247,7 +2253,7 @@ function ExecutionRecord({
 
             <span
               className="
-                text-[7px]
+                text-xs
                 uppercase
                 tracking-[0.1em]
               "
@@ -2265,7 +2271,7 @@ function ExecutionRecord({
           <p
             className="
               mt-2
-              text-[10px]
+              text-xs
               font-medium
             "
           >
@@ -2284,7 +2290,7 @@ function ExecutionRecord({
         >
           <p
             className="
-              text-[8px]
+              text-xs
               tabular-nums
             "
           >
@@ -2298,7 +2304,7 @@ function ExecutionRecord({
           <p
             className="
               mt-1
-              text-[7px]
+              text-xs
               tabular-nums
             "
             style={{
@@ -2329,7 +2335,7 @@ function ExecutionRecord({
         <summary
           className="
             cursor-pointer
-            text-[7px]
+            text-xs
             uppercase
             tracking-[0.11em]
           "
@@ -2349,7 +2355,7 @@ function ExecutionRecord({
             overflow-auto
             border
             p-3
-            text-[8px]
+            text-xs
             leading-4
           "
           style={{

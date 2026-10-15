@@ -11,7 +11,10 @@ export async function POST(request: Request) {
     const result = await runLiveMatchRefresh();
     const status = result.status;
     const ok = !["failed", "blocked", "unconfigured"].includes(status);
-    return NextResponse.json({ ok, ...result }, { status: status === "already-running" ? 202 : status === "failed" || status === "blocked" ? 207 : 200 });
+    // BusyBox wget in the scheduler drops 207 responses, hiding the useful
+    // retry/error JSON. This is an authenticated job-result envelope, so keep
+    // handled provider failures visible with `ok: false` and a 200 transport.
+    return NextResponse.json({ ok, ...result });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     console.error("LIVE MATCH JOB FAILED:", message);

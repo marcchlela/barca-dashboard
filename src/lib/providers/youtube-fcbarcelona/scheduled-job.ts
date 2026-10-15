@@ -4,7 +4,9 @@ import { Temporal } from "temporal-polyfill";
 import { db } from "../../../prisma/db";
 import { runScheduledFixtureRefresh } from "../football-data/scheduled-refresh";
 import { runScheduledStandingsRefresh } from "../football-data/scheduled-standings";
+import { runScheduledChampionsLeagueRefresh } from "../football-data/scheduled-champions";
 import { runScheduledGoalEventRefresh } from "../rich-match/scheduled-events";
+import { runBeinHighlightRefresh } from "../goal-api/bein-highlights";
 import { runGoalMediaBackgroundWorker } from "../dailygoal/background-worker";
 import { runAutomaticMatchMediaWorker } from "./automatic-worker";
 import { syncCurrentBarcelonaPlayerHeatmaps } from "../../squad/sync-player-heatmaps";  
@@ -16,7 +18,9 @@ type OfficialWorker = typeof runAutomaticMatchMediaWorker;
 type GoalWorker = typeof runGoalMediaBackgroundWorker;
 type FixtureWorker = typeof runScheduledFixtureRefresh;
 type StandingsWorker = typeof runScheduledStandingsRefresh;
+type ChampionsWorker = typeof runScheduledChampionsLeagueRefresh;
 type EventWorker = typeof runScheduledGoalEventRefresh;
+type BeinWorker = typeof runBeinHighlightRefresh;
 
 export function goalMediaJobEnabled() {
   return process.env.GOAL_MEDIA_SCHEDULE_ENABLED === "true";
@@ -40,7 +44,9 @@ function skipAfterLockFailure(error: unknown) {
 export async function runScheduledMatchMediaJob(input: {
   fixtureWorker?: FixtureWorker;
   standingsWorker?: StandingsWorker;
+  championsWorker?: ChampionsWorker;
   eventWorker?: EventWorker;
+  beinWorker?: BeinWorker;
   officialWorker?: OfficialWorker;
   goalWorker?: GoalWorker;
   goalEnabled?: boolean;
@@ -125,6 +131,17 @@ export async function runScheduledMatchMediaJob(input: {
         console.error("STANDINGS REFRESH STAGE FAILED:", error);
       }
     }
+    let championsRefresh: { status: string; nextAt: string | null; fixturesChanged: number; standingsChanged: number; error: string | null } = {
+      status: "disabled", nextAt: null, fixturesChanged: 0, standingsChanged: 0, error: null,
+    };
+    if (enabled) {
+      try {
+        championsRefresh = await (input.championsWorker ?? runScheduledChampionsLeagueRefresh)();
+      } catch (error) {
+        championsRefresh = { status: "failed", nextAt: new Date(Date.now() + 3 * 3_600_000).toISOString(), fixturesChanged: 0, standingsChanged: 0, error: message(error).slice(0, 500) };
+        console.error("CHAMPIONS LEAGUE REFRESH STAGE FAILED:", error);
+      }
+    }
     let eventRefresh: { status: string; matchId: string | null; nextAt: string | null; error: string | null };
     if (!enabled) eventRefresh = { status: "disabled", matchId: null, nextAt: null, error: null };
     else try {
@@ -134,6 +151,16 @@ export async function runScheduledMatchMediaJob(input: {
       console.error("CANONICAL GOAL EVENT STAGE FAILED:", error);
     }
     const result = await officialWorker({ dryRun: false, forceAllFinished: false });
+    let beinHighlights: { status: string; matchId: string | null; created: number; error: string | null };
+    if (!enabled) beinHighlights = { status: "disabled" as const, matchId: null, created: 0, error: null };
+    else {
+      try {
+        beinHighlights = await (input.beinWorker ?? runBeinHighlightRefresh)();
+      } catch (error) {
+        beinHighlights = { status: "failed" as const, matchId: null, created: 0, error: message(error).slice(0, 500) };
+        console.error("BEIN HIGHLIGHT STAGE FAILED:", error);
+      }
+    }
     let heatmapSync: {
       status: string;
       written?: number;
@@ -184,6 +211,7 @@ export async function runScheduledMatchMediaJob(input: {
     status = result.counts.failed > 0 ? "primary-partial" : goalMedia.status === "failed" ? "goal-failed" :
       fixtureRefresh.status === "failed" || fixtureRefresh.status === "blocked" || fixtureRefresh.status === "unconfigured" ? "fixture-partial" :
       standingsRefresh.status === "failed" || standingsRefresh.status === "blocked" || standingsRefresh.status === "unconfigured" ? "standings-partial" :
+      championsRefresh.status === "failed" || championsRefresh.status === "blocked" || championsRefresh.status === "unconfigured" ? "champions-partial" :
       eventRefresh.status === "failed" || eventRefresh.status === "blocked" || eventRefresh.status === "unconfigured" ? "events-partial" : "success";
     resultData = { fixtureStatus: fixtureRefresh.status, fixtureFetched: fixtureRefresh.fetched, fixtureNextAt: fixtureRefresh.nextAt,
       eventStatus: eventRefresh.status, eventMatchId: eventRefresh.matchId, officialFailed: result.counts.failed, officialEligible: result.counts.eligible,
@@ -192,13 +220,21 @@ export async function runScheduledMatchMediaJob(input: {
       standingsStatus: standingsRefresh.status,
       standingsSynced: standingsRefresh.synced,
       standingsNextAt: standingsRefresh.nextAt,
+      championsStatus: championsRefresh.status,
+      championsFixturesChanged: championsRefresh.fixturesChanged,
+      championsStandingsChanged: championsRefresh.standingsChanged,
+      championsNextAt: championsRefresh.nextAt,
+      beinStatus: beinHighlights.status,
+      beinCreated: beinHighlights.created,
     };
     return {
       status: "completed" as const,
       fixtureRefresh,
       standingsRefresh,
+      championsRefresh,
       eventRefresh,
       result,
+      beinHighlights,
       goalMedia,
       heatmapSync,
     };

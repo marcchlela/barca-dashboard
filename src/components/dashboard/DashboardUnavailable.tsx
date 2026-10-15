@@ -80,7 +80,7 @@ export default function DashboardUnavailable() {
                 {/* COPY */}
 
                 <div>
-                  <p className="text-[10px] uppercase tracking-[0.25em] text-[#8D9AAF]">
+                  <p className="text-xs uppercase tracking-[0.25em] text-[#8D9AAF]">
                     Data Connection
                   </p>
 
@@ -101,7 +101,7 @@ export default function DashboardUnavailable() {
                     onClick={() => {
                       router.refresh();
                     }}
-                    className="mt-7 flex items-center gap-3 border border-[#6B1D2F] bg-[#6B1D2F] px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.16em] transition-transform hover:translate-x-1"
+                    className="mt-7 flex items-center gap-3 border border-[#6B1D2F] bg-[#6B1D2F] px-5 py-3 text-xs font-semibold uppercase tracking-[0.16em] transition-transform hover:translate-x-1"
                   >
                     <RefreshCw
                       size={14}
@@ -116,7 +116,7 @@ export default function DashboardUnavailable() {
 
             {/* FOOTER NOTE */}
 
-            <p className="mt-4 text-[9px] uppercase tracking-[0.16em] text-[#8D9AAF]">
+            <p className="mt-4 text-xs uppercase tracking-[0.16em] text-[#8D9AAF]">
               No placeholder statistics are shown while real data is unavailable
             </p>
           </div>

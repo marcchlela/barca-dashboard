@@ -186,7 +186,7 @@ export default function TunnelIntro({
               }}
             />
 
-            <span className="text-[9px] font-semibold uppercase tracking-[0.32em] opacity-55">
+            <span className="text-xs font-semibold uppercase tracking-[0.32em] opacity-55">
               Preparing the tunnel
             </span>
           </div>

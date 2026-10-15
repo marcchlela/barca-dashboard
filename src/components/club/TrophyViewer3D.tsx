@@ -41,6 +41,6 @@ export default function TrophyViewer3D({ url, name, accent }: { url: string; nam
       <button type="button" onClick={() => setAngle((current) => current - Math.PI / 6)} className="club-focus inline-flex size-9 items-center justify-center border backdrop-blur-sm" style={{ borderColor: accent, color: accent, background: "#07111fbb" }} aria-label="Rotate trophy left"><RotateCcw size={17} aria-hidden="true" /></button>
       <button type="button" onClick={() => setAngle((current) => current + Math.PI / 6)} className="club-focus inline-flex size-9 items-center justify-center border backdrop-blur-sm" style={{ borderColor: accent, color: accent, background: "#07111fbb" }} aria-label="Rotate trophy right"><RotateCw size={17} aria-hidden="true" /></button>
     </div>
-    <p className="pointer-events-none absolute bottom-4 right-3 text-[10px] uppercase tracking-widest opacity-65">Drag to orbit</p>
+    <p className="pointer-events-none absolute bottom-4 right-3 text-xs uppercase tracking-widest opacity-65">Drag to orbit</p>
   </div>;
 }

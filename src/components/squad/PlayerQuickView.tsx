@@ -309,7 +309,7 @@ export default function PlayerQuickView({
           <div className="min-w-0">
             <p
               className="
-                text-[8px]
+                text-xs
                 uppercase
                 tracking-[0.19em]
               "
@@ -325,7 +325,7 @@ export default function PlayerQuickView({
               className="
                 mt-0.5
                 truncate
-                text-[11px]
+                text-xs
                 font-medium
               "
             >
@@ -456,7 +456,7 @@ export default function PlayerQuickView({
                 <div>
                   <p
                     className="
-                      text-[8px]
+                      text-xs
                       uppercase
                       tracking-[0.17em]
                     "
@@ -471,7 +471,7 @@ export default function PlayerQuickView({
                   <p
                     className="
                       mt-1
-                      text-[10px]
+                      text-xs
                     "
                     style={{
                       color:
@@ -588,7 +588,7 @@ export default function PlayerQuickView({
                   mt-6
                   border-t
                   pt-4
-                  text-[7px]
+                  text-xs
                   leading-4
                 "
                 style={{
@@ -673,7 +673,7 @@ function PlayerRail({
         >
           <p
             className="
-              text-[8px]
+              text-xs
               uppercase
               tracking-[0.16em]
             "
@@ -688,7 +688,7 @@ function PlayerRail({
           <p
             className="
               mt-1
-              text-[10px]
+              text-xs
               font-medium
             "
           >
@@ -787,7 +787,7 @@ function PlayerRail({
       >
         <p
           className="
-            text-[8px]
+            text-xs
             uppercase
             tracking-[0.13em]
           "
@@ -825,7 +825,7 @@ function PlayerRail({
         <div
           className="
             mt-3
-            text-[10px]
+            text-xs
           "
           style={{
             color:
@@ -1318,7 +1318,7 @@ function RatingTrend({
               <div>
                 <p
                   className="
-                    text-[8px]
+                    text-xs
                     font-medium
                     uppercase
                     tracking-[0.11em]
@@ -1330,7 +1330,7 @@ function RatingTrend({
                 <p
                   className="
                     mt-1
-                    text-[7px]
+                    text-xs
                   "
                   style={{
                     color:
@@ -1367,7 +1367,7 @@ function RatingTrend({
 
                 <p
                   className="
-                    text-[6px]
+                    text-xs
                     uppercase
                   "
                   style={{
@@ -1867,7 +1867,7 @@ function RecentForm({
         <span
           className="
             shrink-0
-            text-[6px]
+            text-xs
             uppercase
             tracking-[0.09em]
           "
@@ -1991,7 +1991,7 @@ function RecentMatchCard({
             <p
               className="
                 truncate
-                text-[9px]
+                text-xs
                 font-medium
               "
             >
@@ -2005,7 +2005,7 @@ function RecentMatchCard({
               className="
                 mt-1
                 truncate
-                text-[6px]
+                text-xs
                 uppercase
                 tracking-[0.08em]
               "
@@ -2022,7 +2022,7 @@ function RecentMatchCard({
             <p
               className="
                 mt-0.5
-                text-[6px]
+                text-xs
               "
               style={{
                 color:
@@ -2288,7 +2288,7 @@ function PlayerHeatmap({
           <div>
             <p
               className="
-                text-[8px]
+                text-xs
                 font-medium
                 uppercase
                 tracking-[0.1em]
@@ -2300,7 +2300,7 @@ function PlayerHeatmap({
             <p
               className="
                 mt-1
-                text-[6px]
+                text-xs
                 leading-4
               "
               style={{
@@ -2421,7 +2421,7 @@ function PlayerHeatmap({
                 <p
                   className="
                     mt-3
-                    text-[8px]
+                    text-xs
                     font-medium
                   "
                 >
@@ -2581,7 +2581,7 @@ function PlayerHeatmap({
             items-center
             justify-between
             gap-3
-            text-[6px]
+            text-xs
             leading-4
           "
           style={{
@@ -2633,7 +2633,7 @@ function HeatmapHeaderStat({
       <p
         className="
           mt-0.5
-          text-[5px]
+          text-xs
           uppercase
           tracking-[0.1em]
         "
@@ -2733,7 +2733,7 @@ function HeatmapAggregateButton({
         <p
           className="
             truncate
-            text-[7px]
+            text-xs
             font-medium
             uppercase
             tracking-[0.08em]
@@ -2746,7 +2746,7 @@ function HeatmapAggregateButton({
           className="
             mt-1
             truncate
-            text-[6px]
+            text-xs
           "
           style={{
             color:
@@ -2853,7 +2853,7 @@ function HeatmapMatchButton({
           <p
             className="
               truncate
-              text-[7px]
+              text-xs
               font-medium
               uppercase
               tracking-[0.07em]
@@ -2884,7 +2884,7 @@ function HeatmapMatchButton({
             <span
               className="
                 truncate
-                text-[5px]
+                text-xs
               "
               style={{
                 color:
@@ -2952,7 +2952,7 @@ function HeatmapTeamLogo({
       ) : (
         <span
           className="
-            text-[7px]
+            text-xs
             font-semibold
           "
         >
@@ -3292,7 +3292,7 @@ export function PitchHeatmap({
             flex
             items-center
             gap-1.5
-            text-[6px]
+            text-xs
             uppercase
             tracking-[0.1em]
           "
@@ -3331,7 +3331,7 @@ export function PitchHeatmap({
         >
           <span
             className="
-              text-[6px]
+              text-xs
               uppercase
               tracking-[0.08em]
             "
@@ -3366,7 +3366,7 @@ export function PitchHeatmap({
 
           <span
             className="
-              text-[6px]
+              text-xs
               uppercase
               tracking-[0.08em]
             "
@@ -3385,7 +3385,7 @@ export function PitchHeatmap({
             flex-wrap
             items-center
             gap-4
-            text-[6px]
+            text-xs
             uppercase
             tracking-[0.08em]
           "
@@ -4027,7 +4027,7 @@ function CoveragePanel({
           <div>
             <p
               className="
-                text-[8px]
+                text-xs
                 font-medium
                 uppercase
                 tracking-[0.1em]
@@ -4040,7 +4040,7 @@ function CoveragePanel({
               className="
                 mt-2
                 max-w-[600px]
-                text-[7px]
+                text-xs
                 leading-4
               "
               style={{
@@ -4075,7 +4075,7 @@ function CoveragePanel({
           <p
             className="
               mt-1
-              text-[6px]
+              text-xs
               uppercase
             "
             style={{
@@ -4130,7 +4130,7 @@ function CaptainBadge({
 
       <span
         className="
-          text-[7px]
+          text-xs
           font-medium
           uppercase
           tracking-[0.1em]
@@ -4266,7 +4266,7 @@ function AvailabilityStrip({
       <span
         className="
           truncate
-          text-[7px]
+          text-xs
           font-medium
           uppercase
           tracking-[0.1em]
@@ -4337,7 +4337,7 @@ function FavouriteButton({
         gap-2
         border
         px-3
-        text-[7px]
+        text-xs
         font-medium
         uppercase
         tracking-[0.1em]
@@ -4446,7 +4446,7 @@ function ResultBadge({
 
       <span
         className="
-          text-[8px]
+          text-xs
           font-medium
           tabular-nums
         "
@@ -4511,7 +4511,7 @@ function OpponentCrest({
       ) : (
         <span
           className="
-            text-[7px]
+            text-xs
             font-semibold
           "
         >
@@ -4567,7 +4567,7 @@ function SectionHeading({
       <p
         className="
           shrink-0
-          text-[7px]
+          text-xs
           font-medium
           uppercase
           tracking-[0.15em]
@@ -4622,7 +4622,7 @@ function DetailBox({
     >
       <p
         className="
-          text-[6px]
+          text-xs
           uppercase
           tracking-[0.1em]
         "
@@ -4637,7 +4637,7 @@ function DetailBox({
       <div
         className="
           mt-1.5
-          text-[10px]
+          text-xs
           font-medium
         "
       >
@@ -4680,7 +4680,7 @@ function StatBox({
     >
       <p
         className="
-          text-[6px]
+          text-xs
           uppercase
           tracking-[0.09em]
         "
@@ -4748,7 +4748,7 @@ function PerformanceMetric({
       <p
         className="
           truncate
-          text-[6px]
+          text-xs
           uppercase
           tracking-[0.08em]
         "
@@ -4763,7 +4763,7 @@ function PerformanceMetric({
       <p
         className="
           mt-1.5
-          text-[11px]
+          text-xs
           font-medium
           tabular-nums
         "
@@ -4815,7 +4815,7 @@ function TinyMetric({
       }}
     >
       <p
-        className="text-[5px]"
+        className="text-xs"
         style={{
           color:
             theme.colors.textMuted,
@@ -4827,7 +4827,7 @@ function TinyMetric({
       <p
         className="
           mt-0.5
-          text-[8px]
+          text-xs
           font-medium
           tabular-nums
         "
@@ -4879,7 +4879,7 @@ function EmptyAnalysis({
       <p
         className="
           mt-2
-          text-[7px]
+          text-xs
         "
       >
         {text}

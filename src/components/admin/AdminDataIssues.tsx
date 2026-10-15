@@ -160,7 +160,7 @@ export default function AdminDataIssues({
         <div>
           <p
             className="
-              text-[9px]
+              text-xs
               uppercase
               tracking-[0.24em]
             "
@@ -189,7 +189,7 @@ export default function AdminDataIssues({
             className="
               mt-2
               max-w-2xl
-              text-[11px]
+              text-xs
               leading-5
             "
             style={{
@@ -308,7 +308,7 @@ export default function AdminDataIssues({
           <div>
             <p
               className="
-                text-[8px]
+                text-xs
                 font-medium
                 uppercase
                 tracking-[0.16em]
@@ -322,7 +322,7 @@ export default function AdminDataIssues({
               className="
                 mt-1
                 max-w-3xl
-                text-[8px]
+                text-xs
                 leading-4
               "
               style={{
@@ -345,7 +345,7 @@ export default function AdminDataIssues({
         <div
           className="
             shrink-0
-            text-[7px]
+            text-xs
             uppercase
             tracking-[0.13em]
           "
@@ -505,7 +505,7 @@ export default function AdminDataIssues({
                 bg-transparent
                 pl-9
                 pr-3
-                text-[10px]
+                text-xs
                 outline-none
               "
               style={{
@@ -520,7 +520,7 @@ export default function AdminDataIssues({
 
           <p
             className="
-              text-[8px]
+              text-xs
               tabular-nums
             "
             style={{
@@ -754,7 +754,7 @@ export default function AdminDataIssues({
           <div>
             <p
               className="
-                text-[8px]
+                text-xs
                 uppercase
                 tracking-[0.18em]
               "
@@ -891,7 +891,7 @@ function IssueRow({
               border
               px-2
               py-1
-              text-[7px]
+              text-xs
               uppercase
               tracking-[0.11em]
             "
@@ -920,7 +920,7 @@ function IssueRow({
               inline-flex
               items-center
               gap-1.5
-              text-[7px]
+              text-xs
               uppercase
               tracking-[0.11em]
             "
@@ -956,7 +956,7 @@ function IssueRow({
           className="
             mt-1.5
             max-w-4xl
-            text-[9px]
+            text-xs
             leading-4
           "
           style={{
@@ -982,7 +982,7 @@ function IssueRow({
           <div>
             <p
               className="
-                text-[7px]
+                text-xs
                 uppercase
                 tracking-[0.11em]
               "
@@ -997,7 +997,7 @@ function IssueRow({
             <p
               className="
                 mt-1
-                text-[9px]
+                text-xs
                 font-medium
               "
             >
@@ -1011,7 +1011,7 @@ function IssueRow({
             <div>
               <p
                 className="
-                  text-[7px]
+                  text-xs
                   uppercase
                   tracking-[0.11em]
                 "
@@ -1026,7 +1026,7 @@ function IssueRow({
               <p
                 className="
                   mt-1
-                  text-[9px]
+                  text-xs
                 "
               >
                 {
@@ -1040,7 +1040,7 @@ function IssueRow({
             <div>
               <p
                 className="
-                  text-[7px]
+                  text-xs
                   uppercase
                   tracking-[0.11em]
                 "
@@ -1055,7 +1055,7 @@ function IssueRow({
               <p
                 className="
                   mt-1
-                  text-[9px]
+                  text-xs
                   tabular-nums
                 "
               >
@@ -1099,7 +1099,7 @@ function IssueRow({
               gap-2
               border
               px-3
-              text-[7px]
+              text-xs
               uppercase
               tracking-[0.11em]
               transition-colors
@@ -1123,7 +1123,7 @@ function IssueRow({
         ) : (
           <span
             className="
-              text-[7px]
+              text-xs
               uppercase
               tracking-[0.11em]
             "
@@ -1181,7 +1181,7 @@ function HeaderMetric({
     >
       <p
         className="
-          text-[7px]
+          text-xs
           uppercase
           tracking-[0.14em]
         "
@@ -1272,7 +1272,7 @@ function SummaryMetric({
 
         <p
           className="
-            text-[7px]
+            text-xs
             uppercase
             tracking-[0.14em]
           "
@@ -1337,7 +1337,7 @@ function FilterButton({
         border
         px-2.5
         py-1.5
-        text-[7px]
+        text-xs
         uppercase
         tracking-[0.1em]
         transition-colors
@@ -1412,7 +1412,7 @@ function SeverityButton({
         border
         px-2.5
         py-1.5
-        text-[7px]
+        text-xs
         uppercase
         tracking-[0.1em]
         transition-colors
@@ -1476,7 +1476,7 @@ function EmptyState() {
       <p
         className="
           mt-3
-          text-[11px]
+          text-xs
           font-medium
         "
       >
@@ -1487,7 +1487,7 @@ function EmptyState() {
         className="
           mt-1
           max-w-sm
-          text-[8px]
+          text-xs
           leading-4
         "
         style={{

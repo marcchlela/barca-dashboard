@@ -202,7 +202,7 @@ export default function PlayerPerformanceModal({
           <div>
             <p
               className="
-                text-[8px]
+                text-xs
                 uppercase
                 tracking-[0.22em]
               "
@@ -291,7 +291,7 @@ export default function PlayerPerformanceModal({
                 {player.role ? (
                   <span
                     className="
-                      text-[8px]
+                      text-xs
                       uppercase
                       tracking-[0.16em]
                     "
@@ -318,7 +318,7 @@ export default function PlayerPerformanceModal({
               <p
                 className="
                   mt-2
-                  text-[9px]
+                  text-xs
                   uppercase
                   tracking-[0.18em]
                 "
@@ -803,7 +803,7 @@ function HeroMetric({
     >
       <p
         className="
-          text-[7px]
+          text-xs
           uppercase
           tracking-[0.16em]
         "
@@ -899,7 +899,7 @@ function RatingBadge({
       <p
         className="
           mt-1
-          text-[7px]
+          text-xs
           uppercase
           tracking-[0.18em]
         "
@@ -943,7 +943,7 @@ function StatSection({
       >
         <p
           className="
-            text-[8px]
+            text-xs
             font-semibold
             uppercase
             tracking-[0.22em]
@@ -1032,7 +1032,7 @@ function DataRow({
       }}
     >
       <span
-        className="text-[11px]"
+        className="text-xs"
         style={{
           color:
             theme.colors

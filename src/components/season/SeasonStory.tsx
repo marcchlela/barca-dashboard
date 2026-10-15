@@ -272,7 +272,7 @@ export default function SeasonStory({
       <div className="flex items-end justify-between gap-6">
         <div>
           <p
-            className="text-[10px] uppercase tracking-[0.26em]"
+            className="text-xs uppercase tracking-[0.26em]"
             style={{
               color:
                 theme.colors.textMuted,
@@ -287,7 +287,7 @@ export default function SeasonStory({
         </div>
 
         <div
-          className="text-right text-[9px] uppercase tracking-[0.18em]"
+          className="text-right text-xs uppercase tracking-[0.18em]"
           style={{
             color:
               theme.colors.textMuted,
@@ -403,7 +403,7 @@ export default function SeasonStory({
                   key={
                     month.key
                   }
-                  className="absolute -translate-x-1/2 text-[9px] uppercase tracking-[0.18em]"
+                  className="absolute -translate-x-1/2 text-xs uppercase tracking-[0.18em]"
                   style={{
                     left:
                       `${month.position}%`,
@@ -508,7 +508,7 @@ export default function SeasonStory({
                       </div>
 
                       <p
-                        className="mt-1 text-[8px] uppercase tracking-[0.16em]"
+                        className="mt-1 text-xs uppercase tracking-[0.16em]"
                         style={{
                           color:
                             theme.colors.textMuted,
@@ -519,13 +519,13 @@ export default function SeasonStory({
                         )}
                       </p>
 
-                      <p className="mt-1 text-[10px] font-medium leading-4">
+                      <p className="mt-1 text-xs font-medium leading-4">
                         {event.title}
                       </p>
 
                       {event.subtitle ? (
                         <p
-                          className="mx-auto mt-1 line-clamp-2 text-[8px] leading-3.5"
+                          className="mx-auto mt-1 line-clamp-2 text-xs leading-3.5"
                           style={{
                             color:
                               theme.colors.textMuted,
@@ -553,7 +553,7 @@ export default function SeasonStory({
         }}
       >
         <p
-          className="text-[9px] uppercase tracking-[0.2em]"
+          className="text-xs uppercase tracking-[0.2em]"
           style={{
             color:
               theme.colors.textMuted,
@@ -714,7 +714,7 @@ function EventVisual({
         />
 
         <span
-          className="mx-1 text-[8px] font-semibold"
+          className="mx-1 text-xs font-semibold"
           style={{
             color:
               theme.colors.textMuted,
@@ -746,21 +746,14 @@ function EventVisual({
       ?.logoUrl
   ) {
     return (
-      <div
-        className="flex h-8 w-10 items-center justify-center"
-        style={{
-          backgroundColor:
-            "#F3F1EB",
-        }}
-      >
+      <div className="flex h-8 w-10 items-center justify-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-
         <img
           src={
             event.competition.logoUrl
           }
           alt="UEFA Champions League"
-          className="h-6 w-6 object-contain"
+          className="h-6 w-6 object-contain brightness-0 invert"
         />
       </div>
     );
@@ -1327,7 +1320,7 @@ function Legend({
         }}
       />
 
-      <span className="text-[9px] uppercase tracking-[0.14em]">
+      <span className="text-xs uppercase tracking-[0.14em]">
         {label}
       </span>
     </div>

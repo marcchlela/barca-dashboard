@@ -4,6 +4,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import { useRouter } from "next/navigation";
 
 import DashboardSyncController from "./DashboardSyncController";
 
@@ -17,6 +18,7 @@ import IntroGate, {
 import MatchStage from "../match/MatchStage";
 import SeasonStory from "../season/SeasonStory";
 import BarcaPulse from "../shell/BarcaPulse";
+import BrandHomeLink from "../shell/BrandHomeLink";
 import StadiumRail from "../shell/StadiumRail";
 import ThemeScrollbarSync from "../theme/ThemeScrollbarSync";
 
@@ -41,6 +43,7 @@ const KIT_STORAGE_KEY =
 export default function DashboardClient({
   overview,
 }: DashboardClientProps) {
+  const router = useRouter();
   /*
   |--------------------------------------------------------------------------
   | Kit
@@ -181,6 +184,22 @@ export default function DashboardClient({
   }, [
     overview,
   ]);
+
+  // The background worker updates PostgreSQL, not an already-open browser tab.
+  // Refresh the server-rendered overview near kickoff while it is visible.
+  useEffect(() => {
+    const kickoff = overview.nextMatch?.kickoff;
+    if (!kickoff) return;
+    const kickoffAt = Date.parse(kickoff);
+    if (!Number.isFinite(kickoffAt)) return;
+    const timer = window.setInterval(() => {
+      const sinceKickoff = Date.now() - kickoffAt;
+      if (document.visibilityState === "visible" && sinceKickoff >= -60 * 60_000 && sinceKickoff <= 8 * 60 * 60_000) {
+        router.refresh();
+      }
+    }, 15_000);
+    return () => window.clearInterval(timer);
+  }, [overview.nextMatch?.kickoff, router]);
 
   const matchState =
     devMatchStateOverride ??
@@ -359,40 +378,12 @@ export default function DashboardClient({
           "
         >
           <div>
-            <p
-              className="
-                text-[10px]
-                uppercase
-                tracking-[0.28em]
-
-                sm:text-xs
-                sm:tracking-[0.32em]
-              "
-              style={{
-                color:
-                  theme.colors.textMuted,
-              }}
-            >
-              FC Barcelona
-            </p>
-
-            <h1
-              className="
-                mt-2
-                text-2xl
-                font-medium
-                tracking-[-0.03em]
-
-                sm:text-3xl
-              "
-            >
-              Barça Command Center
-            </h1>
+            <BrandHomeLink title="Barça Command Center" />
           </div>
 
           <div
             className="
-              text-[10px]
+              text-xs
               uppercase
               tracking-[0.16em]
 
@@ -617,7 +608,11 @@ function getAutomaticMatchState(
     nextMatch?.status ===
       "live" ||
     nextMatch?.status ===
-      "halftime"
+      "halftime" ||
+    nextMatch?.status ===
+      "extra_time" ||
+    nextMatch?.status ===
+      "penalties"
   ) {
     return "live";
   }
@@ -663,6 +658,10 @@ function getAutomaticMatchState(
       new Date(
         nextMatch.kickoff,
       );
+
+    if (nextMatch.status === "scheduled" && now.getTime() >= kickoff.getTime() && now.getTime() - kickoff.getTime() <= 4 * 3_600_000) {
+      return "matchday";
+    }
 
     if (
       isSameCalendarDay(

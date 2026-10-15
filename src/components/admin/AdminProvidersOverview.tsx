@@ -56,7 +56,7 @@ export default function AdminProvidersOverview({
         <div>
           <p
             className="
-              text-[9px]
+              text-xs
               uppercase
               tracking-[0.24em]
             "
@@ -85,7 +85,7 @@ export default function AdminProvidersOverview({
             className="
               mt-2
               max-w-2xl
-              text-[11px]
+              text-xs
               leading-5
             "
             style={{
@@ -207,7 +207,7 @@ export default function AdminProvidersOverview({
           <div>
             <p
               className="
-                text-[8px]
+                text-xs
                 uppercase
                 tracking-[0.16em]
               "
@@ -218,7 +218,7 @@ export default function AdminProvidersOverview({
             <p
               className="
                 mt-1
-                text-[8px]
+                text-xs
                 leading-4
               "
               style={{
@@ -239,7 +239,7 @@ export default function AdminProvidersOverview({
         <div
           className="
             shrink-0
-            text-[7px]
+            text-xs
             uppercase
             tracking-[0.13em]
           "
@@ -339,7 +339,7 @@ export default function AdminProvidersOverview({
           <div>
             <p
               className="
-                text-[8px]
+                text-xs
                 uppercase
                 tracking-[0.18em]
               "
@@ -365,7 +365,7 @@ export default function AdminProvidersOverview({
 
           <p
             className="
-              text-[8px]
+              text-xs
               tabular-nums
             "
             style={{
@@ -435,7 +435,7 @@ export default function AdminProvidersOverview({
         >
           <p
             className="
-              text-[8px]
+              text-xs
               uppercase
               tracking-[0.17em]
             "
@@ -562,7 +562,7 @@ function ProviderCard({
           <div className="min-w-0">
             <p
               className="
-                text-[8px]
+                text-xs
                 font-medium
                 uppercase
                 tracking-[0.15em]
@@ -635,7 +635,7 @@ function ProviderCard({
         <p
           className="
             max-w-4xl
-            text-[11px]
+            text-xs
             leading-5
           "
           style={{
@@ -670,7 +670,7 @@ function ProviderCard({
                   border
                   px-2
                   py-1
-                  text-[7px]
+                  text-xs
                   uppercase
                   tracking-[0.09em]
                 "
@@ -854,7 +854,7 @@ function ProviderCard({
             <div>
               <p
                 className="
-                  text-[8px]
+                  text-xs
                   font-medium
                   uppercase
                   tracking-[0.12em]
@@ -870,7 +870,7 @@ function ProviderCard({
               <p
                 className="
                   mt-1
-                  text-[9px]
+                  text-xs
                 "
               >
                 {provider.lastActivity
@@ -886,7 +886,7 @@ function ProviderCard({
                 border
                 px-2.5
                 py-1.5
-                text-[7px]
+                text-xs
                 uppercase
                 tracking-[0.11em]
               "
@@ -915,7 +915,7 @@ function ProviderCard({
                 justify-between
                 border
                 px-3
-                text-[7px]
+                text-xs
                 uppercase
                 tracking-[0.12em]
               "
@@ -1017,7 +1017,7 @@ function ProviderLogo({
           items-center
           justify-center
           border
-          text-[8px]
+          text-xs
           font-medium
           uppercase
           tracking-[0.08em]
@@ -1119,7 +1119,7 @@ function HeaderMetric({
     >
       <p
         className="
-          text-[7px]
+          text-xs
           uppercase
           tracking-[0.14em]
         "
@@ -1211,7 +1211,7 @@ function PipelineMetric({
 
         <p
           className="
-            text-[7px]
+            text-xs
             uppercase
             tracking-[0.15em]
           "
@@ -1239,7 +1239,7 @@ function PipelineMetric({
       <p
         className="
           mt-1
-          text-[8px]
+          text-xs
         "
         style={{
           color:
@@ -1292,7 +1292,7 @@ function MiniMetric({
     >
       <p
         className="
-            text-[8px]
+            text-xs
             font-medium
             uppercase
             tracking-[0.12em]
@@ -1308,7 +1308,7 @@ function MiniMetric({
       <p
         className="
           mt-1.5
-          text-[11px]
+          text-xs
           font-medium
           tabular-nums
         "
@@ -1359,7 +1359,7 @@ function CountItem({
     <div>
       <p
         className="
-            text-[8px]
+            text-xs
             font-medium
             uppercase
             tracking-[0.11em]
@@ -1431,7 +1431,7 @@ function StatusBadge({
         border
         px-2.5
         py-1.5
-        text-[7px]
+        text-xs
         uppercase
         tracking-[0.12em]
       "
@@ -1572,7 +1572,7 @@ function ArchitectureStep({
       >
         <span
           className="
-            text-[8px]
+            text-xs
             font-mono
           "
           style={{
@@ -1595,7 +1595,7 @@ function ArchitectureStep({
       <p
         className="
           mt-4
-          text-[11px]
+          text-xs
           font-medium
         "
       >
@@ -1605,7 +1605,7 @@ function ArchitectureStep({
       <p
         className="
           mt-2
-          text-[8px]
+          text-xs
           leading-4
         "
         style={{

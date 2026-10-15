@@ -256,17 +256,16 @@ export default function MatchTimeline({
     );
   }
 
-  if (!halfTimeInserted && ["halftime", "finished", "extra_time", "penalties"].includes(data.match.status)) {
-    halfTimeScore = {
-      ...runningScore,
-    };
-
+  if (!halfTimeInserted && data.match.status === "halftime") {
+    const knownHalfTimeScore = data.match.score.home !== null && data.match.score.away !== null
+      ? `${data.match.score.home} – ${data.match.score.away}`
+      : events.length ? `${runningScore.home} – ${runningScore.away}` : "Score pending";
     rows.push(
       <MatchPhase
         key="half-time"
         type="half-time"
         title="Half Time"
-        detail={`${halfTimeScore.home} – ${halfTimeScore.away}`}
+        detail={knownHalfTimeScore}
         theme={theme}
       />,
     );
@@ -319,14 +318,14 @@ export default function MatchTimeline({
       >
         {activeGoal && <>
           <div className="flex items-start justify-between gap-4 border-b p-4 sm:p-5" style={{ borderColor: theme.colors.border }}>
-            <div className="min-w-0"><p className="text-[9px] uppercase tracking-[.2em]" style={{ color: theme.colors.accent }}>Match Flow / Goal footage</p><h3 className="mt-1 text-lg font-medium sm:text-xl">{activeGoal.label}</h3><p className="mt-1 text-xs" style={{ color: theme.colors.textMuted }}>{data.match.homeTeam.name} {data.match.score.home ?? "–"}–{data.match.score.away ?? "–"} {data.match.awayTeam.name} · {data.match.competition.name}</p></div>
+            <div className="min-w-0"><p className="text-xs uppercase tracking-[.2em]" style={{ color: theme.colors.accent }}>Match Flow / Goal footage</p><h3 className="mt-1 text-lg font-medium sm:text-xl">{activeGoal.label}</h3><p className="mt-1 text-xs" style={{ color: theme.colors.textMuted }}>{data.match.homeTeam.name} {data.match.score.home ?? "–"}–{data.match.score.away ?? "–"} {data.match.awayTeam.name} · {data.match.competition.name}</p></div>
             <button type="button" onClick={() => setActiveGoalId(null)} aria-label="Close goal video" className="cursor-pointer border p-2 focus-visible:outline-2" style={{ borderColor: theme.colors.border, outlineColor: theme.colors.accent }}><X size={18} /></button>
           </div>
           <div className="p-4 sm:p-5">
             <div className="aspect-video w-full bg-black"><iframe key={`${activeGoal.eventId}:${activeGoal.videoId}:${activeGoal.startSecond}`} src={goalEmbedUrl(activeGoal)} title={`${activeGoal.label} · ${activeGoal.mediaTitle}`} allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" className="h-full w-full border-0" /></div>
             <div className="mt-3 flex flex-wrap items-start justify-between gap-3 text-xs" style={{ color: theme.colors.textMuted }}><p>{activeGoal.verificationBasis === "manual_visual" ? "Visually verified goal" : "Metadata-confirmed start; footage not visually verified"} · starts at {activeGoal.startSecond}s{activeGoal.endSecond !== null ? ` · ends at ${activeGoal.endSecond}s` : ""}</p><a href={goalYouTubeUrl(activeGoal)} target="_blank" rel="noopener noreferrer" className="inline-flex cursor-pointer items-center gap-1 underline focus-visible:outline-2" style={{ color: theme.colors.accent }}>Open on YouTube <ExternalLink size={12} /></a></div>
-            <p className="mt-2 text-[11px]" style={{ color: theme.colors.textMuted }}>If the embed is unavailable or blocked, open the same video on YouTube at this timestamp.</p>
-            {playable.size > 1 && <div className="mt-4 border-t pt-4" style={{ borderColor: theme.colors.border }}><p className="mb-2 text-[9px] uppercase tracking-widest" style={{ color: theme.colors.textMuted }}>Other goals</p><div className="flex flex-wrap gap-2">{[...playable.values()].map((goal) => <button key={goal.eventId} type="button" onClick={() => setActiveGoalId(goal.eventId)} aria-current={goal.eventId === activeGoalId ? "true" : undefined} className="cursor-pointer border px-2.5 py-1.5 text-xs focus-visible:outline-2" style={{ borderColor: goal.eventId === activeGoalId ? theme.colors.accent : theme.colors.border, color: goal.eventId === activeGoalId ? theme.colors.accent : theme.colors.text }}>{goal.label}</button>)}</div></div>}
+            <p className="mt-2 text-xs" style={{ color: theme.colors.textMuted }}>If the embed is unavailable or blocked, open the same video on YouTube at this timestamp.</p>
+            {playable.size > 1 && <div className="mt-4 border-t pt-4" style={{ borderColor: theme.colors.border }}><p className="mb-2 text-xs uppercase tracking-widest" style={{ color: theme.colors.textMuted }}>Other goals</p><div className="flex flex-wrap gap-2">{[...playable.values()].map((goal) => <button key={goal.eventId} type="button" onClick={() => setActiveGoalId(goal.eventId)} aria-current={goal.eventId === activeGoalId ? "true" : undefined} className="cursor-pointer border px-2.5 py-1.5 text-xs focus-visible:outline-2" style={{ borderColor: goal.eventId === activeGoalId ? theme.colors.accent : theme.colors.border, color: goal.eventId === activeGoalId ? theme.colors.accent : theme.colors.text }}>{goal.label}</button>)}</div></div>}
           </div>
         </>}
       </dialog>
@@ -336,7 +335,7 @@ export default function MatchTimeline({
           border-t
           px-5
           py-3
-          text-[8px]
+          text-xs
           uppercase
           tracking-[0.16em]
         "
@@ -448,7 +447,7 @@ function TimelineEvent({
           className="
             px-1
             font-mono
-            text-[11px]
+            text-xs
             font-semibold
             tabular-nums
           "
@@ -531,7 +530,7 @@ function TimelineEvent({
               event={event}
               theme={theme}
             />
-            {isGoal && playable && <span className="mt-2 inline-flex items-center gap-1.5 text-[9px] font-semibold uppercase tracking-[.12em]" style={{ color: theme.colors.accent }}><Play size={11} fill="currentColor" aria-hidden="true" />Watch goal</span>}
+            {isGoal && playable && <span className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[.12em]" style={{ color: theme.colors.accent }}><Play size={11} fill="currentColor" aria-hidden="true" />Watch goal</span>}
           </div>
 
           <div className="flex shrink-0 items-center gap-3">
@@ -542,7 +541,7 @@ function TimelineEvent({
                   px-2
                   py-1
                   font-mono
-                  text-[10px]
+                  text-xs
                   font-semibold
                   tabular-nums
                 "
@@ -578,7 +577,7 @@ function TimelineEvent({
                 max-w-24
                 truncate
                 text-right
-                text-[8px]
+                text-xs
                 uppercase
                 tracking-[0.14em]
               "
@@ -732,7 +731,7 @@ function MatchPhase({
       >
         <span
           className="
-            text-[9px]
+            text-xs
             font-semibold
             uppercase
             tracking-[0.2em]
@@ -753,7 +752,7 @@ function MatchPhase({
         <span
           className="
             font-mono
-            text-[10px]
+            text-xs
             tabular-nums
           "
           style={{
@@ -946,7 +945,7 @@ function EventDetail({
 
   return (
     <p
-      className="mt-1 text-[10px]"
+      className="mt-1 text-xs"
       style={{
         color:
           theme.colors
@@ -1059,24 +1058,11 @@ function eventDetail(
     event.type ===
     "substitution"
   ) {
-    if (
-      event.primaryPlayer &&
-      event.relatedPlayer
-    ) {
-      return `${event.relatedPlayer.name} on · ${event.primaryPlayer.name} off`;
-    }
-
-    if (
-      event.relatedPlayer
-    ) {
-      return `${event.relatedPlayer.name} on`;
-    }
-
-    if (
-      event.primaryPlayer
-    ) {
-      return `${event.primaryPlayer.name} off`;
-    }
+    const off = event.primaryPlayer?.name ?? event.offName;
+    const on = event.relatedPlayer?.name ?? event.onName;
+    if (off && on) return `${on} on · ${off} off`;
+    if (on) return `${on} on`;
+    if (off) return `${off} off`;
 
     return "Player change";
   }

@@ -62,7 +62,7 @@ export function RatingMenu({ value, onChange, theme }: { value: number | null; o
         <Star size={16} fill={value === null ? "none" : theme.colors.accent} color={theme.colors.accent} aria-hidden="true" /><span className={styles.triggerText}>{value === null ? "All ratings" : `${value.toFixed(1)} stars`}</span><ChevronDown size={15} className={styles.chevron} style={{ color: theme.colors.accent }} aria-hidden="true" />
       </summary>
       <div className={styles.ratingOptions} style={{ borderColor: theme.colors.accent, background: theme.colors.surface }}>
-        <p className="text-[11px]" style={{ color: theme.colors.textMuted }}>Choose a full or half star</p>
+        <p className="text-xs" style={{ color: theme.colors.textMuted }}>Choose a full or half star</p>
         <div className={styles.stars} onPointerLeave={() => setPreview(null)} role="group" aria-label="Choose an exact rating in half-star steps">
           {[0, 1, 2, 3, 4].map((index) => {
             const filled = Math.max(0, Math.min(1, shown - index));

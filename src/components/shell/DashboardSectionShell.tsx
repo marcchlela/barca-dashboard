@@ -10,6 +10,7 @@ import type {
 } from "react";
 
 import StadiumRail from "./StadiumRail";
+import BrandHomeLink from "./BrandHomeLink";
 import ThemeScrollbarSync from "../theme/ThemeScrollbarSync";
 
 import {
@@ -247,40 +248,12 @@ export default function DashboardSectionShell({
           "
         >
           <div>
-            <p
-              className="
-                text-[10px]
-                uppercase
-                tracking-[0.28em]
-
-                sm:text-xs
-                sm:tracking-[0.32em]
-              "
-              style={{
-                color:
-                  theme.colors.textMuted,
-              }}
-            >
-              FC Barcelona
-            </p>
-
-            <h1
-              className="
-                mt-2
-                text-2xl
-                font-medium
-                tracking-[-0.03em]
-
-                sm:text-3xl
-              "
-            >
-              {title}
-            </h1>
+            <BrandHomeLink title={title} />
           </div>
 
           <div
             className="
-              text-[10px]
+              text-xs
               uppercase
               tracking-[0.16em]
 

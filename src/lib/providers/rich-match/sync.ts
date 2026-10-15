@@ -16,6 +16,7 @@ import {
 } from "../shared/normalization";
 import { RICH_DATA_SOURCES } from "./constants";
 import { lineupNeedsBackfill } from "./lineup-coverage";
+import { lineupRefreshWindow } from "./lineup-refresh-window";
 import { bigBallsPlayerStatisticsProvider } from "./player-stat-provider";
 import {
   emptySyncCounts,
@@ -94,8 +95,7 @@ async function loadMatchContext(
   }
 
   const scheduledLineup = options.allowScheduledLineup === true &&
-    match.status === "scheduled" &&
-    Date.parse(match.kickoff.toString()) > Date.now();
+    lineupRefreshWindow(match.status, match.kickoff.toString(), Date.now());
 
   if (match.status !== "finished" && !scheduledLineup) {
     throw new Error(
@@ -147,10 +147,10 @@ async function loadMatchContext(
 
       score: {
         home:
-          match.homeScore,
+          match.status === "finished" ? match.homeScore : null,
 
         away:
-          match.awayScore,
+          match.status === "finished" ? match.awayScore : null,
       },
 
       providerIds:
