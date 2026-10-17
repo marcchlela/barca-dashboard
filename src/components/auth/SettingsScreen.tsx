@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 import DashboardSectionShell, { useDashboardSectionTheme } from "../shell/DashboardSectionShell";
 import { getTheme, type KitType } from "../../lib/themes";
+import NotificationsSettings from "./NotificationsSettings";
 
 type Viewer = { username: string; email: string; role: "user" | "admin" } | null;
 
@@ -53,6 +54,7 @@ export default function SettingsScreen({ viewer }: { viewer: Viewer }) {
           </button>;
         })}</div>
       </section>
+      <NotificationsSettings signedIn={Boolean(viewer)} />
       <section className="border p-5 md:p-7" style={{ background: theme.colors.surface, borderColor: theme.colors.border }}>
         <h2 className="text-xl">Account & security</h2>
         {!viewer ? <p className="mt-4 text-sm" style={{ color: theme.colors.textMuted }}>Sign in to manage your personal archive and password. <Link href="/account?next=/settings" className="underline underline-offset-4" style={{ color: theme.colors.accent }}>Sign in</Link></p> : <>

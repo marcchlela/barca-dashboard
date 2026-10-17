@@ -70,12 +70,18 @@ The production stack is operational, but this README intentionally does not clai
 
 ## Accounts and security
 
+### Web Push notifications (opt-in)
+
+The notification tables are added by the `20261016T2037_web_push_notifications` migration. Review and apply that migration through the existing deployment workflow before using the new Settings or Admin Notifications screens. Generate one VAPID key pair with `npx web-push generate-vapid-keys`, then place `WEB_PUSH_PUBLIC_KEY`, `WEB_PUSH_PRIVATE_KEY`, and `WEB_PUSH_CONTACT=mailto:your-address` in the private server environment; never commit the private key. Set `PUSH_NOTIFICATIONS_ENABLED=true` only after a backup, migration, configuration and a manual test notification pass. Its default is `false`. The existing media-scheduler calls the authenticated notifications endpoint every 60 seconds; no separate scheduler is needed. Keep the same VAPID keys across deployments or devices must subscribe again.
+
+Users opt in per device under Settings; admins can edit templates, send a test or custom alert, and inspect delivery history at `/admin/notifications`. On iPhone, open the installed Home Screen app to grant permission. Already-installed Home Screen apps do not need to be removed and re-added, but notification permission still must be granted. A successful push-provider acceptance does not prove the operating system displayed the alert, and goal alerts can only be as prompt and complete as the upstream event provider. Penalty and VAR alerts are sent only for explicit provider events, never guessed from a score change.
+
 - `BARCA_SIGNUP_ENABLED=1` enables signup in production. Keep this under operator control.
 - Signup and login include validation, throttling and same-origin safeguards. Passwords use salted scrypt hashes; sessions use server-managed cookies.
 - Canonical match, squad, analytics and media records are shared; personal diary, favourites and saves must be user-scoped.
 - Production signup and an initial second-account favourites isolation check passed. **Do not interpret this as a full audit of every account-owned route or admin API.**
 - Before broader sharing, test authorization for every admin/debug endpoint, verify ownership on every personal read/write and data-transfer flow, and review public origin/proxy/cookie behavior.
-- Email verification and password recovery are not available yet.
+- Email verification is not implemented. Password recovery uses configured email delivery; an unverified address must not be treated as proof of identity beyond control of that inbox.
 - Never commit `.env`, API keys, database credentials, session secrets, private licensed assets or user records.
 
 ## Product and data rules

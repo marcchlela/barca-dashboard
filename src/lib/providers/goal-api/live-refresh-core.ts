@@ -59,7 +59,7 @@ function sameTeam(left: string, right: string) {
   });
 }
 
-export type LiveEventType = "goal" | "own_goal" | "penalty_goal" | "yellow_card" | "red_card" | "substitution";
+export type LiveEventType = "goal" | "own_goal" | "penalty_goal" | "missed_penalty" | "penalty_awarded" | "var_overturned" | "yellow_card" | "red_card" | "substitution";
 export type LiveMatchStatus = "live" | "halftime" | "extra_time" | "penalties" | "finished";
 
 export type LiveEventCandidate = {
@@ -124,7 +124,10 @@ export function normalizeLiveEvents(value: JsonObject, homeTeam: string, awayTea
         stringValue(asObject(row.type), "name", "label"),
       ].filter(Boolean).join(" ").toLowerCase();
       let type: LiveEventType | null = null;
-      if (names.includes("own goal") || names.includes("own_goal")) type = "own_goal";
+      if ((names.includes("goal") && /(disallow|overturn|cancel|ruled out|no goal)/.test(names)) || names.includes("var overturn")) type = "var_overturned";
+      else if (names.includes("penalt") && /(miss|saved|off target|failed)/.test(names)) type = "missed_penalty";
+      else if (names.includes("penalt") && /(award|given|conceded|won)/.test(names)) type = "penalty_awarded";
+      else if (names.includes("own goal") || names.includes("own_goal")) type = "own_goal";
       else if (names.includes("goal") && names.includes("penalt")) type = "penalty_goal";
       else if (names.includes("goal")) type = "goal";
       else if (names.includes("red card") || names.includes("red_card") || names.includes("second yellow")) type = "red_card";
@@ -185,6 +188,19 @@ export function normalizeLiveStatus(value: JsonObject): LiveMatchStatus | null {
     if (["pen", "penalties", "penalty shootout", "shootout"].includes(status)) return "penalties";
     if (["1h", "2h", "live", "inplay", "in play", "first half", "second half", "playing"].includes(status)) return "live";
   }
+  return null;
+}
+
+export function normalizeLivePeriod(value: JsonObject): 1 | 2 | null {
+  const clock = asObject(value.clock);
+  const status = asObject(value.status);
+  const fields = [
+    stringValue(value, "statusShort", "status_short", "matchPeriod", "match_period"),
+    stringValue(status, "short", "code", "name"),
+    stringValue(clock, "period"),
+  ].filter((field): field is string => Boolean(field)).map((field) => field.toLowerCase().replace(/[ _-]+/g, " "));
+  if (fields.some((field) => ["2h", "second half", "2nd half"].includes(field))) return 2;
+  if (fields.some((field) => ["1h", "first half", "1st half"].includes(field))) return 1;
   return null;
 }
 
