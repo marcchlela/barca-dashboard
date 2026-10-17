@@ -565,8 +565,94 @@ model AppUser {
   favouritePlayers FavouritePlayer[]
   favouriteMatches FavouriteMatch[]
   diaryEntries  MatchDiaryEntry[]
+  pushSubscriptions PushSubscription[]
+  notificationPreferences NotificationPreference[]
 
   @@map("app_user")
+}
+
+model PushSubscription {
+  id            Uuid @id @default(uuid())
+  userId        Uuid
+  endpoint      String @unique
+  p256dh        String
+  auth          String
+  userAgent     String?
+  disabledAt    DateTime?
+  createdAt     temporal.createdAt()
+  updatedAt     temporal.updatedAt()
+
+  user          AppUser @relation(fields:[userId], references:[id])
+  deliveries    NotificationDelivery[]
+
+  @@index([userId])
+  @@map("push_subscription")
+}
+
+model NotificationPreference {
+  id        Uuid @id @default(uuid())
+  userId    Uuid
+  kind      String
+  enabled   Boolean @default(true)
+  updatedAt temporal.updatedAt()
+
+  user      AppUser @relation(fields:[userId], references:[id])
+
+  @@unique([userId, kind])
+  @@map("notification_preference")
+}
+
+model NotificationTemplate {
+  kind      String @id
+  title     String
+  body      String
+  updatedAt temporal.updatedAt()
+
+  @@map("notification_template")
+}
+
+model NotificationEvent {
+  id        Uuid @id @default(uuid())
+  key       String @unique
+  kind      String
+  matchId   Uuid?
+  title     String
+  body      String
+  url       String
+  iconUrl   String?
+  audience  String @default("supporters")
+  createdAt temporal.createdAt()
+
+  deliveries NotificationDelivery[]
+
+  @@index([createdAt])
+  @@index([kind, createdAt])
+  @@map("notification_event")
+}
+
+model NotificationDelivery {
+  id             Uuid @id @default(uuid())
+  eventId        Uuid
+  subscriptionId Uuid
+  status         String @default("pending")
+  errorCode      String?
+  sentAt         DateTime?
+  createdAt      temporal.createdAt()
+
+  event          NotificationEvent @relation(fields:[eventId], references:[id])
+  subscription   PushSubscription @relation(fields:[subscriptionId], references:[id])
+
+  @@unique([eventId, subscriptionId])
+  @@index([status, createdAt])
+  @@map("notification_delivery")
+}
+
+model NotificationCursor {
+  key       String @id
+  snapshot  Json
+  updatedAt temporal.updatedAt()
+
+  @@map("notification_cursor")
 }
 
 model UserSession {

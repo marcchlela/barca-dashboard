@@ -11,6 +11,7 @@ import {
   finishedCoverageIncomplete,
   liveRetryDelayMs,
   normalizeLiveEvents,
+  normalizeLivePeriod,
   normalizeLiveSubstitutions,
   normalizeLiveStatus,
   postMatchPollDelayMs,
@@ -201,9 +202,12 @@ async function upsertLiveEvent(input: {
   const mappedEvent = mapping ? input.existingEvents.find((row) => row.id === mapping.internalId) : undefined;
   if (mapping && !mappedEvent) throw new Error(`GOAL event mapping ${event.providerId} points to a missing event.`);
   const goalTypes = new Set(["goal", "own_goal", "penalty_goal"]);
+  const storedType: "goal" | "own_goal" | "penalty_goal" | "missed_penalty" | "yellow_card" | "red_card" | "substitution" | "other" =
+    event.type === "penalty_awarded" || event.type === "var_overturned" ? "other" : event.type;
   const nearby = mappedEvent ? [mappedEvent] : input.existingEvents.filter((row) =>
+    storedType !== "other" &&
     row.teamId === teamId && row.minute === event.minute &&
-    (row.type === event.type || (goalTypes.has(row.type) && goalTypes.has(event.type))) &&
+    (row.type === storedType || (goalTypes.has(row.type) && goalTypes.has(storedType))) &&
     (event.type === "substitution"
       ? (scorer && row.primaryPlayerId === scorer.playerId) ||
         (personKey(rawName(row.rawData, "offName")) === personKey(event.scorerName) &&
@@ -223,18 +227,19 @@ async function upsertLiveEvent(input: {
     primaryPlayerId: scorer?.playerId ?? null,
     relatedPlayerId: assist?.playerId ?? null,
     dataSourceId: input.sourceId,
-    type: event.type,
+    type: storedType,
     period: event.period ?? (event.minute !== null && event.minute > 45 ? 2 : 1),
     minute: event.minute,
     second: null,
     eventOrder: event.order,
     xG: null,
-    outcome: event.type === "yellow_card" || event.type === "red_card" || event.type === "substitution" ? null : "goal",
+    outcome: goalTypes.has(event.type) ? "goal" : event.type === "var_overturned" ? "goal_overturned" : null,
     sequenceId: `goal-api-live:${event.providerId}`,
     coordinateSystem: null,
     confidence: "exact_provider" as const,
     rawData: {
       providerEventId: event.providerId,
+      notificationType: event.type === "penalty_awarded" || event.type === "var_overturned" ? event.type : null,
       scorerName: event.type === "substitution" ? null : event.scorerName,
       assistName: event.type === "substitution" ? null : event.assistName,
       offName: event.type === "substitution" ? event.scorerName : null,
@@ -249,7 +254,7 @@ async function upsertLiveEvent(input: {
   else {
     const created = await db.orm.public.MatchEvent.create(data);
     storedId = created.id;
-    input.existingEvents.push({ id: created.id, type: event.type, teamId, primaryPlayerId: scorer?.playerId ?? null, relatedPlayerId: assist?.playerId ?? null, minute: event.minute, confidence: "exact_provider", dataSourceId: input.sourceId, rawData: data.rawData, matchId: input.matchId });
+    input.existingEvents.push({ id: created.id, type: storedType, teamId, primaryPlayerId: scorer?.playerId ?? null, relatedPlayerId: assist?.playerId ?? null, minute: event.minute, confidence: "exact_provider", dataSourceId: input.sourceId, rawData: data.rawData, matchId: input.matchId });
   }
   if (mapping) {
     if (mapping.internalId !== storedId) throw new Error("Provider event identity changed; preserving existing mapping.");
@@ -424,6 +429,7 @@ export async function runLiveMatchRefresh(input: { now?: number; client?: GoalAp
     result.eventsPreserved = preserved;
     result.eventsAmbiguous = ambiguous;
     result.providerStatus = status;
+    result.providerPeriod = normalizeLivePeriod(fixture.detail);
 
     const previousStatsAt = typeof result.statsFetchedAt === "string" ? result.statsFetchedAt : null;
     if (shouldFetchLiveStatistics(previousStatsAt, now)) {

@@ -41,8 +41,12 @@ export default function AccountScreen({ viewer, next, signupOpen }: { viewer: Vi
   async function logout() {
     setPending(true);
     try {
-      const response = await fetch("/api/auth/logout", { method: "POST" });
+      const registration = "serviceWorker" in navigator ? await navigator.serviceWorker.getRegistration("/") : null;
+      const subscription = await registration?.pushManager.getSubscription();
+      const response = await fetch("/api/auth/logout", { method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ pushEndpoint: subscription?.endpoint ?? null }) });
       if (!response.ok) throw new Error("Sign-out failed");
+      if (subscription) await subscription.unsubscribe().catch(() => {});
       router.push("/account");
       router.refresh();
     } catch { setError("Could not sign out. Please try again."); }

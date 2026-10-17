@@ -16,6 +16,7 @@ import {
   Database,
   LayoutDashboard,
   Mail,
+  Bell,
   RefreshCw,
   ShieldCheck,
   TriangleAlert,
@@ -76,6 +77,17 @@ const navigation = [
 
     icon:
       Mail,
+  },
+
+  {
+    label:
+      "Notifications",
+
+    href:
+      "/admin/notifications",
+
+    icon:
+      Bell,
   },
 
   {

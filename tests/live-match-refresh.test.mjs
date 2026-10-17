@@ -7,6 +7,7 @@ import {
   normalizeLiveEvents,
   normalizeLiveSubstitutions,
   normalizeLiveStatus,
+  normalizeLivePeriod,
   postMatchPollDelayMs,
   shouldFetchLiveStatistics,
 } from "../src/lib/providers/goal-api/live-refresh-core.ts";
@@ -66,9 +67,22 @@ test("provider status and five-minute stats interval are normalized", () => {
   assert.equal(normalizeLiveStatus({ status: "HT" }), "halftime");
   assert.equal(normalizeLiveStatus({ status: "FT" }), "finished");
   assert.equal(normalizeLiveStatus({ matchStatus: "67", matchPeriod: "SECOND_HALF" }), "live");
+  assert.equal(normalizeLivePeriod({ statusShort: "1H" }), 1);
+  assert.equal(normalizeLivePeriod({ matchPeriod: "SECOND_HALF" }), 2);
+  assert.equal(normalizeLivePeriod({ status: "HT" }), null);
   assert.equal(shouldFetchLiveStatistics(null, 300_000), true);
   assert.equal(shouldFetchLiveStatistics(new Date(0).toISOString(), 299_999), false);
   assert.equal(shouldFetchLiveStatistics(new Date(0).toISOString(), 300_000), true);
+});
+
+test("explicit penalty and overturned-goal events are not mistaken for new goals", () => {
+  const events = normalizeLiveEvents({ data: [
+    { id: "p1", type: "Penalty Awarded", minute: 23, team: { name: "FC Barcelona" } },
+    { id: "p2", type: "Missed Penalty", minute: 24, team: { name: "FC Barcelona" }, player: { name: "Lamine Yamal" } },
+    { id: "v1", type: "Goal Disallowed by VAR", minute: 67, team: { name: "Sevilla FC" } },
+    { id: "p3", type: "Penalty Goal", minute: 80, team: { name: "FC Barcelona" }, player: { name: "Pedri" } },
+  ] }, "FC Barcelona", "Sevilla FC");
+  assert.deepEqual(events.map((event) => event.type), ["penalty_awarded", "missed_penalty", "var_overturned", "penalty_goal"]);
 });
 
 test("provider failures back off; 403 and 429 pause polling safely", () => {

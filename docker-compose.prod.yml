@@ -159,6 +159,8 @@ services:
       PREMATCH_SYNC_INTERVAL_SECONDS: ${PREMATCH_SYNC_INTERVAL_SECONDS:-600}
       LIVE_MATCH_SYNC_ENABLED: ${LIVE_MATCH_SYNC_ENABLED:-false}
       LIVE_MATCH_SYNC_INTERVAL_SECONDS: ${LIVE_MATCH_SYNC_INTERVAL_SECONDS:-60}
+      PUSH_NOTIFICATIONS_ENABLED: ${PUSH_NOTIFICATIONS_ENABLED:-false}
+      PUSH_NOTIFICATION_INTERVAL_SECONDS: ${PUSH_NOTIFICATION_INTERVAL_SECONDS:-60}
 
     depends_on:
       app:
@@ -184,10 +186,14 @@ services:
           elapsed=0
           live_elapsed=0
           prematch_elapsed=0
+          notification_elapsed=0
           while [ "$$elapsed" -lt "$$MEDIA_SYNC_INTERVAL_SECONDS" ]; do
             step="$$PREMATCH_SYNC_INTERVAL_SECONDS"
             if [ "$${LIVE_MATCH_SYNC_ENABLED}" = "true" ] && [ "$$LIVE_MATCH_SYNC_INTERVAL_SECONDS" -lt "$$step" ]; then
               step="$$LIVE_MATCH_SYNC_INTERVAL_SECONDS"
+            fi
+            if [ "$${PUSH_NOTIFICATIONS_ENABLED}" = "true" ] && [ "$$PUSH_NOTIFICATION_INTERVAL_SECONDS" -lt "$$step" ]; then
+              step="$$PUSH_NOTIFICATION_INTERVAL_SECONDS"
             fi
             remaining=$$((MEDIA_SYNC_INTERVAL_SECONDS - elapsed))
             if [ "$$step" -gt "$$remaining" ]; then step="$$remaining"; fi
@@ -195,6 +201,7 @@ services:
             elapsed=$$((elapsed + step))
             live_elapsed=$$((live_elapsed + step))
             prematch_elapsed=$$((prematch_elapsed + step))
+            notification_elapsed=$$((notification_elapsed + step))
             if [ "$$elapsed" -lt "$$MEDIA_SYNC_INTERVAL_SECONDS" ]; then
               if [ "$${LIVE_MATCH_SYNC_ENABLED}" = "true" ] && [ "$$live_elapsed" -ge "$$LIVE_MATCH_SYNC_INTERVAL_SECONDS" ]; then
                 echo "[media-scheduler] polling live match events/statistics"
@@ -215,6 +222,16 @@ services:
                   || true
                 echo
                 prematch_elapsed=0
+              fi
+              if [ "$${PUSH_NOTIFICATIONS_ENABLED}" = "true" ] && [ "$$notification_elapsed" -ge "$$PUSH_NOTIFICATION_INTERVAL_SECONDS" ]; then
+                echo "[media-scheduler] checking notifications"
+                wget -qO- \
+                  --header "Authorization: Bearer $${INTERNAL_JOB_SECRET}" \
+                  --post-data "" \
+                  http://app:3000/api/internal/jobs/notifications \
+                  || true
+                echo
+                notification_elapsed=0
               fi
             fi
           done
