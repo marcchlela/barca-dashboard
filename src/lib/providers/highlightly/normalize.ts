@@ -173,6 +173,9 @@ export function normalizeHighlightlyLiveEvents(
         ? (substitute ? repairMojibake(substitute) : null)
         : (assist ? repairMojibake(assist) : null),
       providerPlayerId: stringValue(row, "playerId"),
+      // Highlightly event rows do not expose a reliable cumulative score.
+      // Keep goal identity strict for this feed rather than risking a false merge.
+      score: null,
       raw: row,
     }];
   });
