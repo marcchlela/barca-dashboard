@@ -93,6 +93,7 @@ export async function getAnalyticsOverview() {
   }
   const rounds = [...roundsMap].sort(([a], [b]) => a - b).map(([matchday, rows]) => ({
     matchday,
+    updatedAt: rows.map((row) => row.updatedAt.toString()).sort().at(-1) ?? null,
       complete:
         rows.length === 20 &&
         new Set(rows.map((row) => row.teamId)).size === 20 &&
@@ -111,7 +112,8 @@ export async function getAnalyticsOverview() {
     })),
   }));
   const latestChampionsRound = Math.max(-1, ...championStandings.map((row) => row.matchday));
-  const championTable = championStandings.filter((row) => row.matchday === latestChampionsRound)
+  const latestChampionRows = championStandings.filter((row) => row.matchday === latestChampionsRound);
+  const championTable = latestChampionRows
     .sort((a, b) => a.position - b.position).map((row) => ({
       teamId: row.teamId, name: row.team.shortName ?? row.team.name, crestUrl: row.team.crestUrl,
       barcelona: row.teamId === barcelonaId, position: row.position, played: row.played,
@@ -133,6 +135,10 @@ export async function getAnalyticsOverview() {
       label: code === "ALL" ? "All" : competitions.find((c) => c.code === code)?.shortName ?? code,
       logoUrl: competitions.find((c) => c.code === code)?.logoUrl ?? null })),
     views, rounds, championTable, fixtures,
+    standingsUpdatedAt: {
+      PD: rounds.filter((round) => round.complete).at(-1)?.updatedAt ?? null,
+      CL: latestChampionRows.map((row) => row.updatedAt.toString()).sort().at(-1) ?? null,
+    },
     ...all, coverage: { ...all.coverage, standingsRounds: rounds.filter((round) => round.complete).length },
   };
 }

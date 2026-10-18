@@ -1,0 +1,44 @@
+[
+  {
+    "id": "column.public.media_moment.curatedAt",
+    "label": "Add column \"curatedAt\" to \"media_moment\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "curatedAt",
+        "table": "media_moment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"curatedAt\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "media_moment",
+          "curatedAt"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"curatedAt\"",
+        "sql": "ALTER TABLE \"public\".\"media_moment\" ADD COLUMN \"curatedAt\" timestamptz"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"curatedAt\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "media_moment",
+          "curatedAt"
+        ]
+      }
+    ]
+  }
+]

@@ -2,6 +2,7 @@
 
 import {
   useEffect,
+  useLayoutEffect,
   useState,
 } from "react";
 import { useRouter } from "next/navigation";
@@ -19,7 +20,7 @@ import MatchStage from "../match/MatchStage";
 import SeasonStory from "../season/SeasonStory";
 import BarcaPulse from "../shell/BarcaPulse";
 import BrandHomeLink from "../shell/BrandHomeLink";
-import StadiumRail from "../shell/StadiumRail";
+import StadiumRail, { MobileHeaderActions } from "../shell/StadiumRail";
 import ThemeScrollbarSync from "../theme/ThemeScrollbarSync";
 
 import type {
@@ -70,36 +71,19 @@ export default function DashboardClient({
   |--------------------------------------------------------------------------
   */
 
-  useEffect(() => {
-    const frame =
-      window.requestAnimationFrame(
-        () => {
-          const savedKit =
-            window.localStorage.getItem(
-              KIT_STORAGE_KEY,
-            );
+  useLayoutEffect(() => {
+    try {
+      const savedKit = window.localStorage.getItem(KIT_STORAGE_KEY);
 
-          if (
-            isKitType(
-              savedKit,
-            )
-          ) {
-            setKit(
-              savedKit,
-            );
-          }
-
-          setKitLoaded(
-            true,
-          );
-        },
-      );
-
-    return () => {
-      window.cancelAnimationFrame(
-        frame,
-      );
-    };
+      if (isKitType(savedKit)) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- restore the persisted kit before the browser paints
+        setKit(savedKit);
+      }
+    } catch {
+      // iOS privacy modes can deny local storage. The default kit is safe.
+    } finally {
+      setKitLoaded(true);
+    }
   }, []);
 
   /*
@@ -113,10 +97,14 @@ export default function DashboardClient({
       return;
     }
 
-    window.localStorage.setItem(
-      KIT_STORAGE_KEY,
-      kit,
-    );
+    try {
+      window.localStorage.setItem(
+        KIT_STORAGE_KEY,
+        kit,
+      );
+    } catch {
+      // Keep the in-memory theme when storage is unavailable.
+    }
   }, [
     kit,
     kitLoaded,
@@ -221,7 +209,7 @@ export default function DashboardClient({
     );
 
   const [
-    introActive,
+    ,
     setIntroActive,
   ] =
     useState(true);
@@ -251,6 +239,7 @@ export default function DashboardClient({
 
         lg:px-5
         lg:py-5
+        max-lg:pb-[calc(5.5rem+env(safe-area-inset-bottom))]
       "
       style={{
         backgroundColor:
@@ -287,17 +276,6 @@ export default function DashboardClient({
 
       <div
         data-dashboard-content
-        inert={
-          introActive
-        }
-        aria-hidden={
-          introActive
-        }
-        className={
-          introActive
-            ? "pointer-events-none select-none"
-            : undefined
-        }
       >
 
       {/* ENVIRONMENT */}
@@ -377,8 +355,9 @@ export default function DashboardClient({
             sm:justify-between
           "
         >
-          <div>
+          <div className="flex min-w-0 items-center justify-between gap-2">
             <BrandHomeLink title="Barça Command Center" />
+            <MobileHeaderActions theme={theme} />
           </div>
 
           <div
@@ -641,7 +620,7 @@ function getAutomaticMatchState(
       hoursSinceKickoff >=
         0 &&
       hoursSinceKickoff <=
-        5
+        3
     ) {
       return "fulltime";
     }

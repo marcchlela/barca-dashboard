@@ -8,3 +8,10 @@ export function lineupRefreshWindow(status: string, kickoff: string, now: number
   const untilKickoff = Date.parse(kickoff) - now;
   return Number.isFinite(untilKickoff) && untilKickoff <= BEFORE_KICKOFF_MS && untilKickoff >= -AFTER_KICKOFF_MS;
 }
+
+/** A provider can expose the fixture before it publishes both complete XIs.
+ * That is an expected pending state, not a failed synchronization attempt. */
+export function lineupNotPublishedYet(error: string) {
+  return /(?:GOAL|Highlightly) returned \d+ (?:home|away) starters; expected 11\./i.test(error) ||
+    /(?:GOAL|Highlightly) did not supply exactly 11 starters for both sides\./i.test(error);
+}

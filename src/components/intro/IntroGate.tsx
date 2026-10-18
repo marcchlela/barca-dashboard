@@ -108,6 +108,16 @@ export default function IntroGate({
     }, []);
 
   useEffect(() => {
+    const useCompactFallback =
+      window.matchMedia(
+        "(max-width: 1023px), (pointer: coarse)",
+      ).matches;
+
+    if (useCompactFallback) {
+      finish();
+      return;
+    }
+
     if (!kitReady) {
       return;
     }
@@ -156,15 +166,7 @@ export default function IntroGate({
         "(prefers-reduced-motion: reduce)",
       ).matches;
 
-    const useCompactFallback =
-      window.matchMedia(
-        "(max-width: 639px)",
-      ).matches;
-
-    if (
-      prefersReducedMotion ||
-      useCompactFallback
-    ) {
+    if (prefersReducedMotion) {
       const statusTimer =
         window.setTimeout(
           () => {
@@ -178,9 +180,7 @@ export default function IntroGate({
       const fallbackTimer =
         window.setTimeout(
           finish,
-          prefersReducedMotion
-            ? 180
-            : 520,
+          180,
         );
 
       return () => {
@@ -464,7 +464,7 @@ export default function IntroGate({
           ? "true"
           : "false"
       }
-      className="fixed inset-0 z-[100] overflow-hidden"
+      className="fixed inset-0 z-[100] overflow-hidden max-lg:hidden [@media(pointer:coarse)]:hidden"
       role="dialog"
       aria-modal="true"
       aria-label="Entering the Barça Command Center"

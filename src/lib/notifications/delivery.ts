@@ -89,7 +89,8 @@ export async function deliverNotification(eventId: string, onlyUserId?: string) 
     if (!delivery) continue;
     try {
       await webpush.sendNotification({ endpoint: subscription.endpoint, keys: { p256dh: subscription.p256dh, auth: subscription.auth } },
-        JSON.stringify({ title: event.title, body: event.body, url: event.url, iconUrl: event.iconUrl || APP_ICON, tag: event.key }),
+        JSON.stringify({ title: event.title, body: event.body, url: event.url, iconUrl: event.iconUrl || APP_ICON,
+          imageUrl: event.iconUrl && event.iconUrl !== APP_ICON ? event.iconUrl : null, tag: event.key }),
         { TTL: 3600, urgency: event.kind.includes("goal") ? "high" : "normal", timeout: 10000 });
       await db.orm.public.NotificationDelivery.where({ id: delivery.id }).update({ status: "accepted", sentAt: Temporal.Instant.from(new Date().toISOString()) });
       sent += 1;

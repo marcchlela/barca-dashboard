@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  useEffect,
+  useLayoutEffect,
   useState,
 } from "react";
 
@@ -9,7 +9,7 @@ import type {
   ReactNode,
 } from "react";
 
-import StadiumRail from "./StadiumRail";
+import StadiumRail, { MobileHeaderActions } from "./StadiumRail";
 import BrandHomeLink from "./BrandHomeLink";
 import ThemeScrollbarSync from "../theme/ThemeScrollbarSync";
 
@@ -57,36 +57,19 @@ export function useDashboardSectionTheme(
       false,
     );
 
-  useEffect(() => {
-    const frame =
-      window.requestAnimationFrame(
-        () => {
-          const saved =
-            window.localStorage.getItem(
-              KIT_STORAGE_KEY,
-            );
+  useLayoutEffect(() => {
+    try {
+      const saved = window.localStorage.getItem(KIT_STORAGE_KEY);
 
-          if (
-            isKitType(
-              saved,
-            )
-          ) {
-            setKit(
-              saved,
-            );
-          }
-
-          setLoaded(
-            true,
-          );
-        },
-      );
-
-    return () => {
-      window.cancelAnimationFrame(
-        frame,
-      );
-    };
+      if (isKitType(saved)) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- restore the persisted kit before the browser paints
+        setKit(saved);
+      }
+    } catch {
+      // Storage can be unavailable in private browsing. Keep the home kit.
+    } finally {
+      setLoaded(true);
+    }
   }, []);
 
   const theme =
@@ -123,6 +106,7 @@ export default function DashboardSectionShell({
 
         lg:px-5
         lg:py-5
+        max-lg:pb-[calc(5.5rem+env(safe-area-inset-bottom))]
       "
       style={{
         backgroundColor:
@@ -247,8 +231,9 @@ export default function DashboardSectionShell({
             sm:justify-between
           "
         >
-          <div>
+          <div className="flex min-w-0 items-center justify-between gap-2">
             <BrandHomeLink title={title} />
+            <MobileHeaderActions theme={theme} />
           </div>
 
           <div

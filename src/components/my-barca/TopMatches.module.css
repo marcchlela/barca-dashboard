@@ -138,27 +138,57 @@
 
 @container (max-width: 760px) {
   .track {
-    justify-content: flex-start;
-    gap: 12px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    padding-bottom: 4px;
-    scroll-snap-type: x proximity;
-    scrollbar-width: none;
-  }
-
-  .track::-webkit-scrollbar {
-    display: none;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
   }
 
   .poster {
-    flex-basis: 192px;
-    width: 192px;
-    height: 300px;
-    scroll-snap-align: start;
+    width: 100%;
+    height: 238px;
   }
 
   .posterButton {
-    padding: 12px;
+    padding: 9px 6px;
+  }
+
+  .poster .crest {
+    width: 24px !important;
+    height: 24px !important;
+  }
+
+  .posterTop {
+    font-size: 8px;
+    letter-spacing: .08em;
+  }
+
+  .posterTopWithRemove {
+    padding-right: 25px;
+  }
+
+  .posterName {
+    margin-top: 10px;
+    font-size: 12px;
+  }
+
+  .posterDate,
+  .posterFoot {
+    font-size: 9px;
+  }
+
+  .posterFoot {
+    min-height: 30px;
+    padding-top: 8px;
+  }
+
+  .remove {
+    top: 7px;
+    right: 5px;
+    min-height: 24px;
+    padding: 3px 4px;
+  }
+
+  .removeText {
+    display: none;
   }
 }

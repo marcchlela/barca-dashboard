@@ -35,11 +35,24 @@ export type MediaLibraryItem = {
   watchLater: boolean;
   featured: boolean;
   verifiedGoalMoments: number;
+  sourceCode: string | null;
+};
+
+export type MediaGoalMoment = {
+  id: string;
+  mediaItemId: string;
+  matchEventId: string;
+  scorer: string;
+  minute: number | null;
+  startSecond: number | null;
+  endSecond: number | null;
+  verifiedAt: string;
 };
 
 export type MediaLibraryData = {
   signedIn: boolean;
   items: MediaLibraryItem[];
+  goalMoments: MediaGoalMoment[];
   featuredId: string | null;
   currentSeasonId: string | null;
   currentSeasonLabel: string | null;
@@ -61,13 +74,14 @@ function validId(value: string | null | undefined) {
 }
 
 export async function getMediaLibrary(userId: string | null): Promise<MediaLibraryData> {
-  const [media, matches, seasons, players, saves, moments] = await Promise.all([
-    db.orm.public.MediaItem.all(),
+  const [media, matches, seasons, players, saves, moments, events] = await Promise.all([
+    db.orm.public.MediaItem.include("dataSource").all(),
     db.orm.public.Match.include("homeTeam").include("awayTeam").include("competition").all(),
     db.orm.public.Season.all(),
     db.orm.public.Player.all(),
     userId ? db.orm.public.MediaSave.where({ userId }).all() : Promise.resolve([]),
     db.orm.public.MediaMoment.all(),
+    db.orm.public.MatchEvent.include("primaryPlayer").all(),
   ]);
   const matchById = new Map(matches.map((match) => [match.id, match]));
   const seasonById = new Map(seasons.map((season) => [season.id, season]));
@@ -105,9 +119,29 @@ export async function getMediaLibrary(userId: string | null): Promise<MediaLibra
       archive: archive ? { opponent: archive.opponent, score: archive.score, competition: archive.competition, chapter: archive.chapter } : null,
       favourite: save?.favourite ?? false, watchLater: save?.watchLater ?? false,
       featured: item.featuredAt !== null, verifiedGoalMoments: momentCount.get(item.id) ?? 0,
+      sourceCode: item.dataSource?.code ?? null,
     };
   }).sort((a, b) => (b.date ?? "").localeCompare(a.date ?? "") || b.id.localeCompare(a.id));
+  const eventById = new Map(events.map((event) => [event.id, event]));
+  const itemById = new Map(items.map((item) => [item.id, item]));
+  const goalMoments = moments
+    .filter((moment) => moment.curatedAt !== null)
+    .flatMap((moment): MediaGoalMoment[] => {
+      const event = eventById.get(moment.matchEventId);
+      if (!event) return [];
+      return [{
+        id: moment.id,
+        mediaItemId: moment.mediaItemId,
+        matchEventId: moment.matchEventId,
+        scorer: event.primaryPlayer?.displayName ?? (event.type === "own_goal" ? "Own goal" : "Goal"),
+        minute: event.minute,
+        startSecond: moment.startSecond,
+        endSecond: moment.endSecond,
+        verifiedAt: moment.verifiedAt.toString(),
+      }];
+    })
+    .sort((a, b) => (itemById.get(b.mediaItemId)?.match?.kickoff ?? "").localeCompare(itemById.get(a.mediaItemId)?.match?.kickoff ?? "") || (b.minute ?? -1) - (a.minute ?? -1));
   const featured = [...media].filter((item) => item.featuredAt).sort((a, b) => (b.featuredAt?.toString() ?? "").localeCompare(a.featuredAt?.toString() ?? ""))[0];
   const fallback = items.find((item) => item.seasonId === current?.id && item.type === "match_highlight") ?? items[0];
-  return { signedIn: Boolean(userId), items, featuredId: featured?.id ?? fallback?.id ?? null, currentSeasonId: current?.id ?? null, currentSeasonLabel: current?.label ?? null };
+  return { signedIn: Boolean(userId), items, goalMoments, featuredId: featured?.id ?? fallback?.id ?? null, currentSeasonId: current?.id ?? null, currentSeasonLabel: current?.label ?? null };
 }

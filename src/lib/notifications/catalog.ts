@@ -1,5 +1,5 @@
 export const notificationKinds = [
-  { id: "match_reminder", label: "30-minute match reminder", group: "Matchday", title: "Kickoff in 30 minutes", body: "{home} vs {away} starts at {kickoff}.", ready: true },
+  { id: "match_reminder", label: "30-minute match reminder", group: "Matchday", title: "Kickoff in 30 minutes", body: "{home} vs {away} starts at {kickoffTime}.", ready: true },
   { id: "official_squad", label: "Official matchday squad", group: "Matchday", title: "Barça squad announced", body: "The official squad for {opponent} is available.", ready: true },
   { id: "confirmed_lineup", label: "Starting XI and substitutes", group: "Matchday", title: "Lineups confirmed", body: "The starting XI and bench for {home} vs {away} are ready.", ready: true },
   { id: "kickoff", label: "Kickoff", group: "Matchday", title: "Kickoff: {home} vs {away}", body: "The match is underway.", ready: true },
@@ -32,4 +32,13 @@ export const notificationKindIds = new Set<string>(notificationKinds.map((item) 
 
 export function renderNotificationTemplate(template: string, values: Record<string, string>) {
   return template.replace(/\{([A-Za-z][A-Za-z0-9]*)\}/g, (match, key: string) => values[key] ?? match).slice(0, 240);
+}
+
+export function formatNotificationKickoffTime(kickoff: string) {
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Beirut",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  }).format(new Date(kickoff));
 }

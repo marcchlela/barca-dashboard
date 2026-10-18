@@ -38,7 +38,10 @@ async function fetchBeinYoutubeHighlights(match: { kickoff: { toString(): string
 
 function retryDue(last: { status: string; finishedAt: string } | null, now: number) {
   if (!last) return true;
-  const delay = last.status === "blocked" ? 24 * 3_600_000 : last.status === "success" ? 6 * 3_600_000 : 3 * 3_600_000;
+  // The outer media scheduler runs every three hours. Retrying successful empty
+  // searches on that same cadence catches highlights published after full time
+  // without adding another background loop or increasing the normal job rate.
+  const delay = last.status === "blocked" ? 24 * 3_600_000 : 3 * 3_600_000;
   return now >= Date.parse(last.finishedAt) + delay;
 }
 

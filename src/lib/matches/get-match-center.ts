@@ -803,6 +803,9 @@ export async function getMatchCenter(
         id:
           event.id,
 
+        updatedAt:
+          event.updatedAt.toString(),
+
         order:
           event.eventOrder,
 
@@ -896,6 +899,9 @@ export async function getMatchCenter(
         onName:
           eventRawString(event.rawData, "onName"),
 
+        notificationType:
+          eventRawString(event.rawData, "notificationType"),
+
         xG:
           event.xG,
 
@@ -949,6 +955,9 @@ export async function getMatchCenter(
   const teamStats =
     teamStatisticRows.map(
       (row) => ({
+        updatedAt:
+          row.updatedAt.toString(),
+
         team: {
           id:
             row.team.id,

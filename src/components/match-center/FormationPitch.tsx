@@ -1044,9 +1044,7 @@ function shortPlayerName(
       .trim()
       .split(/\s+/);
 
-  if (
-    parts.length <= 2
-  ) {
+  if (name.length <= 13) {
     return name;
   }
 

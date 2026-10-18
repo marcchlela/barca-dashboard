@@ -739,8 +739,8 @@ export default function SquadOverview({
 
         <section
           className="
+            hidden
             mt-4
-            flex
             items-start
             gap-3
             border
@@ -899,8 +899,10 @@ export default function SquadOverview({
 
             <div
               className="
-                flex
+                hidden
                 border
+
+                lg:flex
               "
               style={{
                 borderColor:
@@ -1236,9 +1238,10 @@ export default function SquadOverview({
                     className="
                       mt-3
                       grid
-                      gap-3
+                      grid-cols-2
+                      gap-2
 
-                      sm:grid-cols-2
+                      sm:gap-3
                       xl:grid-cols-3
                       2xl:grid-cols-4
                     "
@@ -1511,8 +1514,10 @@ function PlayerCard({
       <div
         className="
           relative
-          h-[230px]
+          h-[150px]
           overflow-hidden
+
+          sm:h-[230px]
         "
         style={{
           background: `
@@ -1529,10 +1534,12 @@ function PlayerCard({
             absolute
             left-3
             top-2
-            text-[64px]
+            text-[42px]
             font-semibold
             leading-none
             opacity-[0.07]
+
+            sm:text-[64px]
           "
         >
           {
@@ -1731,8 +1738,11 @@ function PlayerCard({
       <div
         className="
           border-t
-          px-4
-          py-4
+          px-2.5
+          py-3
+
+          sm:px-4
+          sm:py-4
         "
         style={{
           borderColor:
@@ -1779,10 +1789,12 @@ function PlayerCard({
         <div
           className="
             mt-3
-            flex
+            hidden
             flex-wrap
             gap-x-3
             text-xs
+
+            sm:flex
           "
           style={{
             color:
@@ -1821,11 +1833,15 @@ function PlayerCard({
 
         <div
           className="
-            mt-4
-            grid
-            grid-cols-4
+            mt-3
+            hidden
+            grid-cols-2
             gap-px
             border
+
+            sm:mt-4
+            sm:grid
+            sm:grid-cols-4
           "
           style={{
             borderColor:

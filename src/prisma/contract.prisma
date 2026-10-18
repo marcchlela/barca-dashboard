@@ -801,6 +801,7 @@ model MediaMoment {
   reviewNote    String?
   verificationBasis String @default("manual_visual")
   verifiedAt    DateTime
+  curatedAt     DateTime?
   createdAt     temporal.createdAt()
   updatedAt     temporal.updatedAt()
 

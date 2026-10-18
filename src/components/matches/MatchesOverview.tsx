@@ -986,8 +986,12 @@ function MonthGroup({
       <div
         className="
           mt-3
-          overflow-hidden
-          border
+          grid
+          gap-2
+
+          lg:block
+          lg:overflow-hidden
+          lg:border
         "
         style={{
           borderColor:
@@ -1071,10 +1075,12 @@ function MatchRow({
         relative
         grid
         cursor-pointer
-        border-b
+        border
         transition-colors
-        last:border-b-0
 
+        lg:border-0
+        lg:border-b
+        lg:last:border-b-0
         lg:grid-cols-[112px_150px_minmax(0,1fr)_155px_42px]
       "
       style={{
@@ -1121,12 +1127,19 @@ function MatchRow({
 
       <div
         className="
+          flex
+          items-center
+          justify-between
+          gap-3
           border-b
-          px-4
-          py-4
+          px-3
+          py-2.5
 
+          sm:px-4
           lg:border-b-0
           lg:border-r
+          lg:block
+          lg:py-4
         "
         style={{
           borderColor:
@@ -1149,7 +1162,7 @@ function MatchRow({
 
         <p
           className="
-            mt-1.5
+            ml-auto
             text-xs
             uppercase
             tracking-[0.1em]
@@ -1259,17 +1272,21 @@ function MatchRow({
 
       <div
         className="
-          px-4
-          py-4
+          px-3
+          py-3
 
-          sm:px-5
+          sm:px-4
+          sm:py-4
+          lg:px-5
         "
       >
         <div
           className="
             flex
             items-center
-            gap-5
+              gap-3
+
+              sm:gap-5
           "
         >
           <div
@@ -1297,7 +1314,7 @@ function MatchRow({
               }
             />
 
-            <div className="mt-2.5">
+            <div className="mt-1.5 sm:mt-2.5">
               <TeamLine
                 team={
                   match.awayTeam
@@ -1376,7 +1393,7 @@ function MatchRow({
 
         <div
           className="
-            mt-3
+            mt-2
             flex
             flex-wrap
             items-center

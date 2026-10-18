@@ -246,6 +246,17 @@ export function shouldFetchLiveStatistics(lastFetchedAt: string | null, now: num
   return !lastFetchedAt || now - Date.parse(lastFetchedAt) >= 5 * 60_000;
 }
 
+export function liveStatisticsAreCoherent(input: {
+  shots: number | null;
+  shotsOnTarget: number | null;
+  passes: number | null;
+  completedPasses: number | null;
+}) {
+  if (input.shots !== null && input.shotsOnTarget !== null && input.shotsOnTarget > input.shots) return false;
+  if (input.passes !== null && input.completedPasses !== null && input.completedPasses > input.passes) return false;
+  return true;
+}
+
 export function finishedCoverageIncomplete(input: {
   kickoff: string;
   now: number;

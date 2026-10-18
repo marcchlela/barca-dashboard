@@ -584,7 +584,7 @@ export async function syncLaLigaCurrentSeason() {
         })
         .first();
 
-    const snapshot = {
+    const snapshotValues = {
       dataSourceId: dataSource.id,
       basis: "official_current",
       position:
@@ -613,17 +613,17 @@ export async function syncLaLigaCurrentSeason() {
 
       points:
         row.points,
-
-      snapshotAt:
-        Temporal.Now.instant(),
     };
 
     if (existing) {
-      await db.orm.public.StandingSnapshot
-        .where({
-          id: existing.id,
-        })
-        .update(snapshot);
+      const changed = Object.entries(snapshotValues).some(([key, value]) => existing[key as keyof typeof existing] !== value);
+      if (changed) {
+        await db.orm.public.StandingSnapshot
+          .where({
+            id: existing.id,
+          })
+          .update({ ...snapshotValues, snapshotAt: Temporal.Now.instant() });
+      }
     } else {
       await db.orm.public.StandingSnapshot.create({
         seasonId:
@@ -637,7 +637,8 @@ export async function syncLaLigaCurrentSeason() {
 
         matchday,
 
-        ...snapshot,
+        ...snapshotValues,
+        snapshotAt: Temporal.Now.instant(),
       });
     }
 

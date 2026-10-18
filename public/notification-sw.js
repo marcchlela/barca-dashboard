@@ -7,6 +7,7 @@ self.addEventListener("push", (event) => {
   event.waitUntil(self.registration.showNotification(payload.title.slice(0, 120), {
     body: typeof payload.body === "string" ? payload.body.slice(0, 240) : "",
     icon: typeof payload.iconUrl === "string" ? payload.iconUrl : "/icon.png",
+    image: typeof payload.imageUrl === "string" ? payload.imageUrl : undefined,
     badge: "/icon.png",
     tag: typeof payload.tag === "string" ? payload.tag : undefined,
     data: { url },

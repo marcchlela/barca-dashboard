@@ -13,16 +13,16 @@ const posterGold = "#D7AB48";
 
 function Crest({ src, name, size = 42 }: { src: string | null; name: string; size?: number }) {
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
-  return <span className="inline-flex shrink-0 items-center justify-center" style={{ width: size, height: size }}>
+  return <span className={`${styles.crest} inline-flex shrink-0 items-center justify-center`} style={{ width: size, height: size }}>
     {src && failedSrc !== src ? <Image unoptimized src={src} alt={name} width={size} height={size} className="h-full w-full object-contain" onError={() => setFailedSrc(src)} /> : <Shield size={size * .6} aria-label={name} />}
   </span>;
 }
 
 function Fixture({ entry, barcaCrest, compact = false }: { entry: Entry; barcaCrest: string | null; compact?: boolean }) {
   return <div className="flex items-center justify-center gap-1.5">
-    <Crest src={barcaCrest} name="FC Barcelona" size={compact ? 30 : 42} />
-    <span className="min-w-10 text-center text-base tabular-nums md:text-xl">{entry.result}</span>
-    <Crest src={entry.opponent.crestUrl} name={entry.opponent.name} size={compact ? 30 : 42} />
+    <Crest src={barcaCrest} name="FC Barcelona" size={compact ? 24 : 36} />
+    <span className="min-w-6 text-center text-sm tabular-nums md:min-w-8 md:text-lg">{entry.result}</span>
+    <Crest src={entry.opponent.crestUrl} name={entry.opponent.name} size={compact ? 24 : 36} />
   </div>;
 }
 
@@ -57,7 +57,7 @@ export default function TopMatches({ entries, initialPicks, seasonId, barcaCrest
             {entry ? <div className={styles.posterMiddle}><Fixture entry={entry} barcaCrest={barcaCrest} /><p className={styles.posterName}>vs {entry.opponent.name}</p><p className={styles.posterDate} style={{ color: theme.colors.textMuted }}>{new Date(entry.kickoff).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</p></div> : <div className={`${styles.posterMiddle} flex flex-col items-center gap-3`}><span className="flex h-14 w-14 items-center justify-center border" style={{ borderColor: posterGold, color: posterGold }}><Plus size={29} /></span><span className="text-xs" style={{ color: theme.colors.textMuted }}>Choose a match</span></div>}
             <p className={styles.posterFoot} style={{ borderColor: theme.colors.border, color: theme.colors.textMuted }}>{entry ? `${entry.competition.name} · ${entry.rating !== null ? `${entry.rating.toFixed(1)} ★` : "Unrated"}` : "An empty place in your collection"}</p>
           </button>
-          {entry && <button type="button" onClick={() => void save(slot, null)} disabled={saving} className={`${styles.remove} focus-visible:outline-2`} style={{ borderColor: theme.colors.border, background: theme.colors.surface, color: theme.colors.text }} aria-label={`Remove ${entry.opponent.name} from top match ${slot}`}><X size={13} />Remove</button>}
+          {entry && <button type="button" onClick={() => void save(slot, null)} disabled={saving} className={`${styles.remove} focus-visible:outline-2`} style={{ borderColor: theme.colors.border, background: theme.colors.surface, color: theme.colors.text }} aria-label={`Remove ${entry.opponent.name} from top match ${slot}`}><X size={13} /><span className={styles.removeText}>Remove</span></button>}
         </div>;
       })}
     </div>

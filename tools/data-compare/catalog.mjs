@@ -20,6 +20,12 @@ export const EXCLUDED_AUTH_TABLES = [
   "auth_throttle",
   "password_reset_token",
   "email_delivery_attempt",
+  "push_subscription",
+  "notification_preference",
+  "notification_template",
+  "notification_event",
+  "notification_delivery",
+  "notification_cursor",
 ];
 export const CATEGORY_QUESTIONS = {
   "Football calendar": "Which local-only or different fixtures, scores, standings and competition snapshots (if any) should be considered for a future change? Which production-only records must remain?",

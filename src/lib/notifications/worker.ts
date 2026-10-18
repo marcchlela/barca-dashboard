@@ -3,8 +3,10 @@ import "server-only";
 import { Temporal } from "temporal-polyfill";
 import { db } from "../../prisma/db";
 import { deliverNotification, queueNotification, pushConfiguration } from "./delivery";
-import type { NotificationKind } from "./catalog";
+import { formatNotificationKickoffTime, type NotificationKind } from "./catalog";
 import { discoverOfficialSquad } from "./official-squad";
+import { confirmedLineupNotificationDue } from "./policy";
+import { liveEventSemanticKey } from "../providers/shared/live-event-identity";
 
 const LOCK = "scheduled-notification-worker";
 const GOALS = new Set(["goal", "penalty_goal", "own_goal"]);
@@ -20,6 +22,26 @@ function snapshot(value: unknown): Snapshot | null {
 function playerName(rawData: unknown) {
   const raw = object(rawData);
   return typeof raw?.scorerName === "string" ? raw.scorerName : null;
+}
+
+function notificationEventKey(event: {
+  type: string;
+  teamId: string | null;
+  minute: number | null;
+  primaryPlayerId: string | null;
+  relatedPlayerId: string | null;
+  rawData: unknown;
+}) {
+  const raw = object(event.rawData);
+  return typeof raw?.semanticKey === "string" ? raw.semanticKey : liveEventSemanticKey({
+    type: event.type,
+    teamId: event.teamId,
+    minute: event.minute,
+    primaryPlayerId: event.primaryPlayerId,
+    relatedPlayerId: event.relatedPlayerId,
+    primaryName: typeof raw?.scorerName === "string" ? raw.scorerName : typeof raw?.offName === "string" ? raw.offName : null,
+    relatedName: typeof raw?.assistName === "string" ? raw.assistName : typeof raw?.onName === "string" ? raw.onName : null,
+  });
 }
 
 export async function runNotificationWorker(now = Date.now()) {
@@ -47,8 +69,8 @@ export async function runNotificationWorker(now = Date.now()) {
         db.orm.public.MediaItem.where({ matchId: match.id }).include("dataSource").all(),
         db.orm.public.Lineup.where({ matchId: match.id }).include("players").all(),
       ]);
-      const eventValues = Object.fromEntries(events.map((event) => [event.id,
-        `${event.type}:${event.primaryPlayerId ?? ""}:${event.minute ?? ""}:${event.teamId ?? ""}`]));
+      const eventValues = Object.fromEntries(events.map((event) => [notificationEventKey(event),
+        `${event.type}:${event.primaryPlayerId ?? ""}:${event.relatedPlayerId ?? ""}:${event.minute ?? ""}:${event.teamId ?? ""}:${event.outcome ?? ""}`]));
       const lineup = lineups.length >= 2 && lineups.every((row) => row.isConfirmed && row.players.filter((player) => player.role === "starter").length === 11);
       const mediaIds = media.map((item) => item.id);
       const liveRun = await db.orm.public.GoalMediaSyncRun.where({ mode: "live-match-sync" }).orderBy((row) => row.startedAt.desc()).first();
@@ -63,7 +85,8 @@ export async function runNotificationWorker(now = Date.now()) {
       const opponent = match.homeTeam.isBarcelona ? match.awayTeam.name : match.homeTeam.name;
       const values = { home: match.homeTeam.name, away: match.awayTeam.name, opponent,
         homeScore: String(match.homeScore ?? "–"), awayScore: String(match.awayScore ?? "–"),
-        kickoff: new Date(kickoff).toLocaleString("en-GB", { timeZone: "Asia/Beirut", dateStyle: "medium", timeStyle: "short" }) };
+        kickoff: new Date(kickoff).toLocaleString("en-GB", { timeZone: "Asia/Beirut", dateStyle: "medium", timeStyle: "short" }),
+        kickoffTime: formatNotificationKickoffTime(kickoff) };
       const url = `/matches/${match.id}`;
       const emit = async (kind: NotificationKind, suffix: string, more: Record<string, string> = {}, iconUrl?: string | null) => {
         const result = await queueNotification({ key: `${kind}:${match.id}:${suffix}`, kind, matchId: match.id, values: { ...values, ...more }, url, iconUrl });
@@ -86,15 +109,18 @@ export async function runNotificationWorker(now = Date.now()) {
           if (match.status === "finished") await emit("fulltime", "fulltime");
           if (match.status === "cancelled" || match.status === "postponed") await emit("fixture_cancelled", match.status, { status: match.status });
         }
-        if (!previous.lineup && lineup) await emit("confirmed_lineup", "confirmed");
+        if (confirmedLineupNotificationDue({ previousLineup: previous.lineup, currentLineup: lineup,
+          status: match.status, kickoff, now })) await emit("confirmed_lineup", "confirmed");
         if (period === 2 && previous.period !== 2 && ["live", "halftime"].includes(previous.status)) await emit("second_half", "started");
         const scoreReduced = (match.homeScore !== null && previous.homeScore !== null && match.homeScore < previous.homeScore) ||
           (match.awayScore !== null && previous.awayScore !== null && match.awayScore < previous.awayScore);
-        if (scoreReduced) await emit("goal_corrected", `${match.homeScore}-${match.awayScore}`);
+        const correctionKey = `score:${match.homeScore ?? "?"}-${match.awayScore ?? "?"}`;
+        if (scoreReduced) await emit("goal_corrected", correctionKey);
         for (const event of events) {
-          const before = previous.events[event.id];
-          const after = eventValues[event.id];
-          if (before && before !== after && GOALS.has(event.type)) { await emit("goal_corrected", `${event.id}:${after}`); continue; }
+          const semanticKey = notificationEventKey(event);
+          const before = previous.events[semanticKey];
+          const after = eventValues[semanticKey];
+          if (before && before !== after && GOALS.has(event.type)) { await emit("goal_corrected", correctionKey); continue; }
           if (before || event.confidence === "unknown" || now - Date.parse(event.createdAt.toString()) > 30 * 60_000) continue;
           const barcaEvent = event.teamId === (match.homeTeam.isBarcelona ? match.homeTeamId : match.awayTeamId);
           const extraType = object(event.rawData)?.notificationType;
@@ -105,7 +131,7 @@ export async function runNotificationWorker(now = Date.now()) {
           if (!kind) continue;
           const name = event.primaryPlayer?.displayName ?? playerName(event.rawData);
           const icon = event.primaryPlayer?.portraitUrl ?? null;
-          await emit(kind, event.id, { player: name ?? (barcaEvent ? "Barça scorer not confirmed" : "Scorer not confirmed"),
+          await emit(kind, kind === "goal_corrected" ? correctionKey : semanticKey, { player: name ?? (barcaEvent ? "Barça scorer not confirmed" : "Scorer not confirmed"),
             minute: event.minute === null ? "?" : String(event.minute), team: barcaEvent ? "Barça" : opponent }, icon);
         }
         for (const item of media) {
@@ -155,19 +181,25 @@ async function scanAdminNotifications() {
     const key = `job:${mode}`;
     const prior = await db.orm.public.NotificationCursor.where({ key }).first();
     const before = object(prior?.snapshot);
+    let failureStreak = Number(before?.failureStreak ?? 0);
+    let alerted = before?.alerted === true;
     if (before?.id !== run.id && before) {
       const failed = ["failed", "blocked", "partial", "interrupted"].includes(run.status);
       const wasFailed = ["failed", "blocked", "partial", "interrupted"].includes(String(before.status));
-      const recovered = wasFailed && run.status === "success";
-      const kind: NotificationKind | null = recovered ? "worker_recovered" : failed && !wasFailed
+      failureStreak = failed ? (wasFailed ? Math.max(1, Number(before.failureStreak ?? 1)) + 1 : 1) : 0;
+      const recovered = alerted && run.status === "success";
+      const shouldAlertFailure = failed && !alerted && (run.status === "blocked" || failureStreak >= 2);
+      const kind: NotificationKind | null = recovered ? "worker_recovered" : shouldAlertFailure
         ? (run.status === "blocked" ? "provider_blocked" : "sync_failed") : null;
       if (kind) {
         const result = await queueNotification({ key: `job:${run.id}:${kind}`, kind,
           values: { detail: `${mode}: ${run.error ?? run.status}` }, url: "/admin/sync" });
         if (result.created) queued += 1;
+        alerted = kind !== "worker_recovered";
       }
+      if (!failed) alerted = false;
     }
-    const state = { id: run.id, status: run.status };
+    const state = { id: run.id, status: run.status, failureStreak, alerted };
     if (prior) await db.orm.public.NotificationCursor.where({ key }).update({ snapshot: state });
     else await db.orm.public.NotificationCursor.create({ key, snapshot: state });
   }

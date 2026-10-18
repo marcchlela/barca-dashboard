@@ -190,6 +190,11 @@ export default function MyMatchDiary({
       null,
     );
 
+  const [
+    picksOpen,
+    setPicksOpen,
+  ] = useState(false);
+
   const players =
     useMemo(
       () =>
@@ -712,10 +717,36 @@ export default function MyMatchDiary({
                 }
                 theme={theme}
               />
+
+              {error ? <p className="mt-3 text-xs lg:hidden" style={{ color: "#E96573" }}>{error}</p> : null}
+              <button
+                type="button"
+                onClick={save}
+                disabled={saveState === "saving"}
+                className="mt-5 inline-flex w-full cursor-pointer items-center justify-center gap-2 border px-4 py-3 text-xs font-semibold uppercase tracking-[0.16em] disabled:cursor-wait disabled:opacity-60 lg:hidden"
+                style={{ borderColor: theme.colors.accent, backgroundColor: saveState === "saved" ? `${theme.colors.accent}18` : theme.colors.accent, color: saveState === "saved" ? theme.colors.accent : theme.colors.background }}
+              >
+                <Save size={13} />
+                {saveState === "saved" ? "Saved" : saveState === "saving" ? "Saving..." : "Save Match"}
+              </button>
             </div>
           </div>
 
-          <div className="p-5 lg:p-7">
+          <button
+            type="button"
+            onClick={() => setPicksOpen((value) => !value)}
+            aria-expanded={picksOpen}
+            className="flex w-full cursor-pointer items-center justify-between border-b px-5 py-4 text-left lg:hidden"
+            style={{ borderColor: theme.colors.border }}
+          >
+            <span>
+              <span className="block text-xs font-semibold uppercase tracking-[0.18em]">Picks & notes</span>
+              <span className="mt-1 block text-xs" style={{ color: theme.colors.textMuted }}>Man of the Match, favourite goal and memories</span>
+            </span>
+            <ChevronDown size={16} className={`shrink-0 transition-transform ${picksOpen ? "rotate-180" : ""}`} style={{ color: theme.colors.accent }} />
+          </button>
+
+          <div className={`${picksOpen ? "block" : "hidden"} p-5 lg:block lg:p-7`}>
             <DiarySectionTitle
               title="Your Picks"
               subtitle="The player and moment you want to remember"
@@ -865,12 +896,13 @@ export default function MyMatchDiary({
             <div
               className="
                 mt-6
-                flex
+                hidden
                 items-center
                 justify-between
                 gap-4
                 border-t
                 pt-5
+                lg:flex
               "
               style={{
                 borderColor:

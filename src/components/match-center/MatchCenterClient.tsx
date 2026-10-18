@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import {
   useEffect,
+  useLayoutEffect,
   useState,
 } from "react";
 
@@ -32,7 +33,7 @@ import {
   usePlayerPerformance,
 } from "./PlayerPerformanceContext";
 
-import StadiumRail from "../shell/StadiumRail";
+import StadiumRail, { MobileHeaderActions } from "../shell/StadiumRail";
 import BrandHomeLink from "../shell/BrandHomeLink";
 
 import ThemeScrollbarSync from "../theme/ThemeScrollbarSync";
@@ -89,36 +90,19 @@ export default function MatchCenterClient({
   ] =
     useState(false);
 
-  useEffect(() => {
-    const frame =
-      window.requestAnimationFrame(
-        () => {
-          const saved =
-            window.localStorage.getItem(
-              KIT_STORAGE_KEY,
-            );
+  useLayoutEffect(() => {
+    try {
+      const saved = window.localStorage.getItem(KIT_STORAGE_KEY);
 
-          if (
-            isKitType(
-              saved,
-            )
-          ) {
-            setKit(
-              saved,
-            );
-          }
-
-          setKitLoaded(
-            true,
-          );
-        },
-      );
-
-    return () => {
-      window.cancelAnimationFrame(
-        frame,
-      );
-    };
+      if (isKitType(saved)) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- restore the persisted kit before the browser paints
+        setKit(saved);
+      }
+    } catch {
+      // iOS privacy modes can deny local storage. Use the default kit.
+    } finally {
+      setKitLoaded(true);
+    }
   }, []);
 
   useEffect(() => {
@@ -126,10 +110,14 @@ export default function MatchCenterClient({
       return;
     }
 
-    window.localStorage.setItem(
-      KIT_STORAGE_KEY,
-      kit,
-    );
+    try {
+      window.localStorage.setItem(
+        KIT_STORAGE_KEY,
+        kit,
+      );
+    } catch {
+      // Keep the in-memory theme when storage is unavailable.
+    }
   }, [
     kit,
     kitLoaded,
@@ -189,12 +177,14 @@ export default function MatchCenterClient({
         theme-environment
         relative
         min-h-screen
-        overflow-hidden
+        overflow-x-clip
         px-3
         py-4
+        pb-24
         sm:px-4
         lg:px-5
         lg:py-5
+        lg:pb-5
       "
       style={{
         backgroundColor:
@@ -219,17 +209,17 @@ export default function MatchCenterClient({
             mb-5
             flex
             flex-col
-            gap-4
+            gap-3
             px-1
-            sm:flex-row
-            sm:items-end
-            sm:justify-between
           "
         >
-          <div>
-            <div className="mb-4">
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
               <BrandHomeLink title="Match Center" />
             </div>
+            <MobileHeaderActions theme={theme} />
+          </div>
+          <div className="flex items-center justify-between gap-3">
             <Link
               href="/matches"
               className="
@@ -252,15 +242,13 @@ export default function MatchCenterClient({
 
               Matches
             </Link>
-          </div>
 
-          <KitSelector
-            kit={kit}
-            setKit={
-              setKit
-            }
-            theme={theme}
-          />
+            <KitSelector
+              kit={kit}
+              setKit={setKit}
+              theme={theme}
+            />
+          </div>
         </header>
 
         <div className="mb-5 lg:hidden">
@@ -449,7 +437,7 @@ export default function MatchCenterClient({
                 <SectionHeader
                   eyebrow="Match Flow"
                   title="Match Timeline"
-                  right={`${data.events.length} events`}
+                  right={timelineUpdatedAt(data) ? `Updated ${formatFreshnessTime(timelineUpdatedAt(data)!)}` : `${data.events.length} events`}
                   theme={theme}
                 />
 
@@ -482,11 +470,7 @@ export default function MatchCenterClient({
                 eyebrow="Match Data"
                 title="Team Comparison"
                 right={
-                  data.coverage
-                    .teamStatistics
-                    .complete
-                    ? "Complete"
-                    : "Partial"
+                  `${data.coverage.teamStatistics.complete ? "Complete" : "Partial"}${teamStatisticsUpdatedAt(data) ? ` · Updated ${formatFreshnessTime(teamStatisticsUpdatedAt(data)!)}` : ""}`
                 }
                 theme={theme}
               />
@@ -544,6 +528,30 @@ export default function MatchCenterClient({
       </div>
     </main>
   );
+}
+
+function teamStatisticsUpdatedAt(data: MatchCenterData) {
+  const values = [data.teamStatistics.home?.updatedAt, data.teamStatistics.away?.updatedAt]
+    .filter((value): value is string => Boolean(value))
+    .sort();
+  return values.at(-1) ?? null;
+}
+
+function timelineUpdatedAt(data: MatchCenterData) {
+  const values = data.events
+    .map((event) => event.updatedAt)
+    .filter((value): value is string => Boolean(value))
+    .sort();
+  return values.at(-1) ?? null;
+}
+
+function formatFreshnessTime(value: string) {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "unknown" : date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
 }
 
 function Environment({
@@ -687,15 +695,15 @@ function ScoreHero({
       <div
         className="
           flex
-          flex-col
+          flex-row
+          items-center
+          justify-between
           gap-4
           border-b
-          px-5
-          py-4
-          sm:flex-row
-          sm:items-center
-          sm:justify-between
+          px-4
+          py-3
           sm:px-7
+          sm:py-4
         "
         style={{
           borderColor:
@@ -788,7 +796,7 @@ function ScoreHero({
           items-center
           gap-3
           px-4
-          py-10
+          py-7
           sm:gap-8
           sm:px-8
           sm:py-14
@@ -893,9 +901,9 @@ function ScoreHero({
       <div
         className="
           grid
+          grid-cols-3
           gap-0
           border-t
-          sm:grid-cols-3
         "
         style={{
           borderColor:
@@ -1096,13 +1104,18 @@ function MetaItem({
     <div
       className="
         flex
+        min-w-0
+        flex-col
         items-center
-        gap-3
-        border-b
-        px-5
-        py-4
-        last:border-b-0
-        sm:border-b-0
+        gap-1.5
+        border-r
+        px-3
+        py-3
+        last:border-r-0
+        sm:flex-row
+        sm:gap-3
+        sm:px-5
+        sm:py-4
         sm:border-r
         sm:last:border-r-0
       "
@@ -1111,21 +1124,26 @@ function MetaItem({
           theme.colors.border,
       }}
     >
-      <Icon
-        size={15}
-        style={{
-          color:
-            theme.colors
-              .accent,
-        }}
-      />
+      <div className="flex items-center gap-1.5">
+        <Icon
+          size={13}
+          style={{ color: theme.colors.accent }}
+        />
+        <p
+          className="text-[10px] uppercase tracking-[0.14em] sm:hidden"
+          style={{ color: theme.colors.textMuted }}
+        >
+          {label}
+        </p>
+      </div>
 
       <div>
         <p
           className="
-            text-xs
+            hidden
             uppercase
             tracking-[0.2em]
+            sm:block
           "
           style={{
             color:
@@ -1136,7 +1154,7 @@ function MetaItem({
           {label}
         </p>
 
-        <p className="mt-1 text-xs">
+        <p className="truncate text-[11px] sm:mt-1 sm:text-xs">
           {value}
         </p>
       </div>
@@ -1285,14 +1303,16 @@ function TeamComparison({
   ];
 
   return (
-    <div className="px-5 py-6 sm:px-7">
+    <div className="px-3 py-6 sm:px-7">
       <div
         className="
           mb-7
           grid
-          grid-cols-[64px_minmax(0,1fr)_64px]
+          grid-cols-[40px_minmax(0,1fr)_40px]
           items-center
-          gap-5
+          gap-3
+          sm:grid-cols-[64px_minmax(0,1fr)_64px]
+          sm:gap-5
           text-xs
           uppercase
           tracking-[0.16em]
@@ -1406,9 +1426,11 @@ function ComparisonRow({
     <div
       className="
         grid
-        grid-cols-[64px_minmax(0,1fr)_64px]
+        grid-cols-[40px_minmax(0,1fr)_40px]
         items-center
-        gap-5
+        gap-3
+        sm:grid-cols-[64px_minmax(0,1fr)_64px]
+        sm:gap-5
       "
     >
       <span
@@ -1530,11 +1552,12 @@ function PlayerPerformances({
         scrollbar-subtle
       "
     >
-      <div className="min-w-225">
+      <div className="min-w-[760px] sm:min-w-225">
         <div
           className="
             grid
-            grid-cols-[minmax(210px,1fr)_78px_62px_66px_66px_66px_80px_70px]
+            grid-cols-[minmax(170px,1fr)_70px_56px_60px_60px_60px_72px_64px]
+            sm:grid-cols-[minmax(210px,1fr)_78px_62px_66px_66px_66px_80px_70px]
             border-b
             px-5
             py-3
@@ -1606,7 +1629,8 @@ function PlayerPerformances({
                   grid
                   w-full
                   cursor-pointer
-                  grid-cols-[minmax(210px,1fr)_78px_62px_66px_66px_66px_80px_70px]
+                  grid-cols-[minmax(170px,1fr)_70px_56px_60px_60px_60px_72px_64px]
+                  sm:grid-cols-[minmax(210px,1fr)_78px_62px_66px_66px_66px_80px_70px]
                   items-center
                   border-b
                   px-5
@@ -2037,8 +2061,8 @@ function KitSelector({
             }
             className="
               border-r
-              px-3
-              py-2
+              px-2.5
+              py-1.5
               text-xs
               uppercase
               tracking-[0.16em]

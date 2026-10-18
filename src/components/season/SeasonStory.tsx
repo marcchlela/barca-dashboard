@@ -3,11 +3,7 @@
 import Link from "next/link";
 
 import {
-  useCallback,
-  useEffect,
   useMemo,
-  useRef,
-  useState,
 } from "react";
 
 import type {
@@ -17,8 +13,6 @@ import type {
 
 import {
   CalendarClock,
-  ChevronLeft,
-  ChevronRight,
   CircleX,
   Cross,
   Flag,
@@ -87,19 +81,6 @@ export default function SeasonStory({
   theme,
   overview,
 }: SeasonStoryProps) {
-  const scrollRef =
-    useRef<HTMLDivElement>(null);
-
-  const [
-    canScrollLeft,
-    setCanScrollLeft,
-  ] = useState(false);
-
-  const [
-    canScrollRight,
-    setCanScrollRight,
-  ] = useState(false);
-
   /*
   |--------------------------------------------------------------------------
   | Season dates
@@ -176,89 +157,6 @@ export default function SeasonStory({
       ],
     );
 
-  /*
-  |--------------------------------------------------------------------------
-  | Arrow state
-  |--------------------------------------------------------------------------
-  */
-
-  const updateScrollState =
-    useCallback(() => {
-      const element =
-        scrollRef.current;
-
-      if (!element) {
-        return;
-      }
-
-      setCanScrollLeft(
-        element.scrollLeft > 4,
-      );
-
-      setCanScrollRight(
-        element.scrollLeft +
-          element.clientWidth <
-          element.scrollWidth - 4,
-      );
-    }, []);
-
-  useEffect(() => {
-    const element =
-      scrollRef.current;
-
-    if (!element) {
-      return;
-    }
-
-    updateScrollState();
-
-    element.addEventListener(
-      "scroll",
-      updateScrollState,
-    );
-
-    window.addEventListener(
-      "resize",
-      updateScrollState,
-    );
-
-    return () => {
-      element.removeEventListener(
-        "scroll",
-        updateScrollState,
-      );
-
-      window.removeEventListener(
-        "resize",
-        updateScrollState,
-      );
-    };
-  }, [
-    updateScrollState,
-  ]);
-
-  function scrollTimeline(
-    direction: -1 | 1,
-  ) {
-    const element =
-      scrollRef.current;
-
-    if (!element) {
-      return;
-    }
-
-    element.scrollBy({
-      left:
-        direction *
-        Math.max(
-          450,
-          element.clientWidth * 0.72,
-        ),
-
-      behavior: "smooth",
-    });
-  }
-
   return (
     <section
       className="border-t pt-5"
@@ -310,64 +208,10 @@ export default function SeasonStory({
       {/* TIMELINE */}
 
       <div className="relative mt-7">
-
-        {/* LEFT ARROW */}
-
-        <button
-          type="button"
-          aria-label="Scroll timeline left"
-          disabled={!canScrollLeft}
-          onClick={() =>
-            scrollTimeline(-1)
-          }
-          className="absolute left-1 top-[112px] z-30 flex h-9 w-9 items-center justify-center border transition disabled:cursor-default disabled:opacity-20"
-          style={{
-            backgroundColor:
-              theme.colors.background,
-
-            borderColor:
-              theme.colors.border,
-
-            color:
-              theme.colors.text,
-          }}
-        >
-          <ChevronLeft
-            size={17}
-          />
-        </button>
-
-        {/* RIGHT ARROW */}
-
-        <button
-          type="button"
-          aria-label="Scroll timeline right"
-          disabled={!canScrollRight}
-          onClick={() =>
-            scrollTimeline(1)
-          }
-          className="absolute right-1 top-[112px] z-30 flex h-9 w-9 items-center justify-center border transition disabled:cursor-default disabled:opacity-20"
-          style={{
-            backgroundColor:
-              theme.colors.background,
-
-            borderColor:
-              theme.colors.border,
-
-            color:
-              theme.colors.text,
-          }}
-        >
-          <ChevronRight
-            size={17}
-          />
-        </button>
-
         {/* SCROLL VIEWPORT */}
 
         <div
-          ref={scrollRef}
-          className="overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="touch-pan-x overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           style={{
             scrollbarWidth: "none",
           }}
@@ -543,55 +387,6 @@ export default function SeasonStory({
         </div>
       </div>
 
-      {/* FOOTER */}
-
-      <div
-        className="flex items-center justify-between border-t pt-4"
-        style={{
-          borderColor:
-            theme.colors.border,
-        }}
-      >
-        <p
-          className="text-xs uppercase tracking-[0.2em]"
-          style={{
-            color:
-              theme.colors.textMuted,
-          }}
-        >
-          Only the moments that shape the season
-        </p>
-
-        <div className="flex items-center gap-4">
-          <Legend
-            label="W"
-            color={
-              theme.colors.success
-            }
-          />
-
-          <Legend
-            label="D"
-            color={
-              theme.colors.textMuted
-            }
-          />
-
-          <Legend
-            label="L"
-            color={
-              theme.colors.danger
-            }
-          />
-
-          <Legend
-            label="KEY"
-            color={
-              theme.colors.accent
-            }
-          />
-        </div>
-      </div>
     </section>
   );
 }
@@ -1302,46 +1097,18 @@ function eventColor(
   }
 }
 
-function Legend({
-  label,
-  color,
-}: {
-  label: string;
-
-  color: string;
-}) {
-  return (
-    <div className="flex items-center gap-2">
-      <span
-        className="h-1.5 w-1.5"
-        style={{
-          backgroundColor:
-            color,
-        }}
-      />
-
-      <span className="text-xs uppercase tracking-[0.14em]">
-        {label}
-      </span>
-    </div>
-  );
-}
-
 function formatDate(
   value: string,
 ) {
-  return new Date(
-    value,
-  )
-    .toLocaleDateString(
-      "en-GB",
-      {
-        day:
-          "2-digit",
+  const date = new Date(value);
+  const months = [
+    "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
+    "JUL", "AUG", "SEP", "OCT", "NOV", "DEC",
+  ] as const;
 
-        month:
-          "short",
-      },
-    )
-    .toUpperCase();
+  if (Number.isNaN(date.getTime())) {
+    return "—";
+  }
+
+  return `${String(date.getUTCDate()).padStart(2, "0")} ${months[date.getUTCMonth()]}`;
 }

@@ -9,12 +9,15 @@ import {
 import {
   BarChart3,
   CalendarDays,
+  Heart,
   Home,
-  LibraryBig,
   Settings,
   Shield,
+  SquarePlay,
   Trophy,
   UserRound,
+  UserRoundGroup,
+  type LucideProps,
 } from "lucide-react";
 
 import {
@@ -33,7 +36,15 @@ type StadiumRailProps = {
     | "compact";
 };
 
-const navigation = [
+function MyBarcaIcon({ size = 24, strokeWidth = 2, style, className }: LucideProps) {
+  const iconSize = typeof size === "number" ? size : 24;
+  return <span className={`relative inline-flex shrink-0 items-center justify-center ${className ?? ""}`} style={{ width: size, height: size, ...style }} aria-hidden="true">
+    <Shield size={size} strokeWidth={strokeWidth} />
+    <Heart className="absolute" size={Math.max(7, Math.round(iconSize * .38))} strokeWidth={strokeWidth} fill="currentColor" />
+  </span>;
+}
+
+const primaryNavigation = [
   {
     label: "Overview",
     href: "/",
@@ -49,7 +60,7 @@ const navigation = [
   {
     label: "Squad",
     href: "/squad",
-    icon: UserRound,
+    icon: UserRoundGroup,
   },
 
   {
@@ -67,21 +78,25 @@ const navigation = [
   {
     label: "Media",
     href: "/media",
-    icon: LibraryBig,
+    icon: SquarePlay,
   },
 
   {
     label: "My Barça",
     href: "/my-barca",
-    icon: Shield,
+    icon: MyBarcaIcon,
   },
 
-  {
-    label: "Account",
-    href: "/account",
-    icon: UserRound,
-  },
 ] as const;
+
+const navigation = [
+  ...primaryNavigation,
+  { label: "Account", href: "/account", icon: UserRound },
+] as const;
+
+const mobileNavigation = primaryNavigation.filter(
+  ({ href }) => href !== "/club",
+);
 
 export default function StadiumRail({
   theme,
@@ -317,18 +332,19 @@ function CompactRail({
 }) {
   return (
     <div
-      className="border-y"
+      className="fixed inset-x-0 bottom-0 z-50 border-t px-1 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden"
       style={{
         borderColor:
           theme.colors.border,
+        backgroundColor: `${theme.colors.background}F2`,
       }}
     >
-      <div className="flex items-center justify-between gap-3">
+      <div className="mx-auto max-w-xl [&>a]:hidden">
         <Link href="/" aria-label="Go to Barça overview" className="flex h-10 w-10 shrink-0 items-center justify-center border-r" style={{ borderColor: theme.colors.border }}>
           <Home size={18} strokeWidth={1.6} aria-hidden="true" />
         </Link>
-        <nav className="flex min-w-0 flex-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {navigation.map(
+        <nav className="mx-3 grid h-16 grid-cols-6 items-stretch sm:mx-5">
+          {mobileNavigation.map(
             ({
               label,
               href,
@@ -349,12 +365,14 @@ function CompactRail({
                       ? "page"
                       : undefined
                   }
-                  className="relative flex shrink-0 items-center gap-2 px-3 py-3"
+                  aria-label={label}
+                  title={label}
+                  className="relative flex min-w-0 items-center justify-center rounded-sm active:scale-95"
                 >
                   {active && (
                     <motion.div
                       layoutId="stadium-compact-active"
-                      className="absolute bottom-0 left-3 right-3 h-[2px]"
+                      className="absolute inset-x-2 top-0 h-[2px]"
                       style={{
                         backgroundColor:
                           theme.colors.accent,
@@ -363,7 +381,7 @@ function CompactRail({
                   )}
 
                   <Icon
-                    size={14}
+                    size={20}
                     strokeWidth={1.6}
                     style={{
                       color:
@@ -374,7 +392,7 @@ function CompactRail({
                   />
 
                   <span
-                    className="text-xs uppercase tracking-[0.12em]"
+                    className="sr-only"
                     style={{
                       color:
                         active
@@ -415,6 +433,31 @@ function CompactRail({
         </Link>
       </div>
     </div>
+  );
+}
+
+export function MobileHeaderActions({ theme }: { theme: KitTheme }) {
+  const pathname = usePathname();
+
+  return (
+    <div className="flex shrink-0 items-center gap-1 lg:hidden">
+      <HeaderAction href="/settings" label="Settings" active={isRouteActive(pathname, "/settings")} theme={theme} icon={Settings} />
+      <HeaderAction href="/account" label="Account" active={isRouteActive(pathname, "/account")} theme={theme} icon={UserRound} />
+    </div>
+  );
+}
+
+function HeaderAction({ href, label, active, theme, icon: Icon }: { href: string; label: string; active: boolean; theme: KitTheme; icon: typeof Settings }) {
+  return (
+    <Link
+      href={href}
+      aria-label={label}
+      title={label}
+      className="flex h-11 w-11 items-center justify-center rounded-sm border active:scale-95"
+      style={{ color: active ? theme.colors.accent : theme.colors.textMuted, borderColor: active ? theme.colors.border : "transparent" }}
+    >
+      <Icon size={20} strokeWidth={1.7} aria-hidden="true" />
+    </Link>
   );
 }
 
