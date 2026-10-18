@@ -117,15 +117,17 @@ test("live event identity deduplicates provider IDs while preserving distinct re
   assert.notEqual(liveEventSemanticKey(base), liveEventSemanticKey({ ...base, minute: 53 }));
 });
 
-test("minute corrections collapse repeated cards and substitutions without merging goals", () => {
+test("minute corrections collapse repeated events without merging distinct goals", () => {
   const card = { type: "red_card", teamId: "betis", minute: 54, primaryName: "F. Bernal" };
   assert.equal(liveEventsLikelySame(card, { ...card, minute: 57 }), true);
   const yellow = { type: "yellow_card", teamId: "barca", minute: 55, primaryName: "Lamine Yamal" };
   assert.equal(liveEventsLikelySame(yellow, { ...yellow, minute: 57 }), true);
   const substitution = { type: "substitution", teamId: "barca", minute: 62, primaryName: "Fermin", relatedName: "D. Olmo" };
   assert.equal(liveEventsLikelySame(substitution, { ...substitution, minute: 64 }), true);
-  const goal = { type: "goal", teamId: "barca", minute: 62, primaryName: "E. Garcia" };
-  assert.equal(liveEventsLikelySame(goal, { ...goal, minute: 63 }), false);
+  const goal = { type: "goal", teamId: "barca", minute: 62, primaryName: "E. Garcia", score: "2-4" };
+  assert.equal(liveEventsLikelySame(goal, { ...goal, minute: 63 }), true);
+  assert.equal(liveEventsLikelySame(goal, { ...goal, minute: 63, score: "2-5" }), false);
+  assert.equal(liveEventsLikelySame({ ...goal, score: null }, { ...goal, minute: 63, score: null }), false);
 });
 
 test("impossible statistic snapshots are rejected instead of replacing coherent values", () => {
