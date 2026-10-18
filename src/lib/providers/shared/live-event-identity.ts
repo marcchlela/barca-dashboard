@@ -6,6 +6,8 @@ export type LiveEventIdentityInput = {
   relatedPlayerId?: string | null;
   primaryName?: string | null;
   relatedName?: string | null;
+  /** Cumulative score immediately after the event (for example `1-3`). */
+  score?: string | null;
 };
 
 function token(value: string | null | undefined) {
@@ -31,9 +33,9 @@ function participant(input: LiveEventIdentityInput, kind: "primary" | "related")
 }
 
 /**
- * Some live feeds republish cards and substitutions with a corrected minute
- * and a new provider event id. Treat those as corrections, while keeping goal
- * identity strict so two genuine goals by the same player are never hidden.
+ * Some live feeds republish events with a corrected minute and a new provider
+ * event id. Goals are only collapsed when the cumulative score is also equal;
+ * that keeps genuine back-to-back goals by the same player distinct.
  */
 export function liveEventsLikelySame(
   left: LiveEventIdentityInput,
@@ -47,6 +49,9 @@ export function liveEventsLikelySame(
   if (!primary || primary !== participant(right, "primary")) return false;
 
   const minuteDifference = Math.abs(left.minute - right.minute);
+  if (family === "goal") {
+    return Boolean(left.score && right.score && left.score === right.score && minuteDifference <= 2);
+  }
   if (family === "red_card") return minuteDifference <= 10;
   if (family === "yellow_card") return minuteDifference <= 3;
   if (family === "substitution") {

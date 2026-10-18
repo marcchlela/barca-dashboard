@@ -45,6 +45,14 @@ function rawName(value: unknown, field: string) {
   return typeof data?.[field] === "string" ? data[field] as string : null;
 }
 
+function rawEventScore(value: unknown) {
+  const sourcePayload = asObject(asObject(value)?.sourcePayload);
+  const raw = sourcePayload?.score;
+  if (typeof raw !== "string" && typeof raw !== "number") return null;
+  const match = String(raw).match(/(\d+)\s*[-–—:]\s*(\d+)/);
+  return match ? `${Number(match[1])}-${Number(match[2])}` : null;
+}
+
 function matchStatusForWrite(current: string, incoming: string | null) {
   if (!incoming) return null;
   if (current === "finished" && incoming !== "finished") return null;
@@ -313,6 +321,7 @@ async function upsertLiveEvent(input: {
     relatedPlayerId: assist?.playerId,
     primaryName: event.scorerName,
     relatedName: event.assistName,
+    score: event.score,
   });
   const semanticMatches = input.existingEvents.filter((row) => storedEventSemanticKey(row) === semanticKey);
   const correctedMatches = input.existingEvents.filter((row) => liveEventsLikelySame({
@@ -323,6 +332,7 @@ async function upsertLiveEvent(input: {
     relatedPlayerId: assist?.playerId,
     primaryName: event.scorerName,
     relatedName: event.assistName,
+    score: event.score,
   }, {
     type: row.type,
     teamId: row.teamId,
@@ -331,6 +341,7 @@ async function upsertLiveEvent(input: {
     relatedPlayerId: row.relatedPlayerId,
     primaryName: rawName(row.rawData, row.type === "substitution" ? "offName" : "scorerName"),
     relatedName: rawName(row.rawData, row.type === "substitution" ? "onName" : "assistName"),
+    score: rawEventScore(row.rawData),
   }));
   const nearby = mappedEvent ? [mappedEvent] : semanticMatches.length ? semanticMatches : correctedMatches.length ? correctedMatches : input.existingEvents.filter((row) =>
     storedType !== "other" && row.teamId === teamId && row.minute === event.minute &&

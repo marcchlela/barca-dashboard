@@ -72,8 +72,15 @@ export type LiveEventCandidate = {
   scorerName: string | null;
   assistName: string | null;
   providerPlayerId: string | null;
+  score: string | null;
   raw: JsonObject;
 };
+
+function eventScore(row: JsonObject) {
+  const value = stringValue(row, "score", "result", "scoreline");
+  const match = value?.match(/(\d+)\s*[-–—:]\s*(\d+)/);
+  return match ? `${Number(match[1])}-${Number(match[2])}` : null;
+}
 
 function cleanName(value: string | null) {
   return value?.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").trim() || null;
@@ -152,6 +159,7 @@ export function normalizeLiveEvents(value: JsonObject, homeTeam: string, awayTea
         scorerName: scorer ? cleanName(scorer) : null,
         assistName: assistValue ? cleanName(assistValue) : null,
         providerPlayerId: stringValue(row, `${prefix}ScorerId`, `${prefix}_scorer_id`, `${prefix}PlayerId`, "playerId", "player_id") ?? stringValue(player, "id", "apiId"),
+        score: eventScore(row),
         raw: row,
       }];
     });
@@ -167,7 +175,7 @@ export function normalizeLiveSubstitutions(value: JsonObject): LiveEventCandidat
     const minute = eventMinute(row);
     if (!providerId || (side !== "home" && side !== "away") || names.length !== 2 || !names[0] || !names[1] || minute === null) return [];
     return [{ providerId, order: index + 1, type: "substitution" as const, minute, period: minute > 45 ? 2 : 1,
-      side, scorerName: cleanName(names[0]), assistName: cleanName(names[1]), providerPlayerId: ids[0] || null, raw: row }];
+      side, scorerName: cleanName(names[0]), assistName: cleanName(names[1]), providerPlayerId: ids[0] || null, score: null, raw: row }];
   });
 }
 
