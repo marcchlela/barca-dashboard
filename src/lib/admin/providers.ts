@@ -84,6 +84,40 @@ const PROVIDERS:
 
   {
     code:
+      "highlightly",
+
+    name:
+      "Highlightly",
+
+    category:
+      "Confirmed Match Lineups",
+
+    description:
+      "Primary pre-match source for confirmed starting XIs, with live score and event fallback coverage.",
+
+    mode:
+      "primary",
+
+    envKey:
+      "HIGHLIGHTLY_API_KEY",
+
+    capabilities: [
+      "Starting XI",
+      "Substitutes",
+      "Formations",
+      "Pre-match Coverage",
+      "Live Fallback",
+    ],
+
+    priorityLabel:
+      "Lineups · Primary",
+
+    notes:
+      "Primary for bounded pre-match lineup polling; also used only when the primary GOAL live feed fails.",
+  },
+
+  {
+    code:
       "goal-api",
 
     name:
@@ -93,7 +127,7 @@ const PROVIDERS:
       "Rich Match Data",
 
     description:
-      "Primary rich-match source for match identity, lineups and scoring-event reconstruction.",
+      "Rich-match source for scoring-event reconstruction and fallback confirmed lineups.",
 
     mode:
       "active",
@@ -109,7 +143,7 @@ const PROVIDERS:
     ],
 
     priorityLabel:
-      "Rich Match · Core",
+      "Events · Core / Lineups · Fallback",
 
     notes:
       "Used by the rich-match ingestion pipeline together with Big Balls data.",

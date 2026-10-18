@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Check } from "lucide-react";
 import { useDashboardSectionTheme } from "../shell/DashboardSectionShell";
 
 type Kind = { id: string; label: string; group: string; ready: boolean };
@@ -84,8 +85,9 @@ export default function NotificationsSettings({ signedIn }: { signedIn: boolean 
       {groups.map((group) => <div key={group} className="mt-7"><h3 className="text-sm font-semibold uppercase tracking-widest" style={{ color: theme.colors.accent }}>{group}</h3>
         <div className="mt-3 grid gap-2 sm:grid-cols-2">{data.kinds.filter((kind) => kind.group === group).map((kind) => {
           const checked = data.preferences[kind.id] ?? true;
-          return <label key={kind.id} className="flex items-center gap-3 border p-3 text-sm" style={{ borderColor: theme.colors.border, color: kind.ready ? theme.colors.text : theme.colors.textMuted }}>
-            <input type="checkbox" checked={checked} disabled={!kind.ready} onChange={() => toggle(kind.id, checked)} />
+          return <label key={kind.id} className={`flex items-center gap-3 border p-3 text-sm focus-within:outline-2 focus-within:outline-offset-2 ${kind.ready ? "cursor-pointer" : "cursor-not-allowed"}`} style={{ borderColor: checked && kind.ready ? theme.colors.accent : theme.colors.border, color: kind.ready ? theme.colors.text : theme.colors.textMuted, background: checked && kind.ready ? `${theme.colors.accent}0d` : theme.colors.backgroundElevated, outlineColor: theme.colors.accent }}>
+            <input type="checkbox" checked={checked} disabled={!kind.ready} onChange={() => toggle(kind.id, checked)} className="sr-only" />
+            <span aria-hidden="true" className="grid h-5 w-5 shrink-0 place-items-center border" style={{ borderColor: checked && kind.ready ? theme.colors.accent : theme.colors.border, background: checked && kind.ready ? theme.colors.accent : "transparent", color: theme.colors.background }}>{checked && kind.ready ? <Check size={14} strokeWidth={3} /> : null}</span>
             <span>{kind.label}{!kind.ready && <span className="ml-2 text-xs">Source validation pending</span>}</span>
           </label>;
         })}</div></div>)}

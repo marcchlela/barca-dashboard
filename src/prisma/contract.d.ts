@@ -34,7 +34,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'21d76fd9260385074e2e65907b43639a7830b3829f194093c0afdaf5e9b47cdc'>;
+  StorageHashBase<'d55970d92ed06dd2502e11dcc834c94bd95af920137c50083bac8be296881467'>;
 export type ExecutionHash =
   ExecutionHashBase<'b94d18c32d2ae8abd19e735b78539454aef879a608a6e3ddc86256eb2551e3cb'>;
 export type ProfileHash =
@@ -623,6 +623,7 @@ export type FieldOutputTypes = {
       readonly reviewNote: CodecTypes['pg/text@1']['output'] | null;
       readonly verificationBasis: CodecTypes['pg/text@1']['output'];
       readonly verifiedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly curatedAt: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
       readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
     };
@@ -1326,6 +1327,7 @@ export type FieldInputTypes = {
       readonly reviewNote: CodecTypes['pg/text@1']['input'] | null;
       readonly verificationBasis: CodecTypes['pg/text@1']['input'];
       readonly verifiedAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly curatedAt: CodecTypes['pg/timestamptz-temporal@1']['input'] | null;
       readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
       readonly updatedAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
     };
@@ -2021,6 +2023,7 @@ export type StorageColumnTypes = {
     };
     readonly media_moment: {
       readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
+      readonly curatedAt: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
       readonly endSecond: CodecTypes['pg/int4@1']['output'] | null;
       readonly evidenceUrl: CodecTypes['pg/text@1']['output'] | null;
       readonly id: CodecTypes['pg/uuid@1']['output'];
@@ -2724,6 +2727,7 @@ export type StorageColumnInputTypes = {
     };
     readonly media_moment: {
       readonly createdAt: CodecTypes['pg/timestamptz-temporal@1']['input'];
+      readonly curatedAt: CodecTypes['pg/timestamptz-temporal@1']['input'] | null;
       readonly endSecond: CodecTypes['pg/int4@1']['input'] | null;
       readonly evidenceUrl: CodecTypes['pg/text@1']['input'] | null;
       readonly id: CodecTypes['pg/uuid@1']['input'];
@@ -3683,6 +3687,7 @@ export namespace Models {
     reviewNote: CodecTypes['pg/text@1']['output'] | null;
     verificationBasis: CodecTypes['pg/text@1']['output'];
     verifiedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
+    curatedAt: CodecTypes['pg/timestamptz-temporal@1']['output'] | null;
     createdAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
     updatedAt: CodecTypes['pg/timestamptz-temporal@1']['output'];
     matchEvent: public_MatchEvent;
@@ -6607,6 +6612,11 @@ type ContractBase = Omit<
                   readonly nativeType: 'timestamptz';
                   readonly codecId: 'pg/timestamptz-temporal@1';
                   readonly nullable: false;
+                };
+                readonly curatedAt: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                  readonly nullable: true;
                 };
                 readonly createdAt: {
                   readonly nativeType: 'timestamptz';
@@ -12002,6 +12012,13 @@ type ContractBase = Omit<
                   readonly codecId: 'pg/timestamptz-temporal@1';
                 };
               };
+              readonly curatedAt: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-temporal@1';
+                };
+              };
               readonly createdAt: {
                 readonly nullable: false;
                 readonly type: {
@@ -12056,6 +12073,7 @@ type ContractBase = Omit<
                 readonly reviewNote: { readonly column: 'reviewNote' };
                 readonly verificationBasis: { readonly column: 'verificationBasis' };
                 readonly verifiedAt: { readonly column: 'verifiedAt' };
+                readonly curatedAt: { readonly column: 'curatedAt' };
                 readonly createdAt: { readonly column: 'createdAt' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
               };

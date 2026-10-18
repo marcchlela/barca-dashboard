@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { goalFixtureListingPath } from "../src/lib/providers/goal-api/fixture-search-path.ts";
 import { lineupNeedsBackfill } from "../src/lib/providers/rich-match/lineup-coverage.ts";
-import { lineupRefreshWindow } from "../src/lib/providers/rich-match/lineup-refresh-window.ts";
+import { lineupNotPublishedYet, lineupRefreshWindow } from "../src/lib/providers/rich-match/lineup-refresh-window.ts";
 import { needsBarcelonaPlayerPerformance, needsBarcelonaPlayerRatings, playerRatingRefreshDue } from "../src/lib/providers/rich-match/rich-data-coverage.ts";
 import { resolveMatchIdentity } from "../src/lib/providers/shared/match-identity.ts";
 
@@ -37,6 +37,14 @@ test("missing confirmed lineups remain retryable from pre-match through the live
   assert.equal(lineupRefreshWindow("live", kickoff, at("2026-10-13T20:45:00Z")), true);
   assert.equal(lineupRefreshWindow("finished", kickoff, at("2026-10-13T21:00:00Z")), false);
   assert.equal(lineupRefreshWindow("scheduled", kickoff, at("2026-10-14T00:00:00Z")), false);
+});
+
+test("an unpublished or incomplete provider lineup is pending rather than a worker failure", () => {
+  assert.equal(lineupNotPublishedYet("GOAL returned 0 home starters; expected 11."), true);
+  assert.equal(lineupNotPublishedYet("GOAL returned 7 away starters; expected 11."), true);
+  assert.equal(lineupNotPublishedYet("Highlightly returned 0 home starters; expected 11."), true);
+  assert.equal(lineupNotPublishedYet("GOAL did not supply exactly 11 starters for both sides."), true);
+  assert.equal(lineupNotPublishedYet("GOAL request failed with 429."), false);
 });
 
 test("GOAL's Galatasaray name resolves to the canonical SK fixture without relying on a live score", () => {

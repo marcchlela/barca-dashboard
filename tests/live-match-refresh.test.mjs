@@ -10,7 +10,9 @@ import {
   normalizeLivePeriod,
   postMatchPollDelayMs,
   shouldFetchLiveStatistics,
+  liveStatisticsAreCoherent,
 } from "../src/lib/providers/goal-api/live-refresh-core.ts";
+import { liveEventSemanticKey, liveEventsLikelySame } from "../src/lib/providers/shared/live-event-identity.ts";
 
 test("live event adapter extracts goals, assists, own goals and cards from public fixture event data", () => {
   const events = normalizeLiveEvents({ data: [
@@ -107,4 +109,27 @@ test("post-match catch-up is spaced out to protect the free provider quota", () 
   assert.equal(postMatchPollDelayMs("live", kickoff, Date.parse("2026-10-13T20:00:00Z")), 0);
   assert.equal(postMatchPollDelayMs("finished", kickoff, Date.parse("2026-10-13T21:00:00Z")), 30 * 60_000);
   assert.equal(postMatchPollDelayMs("scheduled", kickoff, Date.parse("2026-10-13T23:01:00Z")), 30 * 60_000);
+});
+
+test("live event identity deduplicates provider IDs while preserving distinct real events", () => {
+  const base = { type: "yellow_card", teamId: "barca", minute: 52, primaryName: "Lamine Yamal" };
+  assert.equal(liveEventSemanticKey(base), liveEventSemanticKey({ ...base, primaryName: "Lámine Yamal" }));
+  assert.notEqual(liveEventSemanticKey(base), liveEventSemanticKey({ ...base, minute: 53 }));
+});
+
+test("minute corrections collapse repeated cards and substitutions without merging goals", () => {
+  const card = { type: "red_card", teamId: "betis", minute: 54, primaryName: "F. Bernal" };
+  assert.equal(liveEventsLikelySame(card, { ...card, minute: 57 }), true);
+  const yellow = { type: "yellow_card", teamId: "barca", minute: 55, primaryName: "Lamine Yamal" };
+  assert.equal(liveEventsLikelySame(yellow, { ...yellow, minute: 57 }), true);
+  const substitution = { type: "substitution", teamId: "barca", minute: 62, primaryName: "Fermin", relatedName: "D. Olmo" };
+  assert.equal(liveEventsLikelySame(substitution, { ...substitution, minute: 64 }), true);
+  const goal = { type: "goal", teamId: "barca", minute: 62, primaryName: "E. Garcia" };
+  assert.equal(liveEventsLikelySame(goal, { ...goal, minute: 63 }), false);
+});
+
+test("impossible statistic snapshots are rejected instead of replacing coherent values", () => {
+  assert.equal(liveStatisticsAreCoherent({ shots: 0, shotsOnTarget: 1, passes: 10, completedPasses: 8 }), false);
+  assert.equal(liveStatisticsAreCoherent({ shots: 4, shotsOnTarget: 2, passes: 10, completedPasses: 11 }), false);
+  assert.equal(liveStatisticsAreCoherent({ shots: 4, shotsOnTarget: 2, passes: 10, completedPasses: 8 }), true);
 });

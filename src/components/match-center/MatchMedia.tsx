@@ -218,9 +218,17 @@ export default function MatchMedia({
               <div
                 className="
                   mt-4
-                  grid
+                  flex
                   gap-3
+                  overflow-x-auto
+                  pb-2
+                  snap-x
+                  snap-mandatory
+                  scrollbar-subtle
+                  md:grid
                   md:grid-cols-2
+                  md:overflow-visible
+                  md:pb-0
                   xl:grid-cols-3
                 "
               >
@@ -662,10 +670,13 @@ function MediaCard({
       }
       className="
         group
+        min-w-[78%]
+        snap-start
         cursor-pointer
         overflow-hidden
         border
         text-left
+        md:min-w-0
       "
       style={{
         borderColor:
@@ -888,11 +899,11 @@ function EmptyMedia({
       <div
         className="
           flex
-          min-h-64
+          min-h-36
           items-center
           justify-center
           px-6
-          py-10
+          py-5
           text-center
         "
       >
@@ -901,8 +912,8 @@ function EmptyMedia({
             className="
               mx-auto
               flex
-              h-11
-              w-11
+              h-9
+              w-9
               items-center
               justify-center
               border
@@ -922,13 +933,13 @@ function EmptyMedia({
             />
           </div>
 
-          <p className="mt-4 text-sm font-medium">
+          <p className="mt-3 text-sm font-medium">
             No match media linked yet
           </p>
 
           <p
             className="
-              mt-2
+              mt-1.5
               text-xs
               leading-5
             "

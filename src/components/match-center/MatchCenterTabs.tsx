@@ -213,9 +213,7 @@ export default function MatchCenterTabs({
         top-0
         z-40
         mt-4
-        overflow-x-auto
         border
-        scrollbar-subtle
         backdrop-blur-xl
       "
       style={{
@@ -228,7 +226,7 @@ export default function MatchCenterTabs({
       }}
       aria-label="Match Center sections"
     >
-      <div className="flex min-w-max">
+      <div className="grid grid-cols-3 sm:grid-cols-6">
         {TABS.map(
           (
             tab,
@@ -255,20 +253,28 @@ export default function MatchCenterTabs({
                 className="
                   relative
                   flex
-                  min-w-28
                   cursor-pointer
                   items-center
                   justify-center
-                  gap-2
+                  gap-1.5
                   border-r
-                  px-5
-                  py-3.5
-                  text-xs
+                  border-b
+                  px-1
+                  py-2.5
+                  text-[10px]
                   font-medium
                   uppercase
-                  tracking-[0.16em]
+                  tracking-[0.1em]
                   transition-colors
-                  last:border-r-0
+                  [&:nth-child(3n)]:border-r-0
+                  [&:nth-child(n+4)]:border-b-0
+                  sm:border-b-0
+                  sm:px-2
+                  sm:py-3.5
+                  sm:text-xs
+                  sm:tracking-[0.13em]
+                  sm:[&:nth-child(3n)]:border-r
+                  sm:last:border-r-0
                 "
                 style={{
                   borderColor:
@@ -311,8 +317,8 @@ export default function MatchCenterTabs({
                     className="
                       absolute
                       bottom-0
-                      left-4
-                      right-4
+                      left-2
+                      right-2
                       h-0.5
                     "
                     style={{

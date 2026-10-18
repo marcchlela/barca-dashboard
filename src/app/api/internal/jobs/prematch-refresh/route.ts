@@ -55,15 +55,35 @@ export async function POST(request: Request) {
     lineups: lineupResult,
     previews: previewResult,
   };
+  const failedStages = [
+    !lineupOk ? `match data: ${stageFailureDetail(lineupResult)}` : null,
+    !previewOk ? `preview media: ${stageFailureDetail(previewResult)}` : null,
+  ].filter((detail): detail is string => Boolean(detail));
+  const failureDetail = failedStages.length > 0
+    ? `Pre-match refresh failed (${failedStages.join("; ")}).`
+    : null;
   await db.orm.public.GoalMediaSyncRun.where({ id: run.id }).update({
     lockKey: null,
     status: result.ok ? "success" : "partial",
     finishedAt: Temporal.Instant.from(new Date().toISOString()),
     result,
-    error: result.ok ? null : "One or more pre-match sync stages failed.",
+    error: failureDetail,
   });
   // BusyBox wget treats 207 as a transport error and discards the JSON body in
   // scheduler logs. Stage failures are represented by `ok: false` and the
   // persisted run status, so return 200 for an authenticated, handled run.
   return NextResponse.json(result);
+}
+
+function stageFailureDetail(value: unknown) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return "unknown failure";
+  const stage = value as Record<string, unknown>;
+  if (typeof stage.error === "string" && stage.error.trim()) return stage.error.trim().slice(0, 240);
+  if (typeof stage.status === "string") return stage.status;
+  const counts = stage.counts;
+  if (counts && typeof counts === "object" && !Array.isArray(counts)) {
+    const failed = (counts as Record<string, unknown>).failed;
+    if (typeof failed === "number" && failed > 0) return `${failed} provider request${failed === 1 ? "" : "s"} failed`;
+  }
+  return "stage did not complete";
 }

@@ -166,6 +166,8 @@ export async function getAdminSyncData() {
 
       goalApiConfigured: Boolean(process.env.GOAL_API_KEY),
 
+      highlightlyConfigured: Boolean(process.env.HIGHLIGHTLY_API_KEY),
+
       richMatchConfigured:
         Boolean(
           process.env

@@ -64,3 +64,32 @@ export async function DELETE(request: Request) {
     return bad("Could not remove this goal link.", 500);
   }
 }
+
+export async function PATCH(request: Request) {
+  const denied = await guardAdminRequest(request);
+  if (denied) return denied;
+  try {
+    const body = await request.json() as { action?: unknown; momentIds?: unknown };
+    if (body.action !== "shelf-add" && body.action !== "shelf-remove") return bad("Choose a valid shelf action.");
+    if (!Array.isArray(body.momentIds) || body.momentIds.length < 1 || body.momentIds.length > 50 || body.momentIds.some((id) => typeof id !== "string" || !uuid.test(id))) return bad("Choose between one and fifty valid goals.");
+    const ids = [...new Set(body.momentIds as string[])];
+    const allMoments = await db.orm.public.MediaMoment.all();
+    const selected = allMoments.filter((moment) => ids.includes(moment.id));
+    if (selected.length !== ids.length) return bad("One or more selected goal moments no longer exist.", 404);
+    const now = Temporal.Now.instant();
+    for (const moment of selected) {
+      if (body.action === "shelf-add") {
+        for (const duplicate of allMoments.filter((candidate) => candidate.matchEventId === moment.matchEventId && candidate.id !== moment.id && candidate.curatedAt !== null)) {
+          await db.orm.public.MediaMoment.where({ id: duplicate.id }).update({ curatedAt: null });
+        }
+        await db.orm.public.MediaMoment.where({ id: moment.id }).update({ curatedAt: now });
+      } else {
+        await db.orm.public.MediaMoment.where({ id: moment.id }).update({ curatedAt: null });
+      }
+    }
+    return NextResponse.json({ ok: true, updated: selected.length });
+  } catch (error) {
+    console.error("MEDIA GOAL SHELF UPDATE FAILED:", error);
+    return bad("Could not update Goals worth another look.", 500);
+  }
+}

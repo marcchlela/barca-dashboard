@@ -4,9 +4,9 @@ import { Temporal } from "temporal-polyfill";
 import { db } from "../../../prisma/db";
 import { fixtureRefreshDue } from "../football-data/scheduled-refresh";
 import { lineupNeedsBackfill } from "./lineup-coverage";
-import { lineupRefreshWindow } from "./lineup-refresh-window";
+import { lineupNotPublishedYet, lineupRefreshWindow } from "./lineup-refresh-window";
 import { needsBarcelonaPlayerPerformance, playerRatingRefreshDue } from "./rich-data-coverage";
-import type { syncRichMatch, syncGoalLineups } from "./sync";
+import type { syncRichMatch, syncConfirmedLineups } from "./sync";
 import type { persistCanonicalPlayerStatistics } from "./persist-canonical-player-stats";
 
 const GOAL_TYPES = new Set(["goal", "penalty_goal", "own_goal"]);
@@ -19,8 +19,8 @@ export function preMatchLineupRefreshDue(last: { status: string; finishedAt: str
 }
 
 /** Refreshes upcoming confirmed lineups and backfills recent finished fixtures, one bounded provider call at a time. */
-export async function runScheduledGoalEventRefresh(input: { sync?: typeof syncRichMatch; syncLineups?: typeof syncGoalLineups; syncPlayerStats?: typeof persistCanonicalPlayerStatistics; now?: number } = {}) {
-  if (!process.env.GOAL_API_KEY && !input.sync && !input.syncLineups) return { status: "unconfigured" as const, matchId: null, nextAt: null, error: null };
+export async function runScheduledGoalEventRefresh(input: { sync?: typeof syncRichMatch; syncLineups?: typeof syncConfirmedLineups; syncPlayerStats?: typeof persistCanonicalPlayerStatistics; now?: number } = {}) {
+  if (!process.env.HIGHLIGHTLY_API_KEY && !process.env.GOAL_API_KEY && !input.sync && !input.syncLineups) return { status: "unconfigured" as const, matchId: null, nextAt: null, error: null };
   const now = input.now ?? Date.now();
   const season = await db.orm.public.Season.where({ isCurrent: true }).first();
   if (!season) return { status: "no-season" as const, matchId: null, nextAt: null, error: null };
@@ -105,7 +105,7 @@ export async function runScheduledGoalEventRefresh(input: { sync?: typeof syncRi
   }
   try {
     if (kind === "lineups" || kind === "pregame-lineups") {
-      const sync = input.syncLineups ?? (await import("./sync")).syncGoalLineups;
+      const sync = input.syncLineups ?? (await import("./sync")).syncConfirmedLineups;
       await sync({ matchId: candidate.id, dryRun: false });
     } else if (kind === "player-performance") {
       const sync = input.syncPlayerStats ?? (await import("./persist-canonical-player-stats")).persistCanonicalPlayerStatistics;
@@ -123,6 +123,17 @@ export async function runScheduledGoalEventRefresh(input: { sync?: typeof syncRi
     return { status: "success" as const, matchId: candidate.id, nextAt: new Date(Date.now() + (kind === "pregame-lineups" || kind === "player-performance" ? 20 * 60_000 : 6 * 3_600_000)).toISOString(), error: null };
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error);
+    if ((kind === "lineups" || kind === "pregame-lineups") && lineupNotPublishedYet(detail)) {
+      const nextAt = new Date(now + 10 * 60_000).toISOString();
+      await db.orm.public.GoalMediaSyncRun.where({ id: run.id }).update({
+        lockKey: null,
+        status: "pending",
+        finishedAt: Temporal.Instant.from(new Date(now).toISOString()),
+        error: null,
+        result: { matchId: candidate.id, kind, reason: "lineup-not-published", detail: detail.slice(0, 500) },
+      });
+      return { status: "pending" as const, matchId: candidate.id, nextAt, error: null };
+    }
     const blocked = /(?:^|\D)(?:403|429)(?:\D|$)/.test(detail);
     await db.orm.public.GoalMediaSyncRun.where({ id: run.id }).update({ lockKey: null, status: blocked ? "blocked" : "failed", finishedAt: Temporal.Instant.from(new Date(now).toISOString()), error: detail.slice(0, 500), result: { matchId: candidate.id, kind } });
     const retryDelay = kind === "pregame-lineups" ? (blocked ? 24 * 3_600_000 : 10 * 60_000) : (blocked ? 24 : 3) * 3_600_000;

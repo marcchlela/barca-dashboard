@@ -33,10 +33,9 @@ export default function MatchNavigation({
       className="
         mt-6
         grid
-        grid-cols-1
+        grid-cols-2
         gap-px
         border
-        sm:grid-cols-2
       "
       style={{
         borderColor:
@@ -90,10 +89,12 @@ function NavigationSlot({
       <div
         className="
           flex
-          min-h-28
+          min-h-20
           items-center
-          px-5
-          py-4
+          px-3
+          py-3
+          sm:px-5
+          sm:py-4
         "
         style={{
           backgroundColor:
@@ -131,12 +132,15 @@ function NavigationSlot({
         group
         relative
         flex
-        min-h-28
+        min-h-20
         items-center
-        gap-4
+        gap-2
         overflow-hidden
-        px-5
-        py-4
+        px-3
+        py-3
+        sm:gap-4
+        sm:px-5
+        sm:py-4
       "
       style={{
         backgroundColor:
@@ -215,8 +219,8 @@ function NavigationSlot({
         <div
           className={
             previous
-              ? "mt-2 flex items-center gap-3"
-              : "mt-2 flex flex-row-reverse items-center gap-3"
+              ? "mt-1.5 flex items-center gap-2 sm:gap-3"
+              : "mt-1.5 flex flex-row-reverse items-center gap-2 sm:gap-3"
           }
         >
           <OpponentCrest
@@ -225,7 +229,7 @@ function NavigationSlot({
           />
 
           <div className="min-w-0">
-            <p className="truncate text-sm font-medium">
+            <p className="truncate text-xs font-medium sm:text-sm">
               {matchLabel(
                 item,
               )}
@@ -233,7 +237,7 @@ function NavigationSlot({
 
             <p
               className="
-                mt-1
+                mt-0.5
                 truncate
                 text-xs
                 uppercase
@@ -312,10 +316,12 @@ function OpponentCrest({
           }
           alt=""
           className="
-            h-10
-            w-10
+            h-8
+            w-8
             shrink-0
             object-contain
+            sm:h-10
+            sm:w-10
           "
         />
       </>
@@ -326,14 +332,16 @@ function OpponentCrest({
     <div
       className="
         flex
-        h-10
-        w-10
+        h-8
+        w-8
         shrink-0
         items-center
         justify-center
         border
         text-xs
         font-semibold
+        sm:h-10
+        sm:w-10
       "
       style={{
         borderColor:

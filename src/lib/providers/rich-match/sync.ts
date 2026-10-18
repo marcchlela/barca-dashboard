@@ -3,6 +3,7 @@ import "server-only";
 import { db } from "../../../prisma/db";
 import type { BigBallsPlayerStatistic } from "../big-balls/types";
 import { fetchGoalMatchBundle } from "../goal-api/fetch";
+import { fetchHighlightlyLineups } from "../highlightly/fetch";
 import type {
   GoalLineupPlayer,
   GoalLineupSide,
@@ -46,6 +47,19 @@ type GoalResolvedPlayer = {
   teamId: string;
   providerTeamId: string;
   player: GoalLineupPlayer;
+};
+
+type LineupBundle = {
+  requestCount: number;
+  providerMatchId: string;
+  home: GoalLineupSide;
+  away: GoalLineupSide;
+};
+
+type LineupProvider = {
+  name: string;
+  source: (typeof RICH_DATA_SOURCES)[keyof typeof RICH_DATA_SOURCES];
+  bundle: LineupBundle;
 };
 
 
@@ -438,10 +452,23 @@ async function findExistingTeamSeasonPlayer(
     );
   }
 
-  return (
-    matches[0]
-      ?.player ?? null
-  );
+  if (matches.length === 1) return matches[0].player;
+
+  const inputParts = normalized.split(" ").filter(Boolean);
+  if (inputParts.length < 2 || inputParts[0].length !== 1) return null;
+  const abbreviated = memberships.filter((membership) => {
+    const candidate = normalizedPersonName(membership.player.displayName).split(" ").filter(Boolean);
+    return candidate.length >= 2 &&
+      candidate[0].startsWith(inputParts[0]) &&
+      candidate.at(-1) === inputParts.at(-1) &&
+      compatiblePosition(input.primaryPosition, membership.position);
+  });
+  if (abbreviated.length > 1) {
+    throw new Error(
+      `Ambiguous abbreviated player identity for ${input.name} in team ${teamId} / season ${seasonId}.`,
+    );
+  }
+  return abbreviated[0]?.player ?? null;
 }
 
 async function ensureGoalPlayer(
@@ -482,7 +509,7 @@ async function ensureGoalPlayer(
     !existing
   ) {
     throw new Error(
-      `GOAL player mapping ${input.providerId} points to a missing player.`,
+      `Provider player mapping ${input.providerId} points to a missing player.`,
     );
   }
 
@@ -2395,8 +2422,41 @@ for (
   };
 }
 
-/** Recover only missing confirmed lineups, leaving existing events, media and stats untouched. */
-export async function syncGoalLineups(input: { matchId: string; dryRun: boolean }) {
+async function preferredLineupProvider(internal: MatchIdentityInput): Promise<LineupProvider> {
+  const errors: string[] = [];
+  if (process.env.HIGHLIGHTLY_API_KEY) {
+    try {
+      return {
+        name: "Highlightly",
+        source: RICH_DATA_SOURCES.highlightly,
+        bundle: await fetchHighlightlyLineups(internal),
+      };
+    } catch (error) {
+      errors.push(`Highlightly: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  } else {
+    errors.push("Highlightly: HIGHLIGHTLY_API_KEY is not configured.");
+  }
+  if (process.env.GOAL_API_KEY) {
+    try {
+      return {
+        name: "GOAL",
+        source: RICH_DATA_SOURCES.goal,
+        bundle: await fetchGoalMatchBundle(internal),
+      };
+    } catch (error) {
+      errors.push(`GOAL: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  } else {
+    errors.push("GOAL: GOAL_API_KEY is not configured.");
+  }
+  throw new Error(`No confirmed-lineup provider succeeded. ${errors.join(" | ")}`);
+}
+
+async function syncLineups(
+  input: { matchId: string; dryRun: boolean },
+  loadProvider: (internal: MatchIdentityInput) => Promise<LineupProvider>,
+) {
   const { match, internal } = await loadMatchContext(input.matchId, { allowScheduledLineup: true });
   const existing = await db.orm.public.Lineup.where({ matchId: match.id }).include("players").all();
   const initial = lineupNeedsBackfill(match.homeTeamId, match.awayTeamId, existing);
@@ -2407,21 +2467,24 @@ export async function syncGoalLineups(input: { matchId: string; dryRun: boolean 
     return { matchId: match.id, status: "unchanged" as const, home: initial.home, away: initial.away, persisted: false };
   }
 
-  const goal = await fetchGoalMatchBundle(internal);
+  const provider = await loadProvider(internal);
+  const bundle = provider.bundle;
   const summary = {
     matchId: match.id,
-    providerMatchId: goal.providerMatchId,
+    provider: provider.name,
+    providerMatchId: bundle.providerMatchId,
+    requests: bundle.requestCount,
     home: initial.home,
     away: initial.away,
-    homeStarters: goal.home.players.filter((player) => player.role === "starter").length,
-    awayStarters: goal.away.players.filter((player) => player.role === "starter").length,
-    homeSubstitutes: goal.home.players.filter((player) => player.role === "substitute").length,
-    awaySubstitutes: goal.away.players.filter((player) => player.role === "substitute").length,
-    homeFormation: goal.home.formation,
-    awayFormation: goal.away.formation,
+    homeStarters: bundle.home.players.filter((player) => player.role === "starter").length,
+    awayStarters: bundle.away.players.filter((player) => player.role === "starter").length,
+    homeSubstitutes: bundle.home.players.filter((player) => player.role === "substitute").length,
+    awaySubstitutes: bundle.away.players.filter((player) => player.role === "substitute").length,
+    homeFormation: bundle.home.formation,
+    awayFormation: bundle.away.formation,
   };
   if (summary.homeStarters !== 11 || summary.awayStarters !== 11) {
-    throw new Error("GOAL did not supply exactly 11 starters for both sides.");
+    throw new Error(`${provider.name} did not supply exactly 11 starters for both sides.`);
   }
   if (input.dryRun) return { ...summary, status: "preview" as const, persisted: false };
 
@@ -2434,24 +2497,24 @@ export async function syncGoalLineups(input: { matchId: string; dryRun: boolean 
     }
     const changes = emptySyncCounts();
     if (coverage.home === "complete" && coverage.away === "complete") return changes;
-    const goalSource = await ensureDataSource(orm, RICH_DATA_SOURCES.goal, changes);
+    const lineupSource = await ensureDataSource(orm, provider.source, changes);
     await ensureMapping(orm, changes, {
-      dataSourceId: goalSource.id, entityType: "match", internalId: match.id,
-      providerId: goal.providerMatchId, metadata: { ownership: ["lineups"] },
+      dataSourceId: lineupSource.id, entityType: "match", internalId: match.id,
+      providerId: bundle.providerMatchId, metadata: { ownership: ["lineups"] },
     });
     for (const { side, teamId, state } of [
-      { side: goal.home, teamId: match.homeTeamId, state: coverage.home },
-      { side: goal.away, teamId: match.awayTeamId, state: coverage.away },
+      { side: bundle.home, teamId: match.homeTeamId, state: coverage.home },
+      { side: bundle.away, teamId: match.awayTeamId, state: coverage.away },
     ]) {
       if (state === "complete") continue;
       await ensureMapping(orm, changes, {
-        dataSourceId: goalSource.id, entityType: "team", internalId: teamId,
+        dataSourceId: lineupSource.id, entityType: "team", internalId: teamId,
         providerId: side.providerTeamId,
       });
       const resolved: GoalResolvedPlayer[] = [];
       for (const player of side.players) {
         resolved.push(await ensureGoalPlayer(
-          orm, changes, goalSource.id, match.seasonId, teamId,
+          orm, changes, lineupSource.id, match.seasonId, teamId,
           side.providerTeamId, player, resolved,
         ));
       }
@@ -2460,4 +2523,18 @@ export async function syncGoalLineups(input: { matchId: string; dryRun: boolean 
     return changes;
   });
   return { ...summary, status: "saved" as const, persisted: true, counts };
+}
+
+/** Recover confirmed lineups from Highlightly first, then GOAL as a fallback. */
+export async function syncConfirmedLineups(input: { matchId: string; dryRun: boolean }) {
+  return syncLineups(input, preferredLineupProvider);
+}
+
+/** Explicit GOAL-only recovery retained for manual/admin compatibility. */
+export async function syncGoalLineups(input: { matchId: string; dryRun: boolean }) {
+  return syncLineups(input, async (internal) => ({
+    name: "GOAL",
+    source: RICH_DATA_SOURCES.goal,
+    bundle: await fetchGoalMatchBundle(internal),
+  }));
 }

@@ -414,7 +414,8 @@ function MatchdayPulse({
     );
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-7">
+      <div className="border p-4 sm:p-5" style={{ borderColor: theme.colors.border, backgroundColor: theme.colors.surface }}>
       <Section title="Tonight">
         <TeamVsRow
           homeTeam={
@@ -480,6 +481,7 @@ function MatchdayPulse({
         theme={theme}
         label="Open Pre-Match"
       />
+      </div>
 
       <PreviousMatch theme={theme} match={overview.previousMatch} />
     </div>
@@ -496,17 +498,24 @@ function PreviousMatch({
   if (!match) return null;
 
   return (
+    <div className="border-t pt-7" style={{ borderColor: theme.colors.border }}>
     <Section title="Previous Match">
-      <Link href={`/matches/${match.id}`} className="group block border-y py-3 transition-opacity hover:opacity-80" style={{ borderColor: theme.colors.border }}>
+      <Link href={`/matches/${match.id}`} className="group relative block cursor-pointer border p-4 transition hover:-translate-y-0.5 hover:opacity-90 active:translate-y-0" style={{ borderColor: theme.colors.border, backgroundColor: theme.colors.surface }}>
+        <span className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center border transition-transform group-hover:translate-x-0.5" style={{ borderColor: theme.colors.border, color: theme.colors.accent }}>
+          <ArrowRight size={15} aria-hidden="true" />
+        </span>
+        <div className="pr-10">
         <TeamResultRow name={match.homeTeam.shortName ?? match.homeTeam.name} crestUrl={match.homeTeam.crestUrl} score={match.score.home} />
         <div className="my-2 h-px" style={{ backgroundColor: theme.colors.border }} />
         <TeamResultRow name={match.awayTeam.shortName ?? match.awayTeam.name} crestUrl={match.awayTeam.crestUrl} score={match.score.away} />
+        </div>
         <div className="mt-3 flex items-center justify-between text-xs uppercase tracking-[0.08em]" style={{ color: theme.colors.textMuted }}>
           <span>{match.competition.shortName ?? match.competition.name}</span>
           <span>{formatMatchDate(match.kickoff)}</span>
         </div>
       </Link>
     </Section>
+    </div>
   );
 }
 

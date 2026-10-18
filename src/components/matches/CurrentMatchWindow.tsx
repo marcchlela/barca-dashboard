@@ -7,7 +7,6 @@ import {
 import Link from "next/link";
 
 import {
-  ArrowRight,
   CircleDot,
 } from "lucide-react";
 
@@ -232,7 +231,7 @@ function FocusMatch({
       <div
         className="
           flex
-          min-h-[150px]
+          min-h-[120px]
           items-center
           justify-center
           border
@@ -277,12 +276,12 @@ function FocusMatch({
       className="
         group
         relative
-        min-h-[150px]
         cursor-pointer
         overflow-hidden
         border
-        p-4
+        p-3
 
+        sm:min-h-[150px]
         sm:p-5
       "
       style={{
@@ -414,26 +413,29 @@ function FocusMatch({
           </div>
         </div>
 
-        <ArrowRight
-          size={14}
-          className="
-            transition-transform
-            duration-150
-
-            group-hover:translate-x-1
-          "
-          style={{
-            color:
-              theme.colors.textMuted,
-          }}
-        />
+        {match.result ? (
+          <span
+            className="flex h-7 w-7 shrink-0 items-center justify-center border text-xs font-semibold"
+            style={{
+              borderColor: `${resultColor}55`,
+              color: resultColor,
+              backgroundColor: `${resultColor}08`,
+            }}
+          >
+            {match.result}
+          </span>
+        ) : (
+          <span className="text-right text-xs tabular-nums" style={{ color: theme.colors.textMuted }}>
+            {formatDate(match.kickoff)}
+          </span>
+        )}
       </div>
 
       {/* TEAMS */}
 
       <div
         className="
-          mt-5
+          mt-3
           grid
           gap-2
         "
@@ -475,7 +477,7 @@ function FocusMatch({
 
       <div
         className="
-          mt-4
+          mt-3
           flex
           items-center
           justify-between
@@ -510,31 +512,6 @@ function FocusMatch({
             : ""}
         </span>
 
-        {match.result ? (
-          <span
-            className="
-              flex
-              h-7
-              w-7
-              items-center
-              justify-center
-              border
-              text-xs
-              font-semibold
-            "
-            style={{
-              borderColor:
-                `${resultColor}55`,
-
-              color:
-                resultColor,
-            }}
-          >
-            {
-              match.result
-            }
-          </span>
-        ) : null}
       </div>
     </Link>
   );

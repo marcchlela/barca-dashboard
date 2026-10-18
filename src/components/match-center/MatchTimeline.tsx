@@ -32,6 +32,7 @@ import type {
 } from "../../lib/themes";
 import type { MatchMediaItem } from "../../lib/matches/get-match-media";
 import { goalEmbedUrl, goalYouTubeUrl, selectPlayableGoals } from "../../lib/matches/goal-playback";
+import { liveEventSemanticKey, liveEventsLikelySame } from "../../lib/providers/shared/live-event-identity";
 
 type MatchTimelineProps = {
   data:
@@ -86,6 +87,7 @@ export default function MatchTimeline({
 }: MatchTimelineProps) {
   const playable = useMemo(() => selectPlayableGoals(data.events, media), [data.events, media]);
   const [activeGoalId, setActiveGoalId] = useState<string | null>(null);
+  const [showAllEvents, setShowAllEvents] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const activeGoal = activeGoalId ? playable.get(activeGoalId) ?? null : null;
   useEffect(() => {
@@ -94,8 +96,37 @@ export default function MatchTimeline({
     if (activeGoal && !dialog.open) dialog.showModal();
     if (!activeGoal && dialog.open) dialog.close();
   }, [activeGoal]);
-  const events =
-    [...data.events].sort(
+  const allEvents = useMemo(() => {
+    const unique = new Map<string, MatchEvent>();
+    for (const event of data.events) {
+      const identity = {
+        type: event.notificationType ?? event.type,
+        teamId: event.team?.id ?? null,
+        minute: event.minute,
+        primaryPlayerId: event.primaryPlayer?.id,
+        relatedPlayerId: event.relatedPlayer?.id,
+        primaryName: event.primaryPlayer?.name ?? event.scorerName ?? event.offName,
+        relatedName: event.relatedPlayer?.name ?? event.assistName ?? event.onName,
+      };
+      const key = liveEventSemanticKey(identity);
+      const previous = unique.get(key);
+      if (previous) {
+        if (event.outcome === "goal_overturned" || (!previous.primaryPlayer && event.primaryPlayer)) unique.set(key, event);
+        continue;
+      }
+      const correctedEntry = [...unique.entries()].find(([, candidate]) => liveEventsLikelySame(identity, {
+        type: candidate.notificationType ?? candidate.type,
+        teamId: candidate.team?.id ?? null,
+        minute: candidate.minute,
+        primaryPlayerId: candidate.primaryPlayer?.id,
+        relatedPlayerId: candidate.relatedPlayer?.id,
+        primaryName: candidate.primaryPlayer?.name ?? candidate.scorerName ?? candidate.offName,
+        relatedName: candidate.relatedPlayer?.name ?? candidate.assistName ?? candidate.onName,
+      }));
+      if (correctedEntry) unique.delete(correctedEntry[0]);
+      unique.set(key, event);
+    }
+    return [...unique.values()].sort(
       (
         left,
         right,
@@ -132,6 +163,22 @@ export default function MatchTimeline({
         );
       },
     );
+  }, [data.events]);
+  const keyEvents = allEvents.filter((event) =>
+    GOAL_TYPES.has(event.type) || RED_TYPES.has(event.type) || event.type === "missed_penalty" ||
+    event.outcome === "goal_overturned" || ["penalty_awarded", "var_overturned"].includes(event.notificationType ?? ""),
+  );
+  const events = showAllEvents ? allEvents : keyEvents;
+  const eventGroups = events.reduce<MatchEvent[][]>((groups, event) => {
+    const previous = groups.at(-1);
+    if (event.type === "substitution" && previous?.every((item) => item.type === "substitution") &&
+      previous[0].minute === event.minute && previous[0].team?.id === event.team?.id) {
+      previous.push(event);
+    } else {
+      groups.push([event]);
+    }
+    return groups;
+  }, []);
 
   let runningScore:
     Score = {
@@ -169,10 +216,8 @@ export default function MatchTimeline({
     );
   }
 
-  for (
-    const event
-    of events
-  ) {
+  for (const group of eventGroups) {
+    const event = group[0];
     const minute =
       event.minute;
 
@@ -199,11 +244,8 @@ export default function MatchTimeline({
       );
     }
 
-    if (
-      GOAL_TYPES.has(
-        event.type,
-      )
-    ) {
+    const overturned = event.outcome === "goal_overturned";
+    if (GOAL_TYPES.has(event.type) && !overturned) {
       if (
         event.team?.id ===
         data.match
@@ -235,24 +277,17 @@ export default function MatchTimeline({
       }
     }
 
-    rows.push(
-      <TimelineEvent
-        key={
-          event.id
-        }
-        event={event}
-        score={
-          GOAL_TYPES.has(
-            event.type,
-          )
-            ? runningScore
-            : null
-        }
-        data={data}
-        theme={theme}
-        playable={playable.has(event.id)}
-        onPlay={() => setActiveGoalId(event.id)}
-      />,
+    rows.push(group.length > 1 && event.type === "substitution"
+      ? <SubstitutionGroup key={group.map((item) => item.id).join(":")} events={group} data={data} theme={theme} />
+      : <TimelineEvent
+          key={event.id}
+          event={event}
+          score={GOAL_TYPES.has(event.type) && !overturned ? runningScore : null}
+          data={data}
+          theme={theme}
+          playable={!overturned && playable.has(event.id)}
+          onPlay={() => setActiveGoalId(event.id)}
+        />,
     );
   }
 
@@ -294,7 +329,7 @@ export default function MatchTimeline({
           pointer-events-none
           absolute
           bottom-7
-          left-10.25
+          left-[29px]
           top-7
           w-px
         "
@@ -304,6 +339,15 @@ export default function MatchTimeline({
               .border,
         }}
       />
+
+      {allEvents.length > 0 ? <div className="grid grid-cols-2 border-b p-2 text-xs" style={{ borderColor: theme.colors.border }}>
+        <button type="button" aria-pressed={!showAllEvents} onClick={() => setShowAllEvents(false)} className="cursor-pointer border px-3 py-2 font-semibold uppercase tracking-[.12em] focus-visible:outline-2" style={{ borderColor: !showAllEvents ? theme.colors.accent : theme.colors.border, background: !showAllEvents ? `${theme.colors.accent}14` : "transparent", color: !showAllEvents ? theme.colors.accent : theme.colors.textMuted, outlineColor: theme.colors.accent }}>
+          Key events ({keyEvents.length})
+        </button>
+        <button type="button" aria-pressed={showAllEvents} onClick={() => setShowAllEvents(true)} className="cursor-pointer border border-l-0 px-3 py-2 font-semibold uppercase tracking-[.12em] focus-visible:outline-2" style={{ borderColor: showAllEvents ? theme.colors.accent : theme.colors.border, background: showAllEvents ? `${theme.colors.accent}14` : "transparent", color: showAllEvents ? theme.colors.accent : theme.colors.textMuted, outlineColor: theme.colors.accent }}>
+          Full timeline ({allEvents.length})
+        </button>
+      </div> : null}
 
       <div>
         {rows}
@@ -355,6 +399,29 @@ export default function MatchTimeline({
   );
 }
 
+function SubstitutionGroup({
+  events,
+  data,
+  theme,
+}: {
+  events: MatchEvent[];
+  data: MatchCenterData;
+  theme: KitTheme;
+}) {
+  const first = events[0];
+  const isBarcelona = first.team?.isBarcelona === true;
+  return <div className="relative grid grid-cols-[58px_minmax(0,1fr)] border-b" style={{ borderColor: theme.colors.border }}>
+    <div className="relative z-10 flex flex-col items-center pt-3">
+      <span className="font-mono text-xs font-semibold tabular-nums" style={{ color: isBarcelona ? theme.colors.accent : theme.colors.textMuted }}>{formatMinute(first.minute)}</span>
+      <div className="mt-1.5 flex h-7 w-7 items-center justify-center rounded-full border" style={{ borderColor: theme.colors.border, background: theme.colors.surface }}><EventIcon event={first} /></div>
+    </div>
+    <div className="min-w-0 px-4 py-3">
+      <div className="flex items-center justify-between gap-3"><p className="text-xs font-semibold">Substitutions</p><span className="text-xs uppercase tracking-[.12em]" style={{ color: theme.colors.textMuted }}>{isBarcelona ? "BARÇA" : first.team?.shortName ?? first.team?.name ?? opponentLabel(data)}</span></div>
+      <div className="mt-2 space-y-1.5">{events.map((event) => <p key={event.id} className="text-xs" style={{ color: theme.colors.textMuted }}>{eventDetail(event)}</p>)}</div>
+    </div>
+  </div>;
+}
+
 function TimelineEvent({
   event,
   score,
@@ -390,6 +457,8 @@ function TimelineEvent({
     GOAL_TYPES.has(
       event.type,
     );
+  const overturned = event.outcome === "goal_overturned";
+  const secondary = YELLOW_TYPES.has(event.type) || SUBSTITUTION_TYPES.has(event.type);
 
   return (
     <div
@@ -406,7 +475,9 @@ function TimelineEvent({
             .border,
 
         background:
-          isBarcelona
+          overturned
+            ? "linear-gradient(90deg, rgba(232,76,91,.14), transparent 70%)"
+            : isBarcelona
             ? `linear-gradient(
                 90deg,
                 ${theme.colors.primary}25 0%,
@@ -415,7 +486,7 @@ function TimelineEvent({
             : "transparent",
       }}
     >
-      {isGoal && playable && <button type="button" onClick={onPlay} aria-label={`Watch goal: ${eventTitle(event)} at ${formatMinute(event.minute)}`} className="absolute inset-0 z-20 cursor-pointer hover:bg-white/5 focus-visible:outline-2 focus-visible:outline-offset-[-2px]" style={{ outlineColor: theme.colors.accent }} />}
+      {isGoal && playable && !overturned && <button type="button" onClick={onPlay} aria-label={`Watch goal: ${eventTitle(event)} at ${formatMinute(event.minute)}`} className="absolute inset-0 z-20 cursor-pointer hover:bg-white/5 focus-visible:outline-2 focus-visible:outline-offset-[-2px]" style={{ outlineColor: theme.colors.accent }} />}
       {isBarcelona ? (
         <div
           className="
@@ -433,16 +504,7 @@ function TimelineEvent({
         />
       ) : null}
 
-      <div
-        className="
-          relative
-          z-10
-          flex
-          flex-col
-          items-center
-          pt-5
-        "
-      >
+      <div className={`relative z-10 flex flex-col items-center ${secondary ? "pt-3" : "pt-5"}`}>
         <span
           className="
             px-1
@@ -453,7 +515,9 @@ function TimelineEvent({
           "
           style={{
             color:
-              isBarcelona
+              overturned
+                ? theme.colors.danger
+                : isBarcelona
                 ? theme.colors
                     .accent
                 : theme.colors
@@ -478,7 +542,9 @@ function TimelineEvent({
           "
           style={{
             borderColor:
-              isBarcelona
+              overturned
+                ? theme.colors.danger
+                : isBarcelona
                 ? theme.colors
                     .accent
                 : theme.colors
@@ -489,7 +555,9 @@ function TimelineEvent({
                 .surface,
 
             color:
-              isBarcelona
+              overturned
+                ? theme.colors.danger
+                : isBarcelona
                 ? theme.colors
                     .accent
                 : theme.colors
@@ -502,7 +570,7 @@ function TimelineEvent({
         </div>
       </div>
 
-      <div className="min-w-0 px-4 py-5">
+      <div className={`min-w-0 px-4 ${secondary ? "py-3" : "py-5"}`}>
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <p
@@ -514,23 +582,26 @@ function TimelineEvent({
                     : 500,
 
                 color:
-                  isBarcelona
+                  overturned
+                    ? theme.colors.danger
+                    : isBarcelona
                     ? theme.colors
                         .text
                     : theme.colors
                         .textMuted,
               }}
             >
-              {eventTitle(
+              <span className={overturned ? "line-through" : undefined}>{eventTitle(
                 event,
-              )}
+              )}</span>
             </p>
 
             <EventDetail
               event={event}
               theme={theme}
             />
-            {isGoal && playable && <span className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[.12em]" style={{ color: theme.colors.accent }}><Play size={11} fill="currentColor" aria-hidden="true" />Watch goal</span>}
+            {overturned ? <span className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[.12em]" style={{ color: theme.colors.danger }}><CircleX size={12} aria-hidden="true" />Goal disallowed</span> : null}
+            {isGoal && playable && !overturned && <span className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[.12em]" style={{ color: theme.colors.accent }}><Play size={11} fill="currentColor" aria-hidden="true" />Watch goal</span>}
           </div>
 
           <div className="flex shrink-0 items-center gap-3">
@@ -774,6 +845,10 @@ function EventIcon({
   event:
     MatchEvent;
 }) {
+  if (event.outcome === "goal_overturned" || event.notificationType === "var_overturned") {
+    return <CircleX size={13} strokeWidth={2.2} className="text-[#E84C5B]" />;
+  }
+
   if (
     GOAL_TYPES.has(
       event.type,
@@ -961,6 +1036,12 @@ function eventTitle(
   event:
     MatchEvent,
 ) {
+  if (event.outcome === "goal_overturned" || event.notificationType === "var_overturned") {
+    return event.primaryPlayer?.name ?? event.scorerName ?? "Goal disallowed";
+  }
+
+  if (event.notificationType === "penalty_awarded") return "Penalty awarded";
+
   if (
     SUBSTITUTION_TYPES.has(
       event.type,
@@ -1009,6 +1090,9 @@ function eventDetail(
   event:
     MatchEvent,
 ) {
+  if (event.outcome === "goal_overturned" || event.notificationType === "var_overturned") return "Disallowed after review";
+  if (event.notificationType === "penalty_awarded") return "Penalty decision";
+
   if (
     event.type ===
     "penalty_goal"

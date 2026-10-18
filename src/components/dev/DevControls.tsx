@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+import { Minus, SlidersHorizontal } from "lucide-react";
+
 import type {
   KitType,
 } from "../../lib/themes";
@@ -39,11 +42,38 @@ export default function DevControls({
   onAutoMatchState,
   onReplayIntro,
 }: DevControlsProps) {
+  const [minimized, setMinimized] = useState(false);
+
+  if (minimized) {
+    return (
+      <button
+        type="button"
+        onClick={() => setMinimized(false)}
+        aria-label="Open Dev Controls"
+        title="Open Dev Controls"
+        className="fixed right-3 z-50 flex h-11 w-11 items-center justify-center border border-white/15 bg-[#05080c] text-white shadow-xl active:scale-95 max-lg:bottom-[calc(5rem+env(safe-area-inset-bottom))] lg:bottom-5 lg:right-5"
+      >
+        <SlidersHorizontal size={19} aria-hidden="true" />
+      </button>
+    );
+  }
+
   return (
-    <aside className="fixed bottom-5 right-5 z-50 w-[250px] border border-white/10 bg-[#05080c] p-4 text-white">
-      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/45">
-        Dev Controls
-      </p>
+    <aside className="fixed right-3 z-50 w-[min(250px,calc(100vw-1.5rem))] border border-white/10 bg-[#05080c] p-4 text-white shadow-2xl max-lg:bottom-[calc(5rem+env(safe-area-inset-bottom))] lg:bottom-5 lg:right-5">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/45">
+          Dev Controls
+        </p>
+        <button
+          type="button"
+          onClick={() => setMinimized(true)}
+          aria-label="Minimize Dev Controls"
+          title="Minimize Dev Controls"
+          className="flex h-8 w-8 items-center justify-center border border-white/10 text-white/65 transition hover:border-white/30 hover:text-white active:scale-95"
+        >
+          <Minus size={17} aria-hidden="true" />
+        </button>
+      </div>
 
       <div className="mt-4">
         <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-white/45">
