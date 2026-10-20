@@ -97,7 +97,7 @@ export async function runNotificationWorker(now = Date.now()) {
         const article = await discoverOfficialSquad({ matchId: match.id, opponent, kickoff, now });
         if (article) {
           const result = await queueNotification({ key: `official_squad:${match.id}:${article.url}`, kind: "official_squad",
-            matchId: match.id, values, url: article.url });
+            matchId: match.id, values, url: `${url}#lineups` });
           if (result.created) queued += 1;
         }
       }

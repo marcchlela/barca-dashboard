@@ -1,12 +1,41 @@
 import "server-only";
 
 import { db } from "../../prisma/db";
-import { candidateSquadLinks, matchingSquadLinks } from "./official-squad-core";
+import { candidateSquadLinks, extractOfficialSquadNames, matchingSquadLinks } from "./official-squad-core";
 
 const INDEX_URL = "https://www.fcbarcelona.com/en/football/first-team/news";
 const INTERVAL_MS = 30 * 60_000;
 
-type Article = { url: string; published: string };
+type Article = { url: string; published: string; names: string[] };
+
+function personKey(value: string) {
+  return value.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+async function persistOfficialSquad(input: { matchId: string; url: string; published: string; names: string[] }) {
+  const match = await db.orm.public.Match.where({ id: input.matchId }).include("homeTeam").include("awayTeam").first();
+  if (!match) return;
+  const teamSide = match.homeTeam.isBarcelona ? "home" : match.awayTeam.isBarcelona ? "away" : null;
+  if (!teamSide) return;
+  const teamId = teamSide === "home" ? match.homeTeamId : match.awayTeamId;
+  const memberships = await db.orm.public.SquadMembership.where({ seasonId: match.seasonId, teamId }).include("player").all();
+  const players = input.names.map((publishedName) => {
+    const wanted = personKey(publishedName);
+    const wantedParts = wanted.split(" ");
+    const matches = memberships.filter(({ player }) => {
+      const candidate = personKey(player.displayName);
+      const parts = candidate.split(" ");
+      return candidate === wanted || candidate.endsWith(` ${wanted}`) || wanted.endsWith(` ${candidate}`) ||
+        (wantedParts.length === 2 && wantedParts[0].length === 1 && parts[0]?.startsWith(wantedParts[0]) && parts.at(-1) === wantedParts.at(-1));
+    });
+    const player = matches.length === 1 ? matches[0].player : null;
+    return { name: player?.displayName ?? publishedName, position: player?.primaryPosition ?? "unknown" };
+  });
+  const payload = { teamSide, sourceUrl: input.url, publishedAt: input.published, names: players.map((player) => player.name), players };
+  const existing = await db.orm.public.ManualOverride.where({ entityType: "match", entityId: input.matchId, fieldName: "matchdaySquad" }).first();
+  if (existing) await db.orm.public.ManualOverride.where({ id: existing.id }).update({ payload, sourceUrl: input.url, confidence: "exact_provider", reason: "Official FC Barcelona matchday squad announcement" });
+  else await db.orm.public.ManualOverride.create({ entityType: "match", entityId: input.matchId, fieldName: "matchdaySquad", payload, sourceUrl: input.url, confidence: "exact_provider", reason: "Official FC Barcelona matchday squad announcement" });
+}
 
 export async function discoverOfficialSquad(input: { matchId: string; opponent: string; kickoff: string; now: number }) {
   const cacheKey = "official-squad-news-index";
@@ -41,7 +70,13 @@ export async function discoverOfficialSquad(input: { matchId: string; opponent: 
   const articleCursor = await db.orm.public.NotificationCursor.where({ key: articleCursorKey }).first();
   if (articleCursor?.snapshot && typeof articleCursor.snapshot === "object" && !Array.isArray(articleCursor.snapshot) &&
     (articleCursor.snapshot as Record<string, unknown>).url === url) {
-    return { url, published: String((articleCursor.snapshot as Record<string, unknown>).published) } satisfies Article;
+    const saved = articleCursor.snapshot as Record<string, unknown>;
+    const names = Array.isArray(saved.names) ? saved.names.filter((name): name is string => typeof name === "string") : [];
+    if (names.length) {
+      const article = { url, published: String(saved.published), names } satisfies Article;
+      await persistOfficialSquad({ matchId: input.matchId, ...article });
+      return article;
+    }
   }
   try {
     const response = await fetch(url, { cache: "no-store", signal: AbortSignal.timeout(12_000), headers: { Accept: "text/html" } });
@@ -49,12 +84,15 @@ export async function discoverOfficialSquad(input: { matchId: string; opponent: 
     const html = await response.text();
     const date = html.match(/datePublished[^0-9]{0,40}(\d{4}-\d{2}-\d{2})/i)?.[1];
     if (!date) return null;
+    const names = extractOfficialSquadNames(html);
+    if (!names.length) return null;
     const publication = Date.parse(`${date}T00:00:00Z`);
     const kickoff = Date.parse(input.kickoff);
     if (publication < kickoff - 4 * 86_400_000 || publication > kickoff + 86_400_000) return null;
-    const state = { url, published: date };
+    const state = { url, published: date, names };
     if (articleCursor) await db.orm.public.NotificationCursor.where({ key: articleCursorKey }).update({ snapshot: state });
     else await db.orm.public.NotificationCursor.create({ key: articleCursorKey, snapshot: state });
+    await persistOfficialSquad({ matchId: input.matchId, ...state });
     return state satisfies Article;
   } catch { return null; }
 }
