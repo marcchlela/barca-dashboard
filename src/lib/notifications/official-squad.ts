@@ -1,6 +1,7 @@
 import "server-only";
 
 import { db } from "../../prisma/db";
+import { getOfficialSquadManifest } from "../squad/official-squad";
 import { candidateSquadLinks, extractOfficialSquadNames, matchingSquadLinks } from "./official-squad-core";
 
 const INDEX_URL = "https://www.fcbarcelona.com/en/football/first-team/news";
@@ -12,24 +13,44 @@ function personKey(value: string) {
   return value.normalize("NFKD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 }
 
+function publishedNameMatches(publishedName: string, candidateName: string) {
+  const published = personKey(publishedName);
+  const candidate = personKey(candidateName);
+  return candidate === published || candidate.startsWith(`${published} `) || candidate.endsWith(` ${published}`);
+}
+
+const OFFICIAL_RESERVE_POSITIONS: Record<string, "goalkeeper" | "defender" | "midfielder" | "forward"> = {
+  "alex campos": "defender",
+};
+
 async function persistOfficialSquad(input: { matchId: string; url: string; published: string; names: string[] }) {
-  const match = await db.orm.public.Match.where({ id: input.matchId }).include("homeTeam").include("awayTeam").first();
+  const match = await db.orm.public.Match.where({ id: input.matchId }).include("homeTeam").include("awayTeam").include("season").first();
   if (!match) return;
   const teamSide = match.homeTeam.isBarcelona ? "home" : match.awayTeam.isBarcelona ? "away" : null;
   if (!teamSide) return;
   const teamId = teamSide === "home" ? match.homeTeamId : match.awayTeamId;
   const memberships = await db.orm.public.SquadMembership.where({ seasonId: match.seasonId, teamId }).include("player").all();
+  const manifest = getOfficialSquadManifest(match.season.label);
   const players = input.names.map((publishedName) => {
     const wanted = personKey(publishedName);
     const wantedParts = wanted.split(" ");
+    const officialMatches = manifest?.players.filter((player) =>
+      [player.displayName, ...player.aliases].some((alias) => publishedNameMatches(publishedName, alias))) ?? [];
+    if (officialMatches.length === 1) return {
+      name: officialMatches[0].displayName,
+      position: officialMatches[0].position,
+    };
     const matches = memberships.filter(({ player }) => {
       const candidate = personKey(player.displayName);
       const parts = candidate.split(" ");
       return candidate === wanted || candidate.endsWith(` ${wanted}`) || wanted.endsWith(` ${candidate}`) ||
         (wantedParts.length === 2 && wantedParts[0].length === 1 && parts[0]?.startsWith(wantedParts[0]) && parts.at(-1) === wantedParts.at(-1));
     });
-    const player = matches.length === 1 ? matches[0].player : null;
-    return { name: player?.displayName ?? publishedName, position: player?.primaryPosition ?? "unknown" };
+    const membership = matches.length === 1 ? matches[0] : null;
+    const position = membership?.position && membership.position !== "unknown"
+      ? membership.position
+      : membership?.player.primaryPosition ?? OFFICIAL_RESERVE_POSITIONS[wanted] ?? "unknown";
+    return { name: membership?.player.displayName ?? publishedName, position };
   });
   const payload = { teamSide, sourceUrl: input.url, publishedAt: input.published, names: players.map((player) => player.name), players };
   const existing = await db.orm.public.ManualOverride.where({ entityType: "match", entityId: input.matchId, fieldName: "matchdaySquad" }).first();
