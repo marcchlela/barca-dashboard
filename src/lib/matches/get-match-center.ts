@@ -6,6 +6,23 @@ import {
 import { asObject } from "../providers/shared/json";
 import { getCuratedMatchdaySquad } from "./curated-matchday-squads";
 
+const SQUAD_POSITIONS = new Set(["goalkeeper", "defender", "midfielder", "forward", "unknown"]);
+
+function storedMatchdaySquad(value: unknown) {
+  const payload = asObject(value);
+  if (!payload || (payload.teamSide !== "home" && payload.teamSide !== "away") ||
+    typeof payload.sourceUrl !== "string" || typeof payload.publishedAt !== "string" || !Array.isArray(payload.names)) return null;
+  const names = payload.names.filter((name): name is string => typeof name === "string" && Boolean(name.trim()));
+  if (!names.length) return null;
+  const rawPlayers = Array.isArray(payload.players) ? payload.players : [];
+  const players = rawPlayers.map(asObject).filter((player): player is NonNullable<ReturnType<typeof asObject>> => Boolean(player))
+    .flatMap((player) => typeof player.name === "string" ? [{
+      name: player.name,
+      position: typeof player.position === "string" && SQUAD_POSITIONS.has(player.position) ? player.position : "unknown",
+    }] : []);
+  return { teamSide: payload.teamSide, sourceUrl: payload.sourceUrl, publishedAt: payload.publishedAt, names, players };
+}
+
 function eventRawString(value: unknown, key: string) {
   const candidate = asObject(value)?.[key];
   return typeof candidate === "string" ? candidate : null;
@@ -508,6 +525,17 @@ export async function getMatchCenter(
       .isBarcelona
       ? "home"
       : "away";
+
+  const squadOverride = await db.orm.public.ManualOverride
+    .where({ entityType: "match", entityId: matchId, fieldName: "matchdaySquad" })
+    .orderBy((override) => override.updatedAt.desc())
+    .first();
+  const storedSquad = storedMatchdaySquad(squadOverride?.payload);
+  const curatedSquad = getCuratedMatchdaySquad(matchId);
+  const matchdaySquad = storedSquad ?? (curatedSquad ? {
+    ...curatedSquad,
+    players: curatedSquad.names.map((name) => ({ name, position: "unknown" })),
+  } : null);
 
   /*
   |--------------------------------------------------------------------------
@@ -1386,7 +1414,7 @@ export async function getMatchCenter(
         awayLineup,
     },
 
-    matchdaySquad: getCuratedMatchdaySquad(matchId),
+    matchdaySquad,
 
     events,
 
