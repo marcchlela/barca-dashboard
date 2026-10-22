@@ -284,6 +284,9 @@ function FeaturedMedia({
   const isHighlight =
     item.type ===
     "match_highlight";
+  const externalPlaybackOnly =
+    item.sourceCode ===
+    "bein-sports-mena";
 
   return (
     <div
@@ -317,7 +320,7 @@ function FeaturedMedia({
             bg-black
           "
         >
-          {youtubeId ? (
+          {youtubeId && !externalPlaybackOnly ? (
             <iframe
               key={
                 youtubeId
@@ -344,12 +347,13 @@ function FeaturedMedia({
                 border-0
               "
             />
-          ) : item.thumbnailUrl ? (
+          ) : item.thumbnailUrl || youtubeId ? (
             <>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={
-                  item.thumbnailUrl
+                  item.thumbnailUrl ??
+                  `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`
                 }
                 alt=""
                 className="
@@ -400,6 +404,15 @@ function FeaturedMedia({
                     fill="currentColor"
                   />
                 </a>
+
+                {externalPlaybackOnly ? (
+                  <span
+                    className="absolute bottom-4 left-1/2 -translate-x-1/2 whitespace-nowrap border bg-black/75 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.14em]"
+                    style={{ borderColor: theme.colors.accent, color: theme.colors.accent }}
+                  >
+                    Watch on YouTube
+                  </span>
+                ) : null}
               </div>
             </>
           ) : (

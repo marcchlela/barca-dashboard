@@ -67,6 +67,15 @@ function lineupPlayer(
   };
 }
 
+function substitutePlayer(value: unknown): GoalLineupPlayer | null {
+  const row = asObject(value);
+  // Highlightly occasionally includes an empty/placeholder substitute entry.
+  // A malformed optional bench row must not discard two otherwise complete
+  // confirmed starting XIs. Starters remain strict below.
+  if (!stringValue(row, "id") || !stringValue(row, "name")) return null;
+  return lineupPlayer(value, "substitute", null);
+}
+
 function lineupSide(value: unknown, side: "home" | "away"): GoalLineupSide {
   const row = asObject(value);
   const providerTeamId = stringValue(row, "id");
@@ -78,7 +87,10 @@ function lineupSide(value: unknown, side: "home" | "away"): GoalLineupSide {
     .flatMap((line) => asArray(line))
     .map((player, index) => lineupPlayer(player, "starter", index + 1));
   const substitutes = asArray(row?.substitutes)
-    .map((player) => lineupPlayer(player, "substitute", null));
+    .flatMap((player) => {
+      const normalized = substitutePlayer(player);
+      return normalized ? [normalized] : [];
+    });
   if (starters.length !== 11) {
     throw new Error(`Highlightly returned ${starters.length} ${side} starters; expected 11.`);
   }
