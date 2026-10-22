@@ -1328,7 +1328,7 @@ export default function AdminSyncControl({
 
           <OperationSection
             title="Rich Match Data"
-            description="GOAL + player-stat provider normalization and canonical merge."
+            description="Try GOAL and the player-stat providers, then report canonical fallback coverage when a source cannot resolve the fixture."
           >
             <ActionButton
               label="Preview Rich Sync"

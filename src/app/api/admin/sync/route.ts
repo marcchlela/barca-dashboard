@@ -2,6 +2,7 @@ import {
   NextResponse,
 } from "next/server";
 import { guardAdminRequest } from "../../../../lib/admin/access";
+import { db } from "../../../../prisma/db";
 
 import {
   syncBarcelonaMatches,
@@ -54,21 +55,74 @@ type RequestBody = {
 };
 
 async function syncCompleteRichMatch(matchId: string, dryRun: boolean) {
-  const richMatch = await syncRichMatch({ matchId, dryRun });
+  let richMatch:
+    | { status: "success"; result: Awaited<ReturnType<typeof syncRichMatch>> }
+    | { status: "unavailable"; error: string };
   try {
-    const playerStatistics = await persistCanonicalPlayerStatistics({ matchId, dryRun });
-    return { richMatch, playerStatistics: { status: "success" as const, result: playerStatistics } };
+    richMatch = { status: "success", result: await syncRichMatch({ matchId, dryRun }) };
+  } catch (error) {
+    // GOAL can omit or misidentify a fixture while Highlightly/live recovery
+    // has already populated useful canonical data. Report that provider stage
+    // accurately without hiding the data that is present or preventing the
+    // independent player-stat provider from running.
+    richMatch = {
+      status: "unavailable",
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
+  let playerStatistics:
+    | { status: "success"; result: Awaited<ReturnType<typeof persistCanonicalPlayerStatistics>> }
+    | { status: "unavailable"; error: string };
+  try {
+    playerStatistics = {
+      status: "success",
+      result: await persistCanonicalPlayerStatistics({ matchId, dryRun }),
+    };
   } catch (error) {
     // Lineups/events remain useful when a free player-stat provider has not
     // published its box score yet. The automatic worker will retry this stage.
-    return {
-      richMatch,
-      playerStatistics: {
-        status: "unavailable" as const,
-        error: error instanceof Error ? error.message : String(error),
-      },
+    playerStatistics = {
+      status: "unavailable",
+      error: error instanceof Error ? error.message : String(error),
     };
   }
+
+  const [match, lineups, events, teamStatistics, playerRows] = await Promise.all([
+    db.orm.public.Match.where({ id: matchId }).first(),
+    db.orm.public.Lineup.where({ matchId }).include("players").all(),
+    db.orm.public.MatchEvent.where({ matchId }).all(),
+    db.orm.public.MatchStatistic.where({ matchId }).all(),
+    db.orm.public.PlayerMatchStatistic.where({ matchId }).all(),
+  ]);
+  const confirmedLineupSides = lineups.filter((lineup) =>
+    lineup.isConfirmed && lineup.players.filter((player) => player.role === "starter").length === 11,
+  ).length;
+  const canonicalCoverage = {
+    matchStatus: match?.status ?? "missing",
+    score: match?.homeScore !== null && match?.homeScore !== undefined &&
+      match.awayScore !== null && match.awayScore !== undefined
+      ? `${match.homeScore}-${match.awayScore}`
+      : null,
+    confirmedLineupSides,
+    events: events.length,
+    goals: events.filter((event) => ["goal", "penalty_goal", "own_goal"].includes(event.type)).length,
+    teamStatisticSides: teamStatistics.length,
+    playerPerformances: playerRows.length,
+    playerRatings: playerRows.filter((row) => row.rating !== null).length,
+  };
+  const fallbackDataPresent = confirmedLineupSides === 2 || events.length > 0 ||
+    teamStatistics.length > 0 || playerRows.length > 0;
+
+  return {
+    status: richMatch.status === "unavailable" && fallbackDataPresent
+      ? "fallback-data-present"
+      : richMatch.status === "unavailable" && playerStatistics.status === "unavailable"
+        ? "providers-unavailable"
+        : "success",
+    richMatch,
+    playerStatistics,
+    canonicalCoverage,
+  };
 }
 
 const MATCH_ACTIONS =
