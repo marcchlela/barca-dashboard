@@ -102,6 +102,7 @@ export async function runNotificationWorker(now = Date.now()) {
         }
       }
       if (previous) {
+        const fixtureIsActive = ["live", "halftime", "extra_time", "penalties"].includes(match.status);
         if (previous.kickoff !== kickoff && match.status === "scheduled") await emit("kickoff_changed", kickoff);
         if (previous.status !== match.status) {
           if (match.status === "live" && previous.status === "scheduled") await emit("kickoff", "started");
@@ -117,6 +118,10 @@ export async function runNotificationWorker(now = Date.now()) {
         const correctionKey = `score:${match.homeScore ?? "?"}-${match.awayScore ?? "?"}`;
         if (scoreReduced) await emit("goal_corrected", correctionKey);
         for (const event of events) {
+          // Provider catch-up can insert a whole match's events hours after
+          // full time. Keep those events in Match Center, but never turn that
+          // historical backfill into a burst of misleading live alerts.
+          if (!fixtureIsActive) continue;
           const semanticKey = notificationEventKey(event);
           const before = previous.events[semanticKey];
           const after = eventValues[semanticKey];

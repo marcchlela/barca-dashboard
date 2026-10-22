@@ -29,6 +29,9 @@ export type MatchMediaItem = {
   isOfficial:
     boolean;
 
+  sourceCode:
+    string | null;
+
   publishedAt:
     string | null;
 
@@ -59,6 +62,7 @@ export async function getMatchMedia(
       .include(
         "player",
       )
+      .include("dataSource")
       .include("goalMoments")
       .all();
   const events = await db.orm.public.MatchEvent.where({ matchId }).include("primaryPlayer").all();
@@ -92,6 +96,9 @@ export async function getMatchMedia(
 
         isOfficial:
           row.isOfficial,
+
+        sourceCode:
+          row.dataSource?.code ?? null,
 
         publishedAt:
           row.publishedAt
@@ -173,6 +180,10 @@ function mediaPriority(
     score +=
       100;
   }
+
+  // Editorial order: official FC Barcelona first, beIN Arabic second,
+  // followed by the remaining verified sources.
+  if (item.sourceCode === "bein-sports-mena") score += 75;
 
   switch (
     item.type

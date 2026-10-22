@@ -658,9 +658,11 @@ export async function runLiveMatchRefresh(input: { now?: number; client?: GoalAp
     if (!client) throw new Error("GOAL_API_KEY is unavailable; using Highlightly live fallback.");
     const fixture = await findLiveFixture(client, match);
     if (!fixture) {
-      const notLiveChecks = Number(result.notLiveChecks) + 1;
-      await db.orm.public.GoalMediaSyncRun.where({ id: run.id }).update({ lockKey: null, status: "success", finishedAt: instant(), fixturesChecked: 1, result: { ...result, status: "no-provider-live-fixture", notLiveChecks, requests: client.requestCount } });
-      return { status: "no-provider-live-fixture" as const, matchId: match.id };
+      // A clean "not found" response is still a primary-provider miss. Route
+      // it through the same Highlightly fallback as timeouts and HTTP errors.
+      // Previously this returned early, so the fallback was only attempted
+      // when GOAL threw, leaving most of a live match without updates.
+      throw new Error("GOAL did not expose the canonical fixture as live.");
     }
     const fixtureCandidate = goalCandidate(fixture.detail);
     if (!makeIdentity(match, fixtureCandidate)) throw new Error("Live fixture detail failed immutable identity validation.");
@@ -668,9 +670,7 @@ export async function runLiveMatchRefresh(input: { now?: number; client?: GoalAp
     await ensureMatchMapping(source.id, match.id, fixture.providerId);
     const status = normalizeLiveStatus(fixture.detail);
     if (!status) {
-      const notLiveChecks = Number(result.notLiveChecks) + 1;
-      await db.orm.public.GoalMediaSyncRun.where({ id: run.id }).update({ lockKey: null, status: "success", finishedAt: instant(), fixturesChecked: 1, result: { ...result, status: "no-provider-live-fixture", notLiveChecks, requests: client.requestCount } });
-      return { status: "no-provider-live-fixture" as const, matchId: match.id };
+      throw new Error("GOAL fixture did not expose a recognized live status.");
     }
     const newStatus = matchStatusForWrite(match.status, status);
     const homeScore = fixtureCandidate?.homeScore;
