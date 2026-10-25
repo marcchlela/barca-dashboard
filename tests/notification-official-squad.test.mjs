@@ -25,3 +25,40 @@ test("official squad names are extracted only from an introduced full list", () 
   assert.deepEqual(extractOfficialSquadNames(html), names);
   assert.deepEqual(extractOfficialSquadNames("<p>Possible squad: Player One, Player Two.</p>"), []);
 });
+
+test("official squad discovery recognizes the Clasico as Real Madrid", () => {
+  const links = [
+    "/en/football/first-team/news/4598231/the-squad-for-the-clasico",
+    "/en/football/first-team/news/4594106/fc-barcelona-squad-for-the-trip-to-psg",
+  ];
+
+  assert.deepEqual(
+    matchingSquadLinks(links, "Real Madrid CF"),
+    [links[0]]
+  );
+
+  assert.deepEqual(
+    matchingSquadLinks(links, "Paris Saint-Germain"),
+    [links[1]]
+  );
+});
+
+test("official squad extraction supports the Clasico announcement format", () => {
+  const names = [
+    "Joan Garcia", "Cancelo", "Balde", "Fariñas", "Cubarsi",
+    "Gavi", "Fermín", "Pedri", "G. Jesus", "Lamine Yamal",
+    "Raphinha", "Xavi Espart", "Szczesny", "Adeyemi",
+    "Rodrigo", "Gordon", "Gerard Martin", "De Jong",
+    "Bernal", "Livakovic", "Orian Goren", "Abdelkarim",
+    "Àlex Campos",
+  ];
+
+  const body =
+    `With another three points the aim, Hansi Flick has called up 23 players ` +
+    `for the Clásico squad : ${names.slice(0, -1).join(", ")} ` +
+    `and ${names.at(-1)}.`;
+
+  const html = `<p>${body}</p>`;
+
+  assert.deepEqual(extractOfficialSquadNames(html), names);
+});
