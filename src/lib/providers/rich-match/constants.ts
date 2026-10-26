@@ -8,6 +8,14 @@ export const RICH_MATCH_TARGET = {
 } as const;
 
 export const RICH_DATA_SOURCES = {
+  officialBarcelona: {
+    code: "fc-barcelona-official-lineup",
+    name: "FC Barcelona official lineup",
+    baseUrl: "https://api-fcb.pulselive.com/football/fixtures",
+    isOfficial: true,
+    isEnabled: true,
+    licenseNotes: "Public match feed powering FC Barcelona's official match page; fixture identity and complete starters must be verified.",
+  },
   highlightly: {
     code: "highlightly",
     name: "Highlightly",

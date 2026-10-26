@@ -20,7 +20,7 @@ export function preMatchLineupRefreshDue(last: { status: string; finishedAt: str
 
 /** Refreshes upcoming confirmed lineups and backfills recent finished fixtures, one bounded provider call at a time. */
 export async function runScheduledGoalEventRefresh(input: { sync?: typeof syncRichMatch; syncLineups?: typeof syncConfirmedLineups; syncPlayerStats?: typeof persistCanonicalPlayerStatistics; now?: number } = {}) {
-  if (!process.env.HIGHLIGHTLY_API_KEY && !process.env.GOAL_API_KEY && !input.sync && !input.syncLineups) return { status: "unconfigured" as const, matchId: null, nextAt: null, error: null };
+  // Official club announcements can supply a confirmed Barça XI without API keys.
   const now = input.now ?? Date.now();
   const season = await db.orm.public.Season.where({ isCurrent: true }).first();
   if (!season) return { status: "no-season" as const, matchId: null, nextAt: null, error: null };
@@ -38,7 +38,6 @@ export async function runScheduledGoalEventRefresh(input: { sync?: typeof syncRi
     if (match.competition.code !== "PD" && match.competition.code !== "CL") continue;
     const lineups = await db.orm.public.Lineup.where({ matchId: match.id }).include("players").all();
     const coverage = lineupNeedsBackfill(match.homeTeamId, match.awayTeamId, lineups);
-    if (coverage.home === "partial" || coverage.away === "partial") continue;
     if (coverage.home === "missing" || coverage.away === "missing") {
       candidate = match;
       kind = "pregame-lineups";

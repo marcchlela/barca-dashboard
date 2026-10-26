@@ -1,9 +1,12 @@
 import "server-only";
 
 import { db } from "../../../prisma/db";
+import { getOfficialSquadManifest } from "../../squad/official-squad";
 import type { BigBallsPlayerStatistic } from "../big-balls/types";
 import { fetchGoalMatchBundle } from "../goal-api/fetch";
 import { fetchHighlightlyLineups } from "../highlightly/fetch";
+import { fetchOfficialBarcelonaLineup } from "../official-barca/lineup";
+import { fetchOfficialMatchLineups } from "../official-barca/match-feed";
 import type {
   GoalLineupPlayer,
   GoalLineupSide,
@@ -52,8 +55,8 @@ type GoalResolvedPlayer = {
 type LineupBundle = {
   requestCount: number;
   providerMatchId: string;
-  home: GoalLineupSide;
-  away: GoalLineupSide;
+  home: GoalLineupSide | null;
+  away: GoalLineupSide | null;
 };
 
 type LineupProvider = {
@@ -453,6 +456,26 @@ async function findExistingTeamSeasonPlayer(
   }
 
   if (matches.length === 1) return matches[0].player;
+
+  const season = await orm.public.Season.where({ id: seasonId }).first();
+  const manifest = season ? getOfficialSquadManifest(season.label) : null;
+  if (manifest && memberships.length) {
+    const aliases = memberships.filter((membership) => {
+      const official = manifest.players.find((row) => normalizedPersonName(row.displayName) === normalizedPersonName(membership.player.displayName));
+      return official?.aliases.some((alias) => normalizedPersonName(alias) === normalized) ?? false;
+    });
+    if (aliases.length === 1) return aliases[0].player;
+    if (aliases.length > 1) throw new Error(`Ambiguous official player alias for ${input.name}.`);
+  }
+
+  // Opponent squads are not imported wholesale. Reuse a player already seen
+  // in a previous lineup for this team before creating a new record.
+  const priorLineups = await orm.public.Lineup.where({ teamId }).include("players").all();
+  const priorIds = [...new Set(priorLineups.flatMap((lineup) => lineup.players.map((entry) => entry.playerId)))];
+  const priorPlayers = (await Promise.all(priorIds.map((id) => orm.public.Player.where({ id }).first()))).filter((player) => player !== null);
+  const priorMatches = priorPlayers.filter((player) => normalizedPersonName(player.displayName) === normalized);
+  if (priorMatches.length === 1) return priorMatches[0];
+  if (priorMatches.length > 1) throw new Error(`Ambiguous earlier lineup identity for ${input.name}.`);
 
   const inputParts = normalized.split(" ").filter(Boolean);
   if (inputParts.length < 2 || inputParts[0].length !== 1) return null;
@@ -2422,15 +2445,28 @@ for (
   };
 }
 
-async function preferredLineupProvider(internal: MatchIdentityInput): Promise<LineupProvider> {
+async function preferredLineupProvider(internal: MatchIdentityInput, needed: { home: boolean; away: boolean }, matchId: string): Promise<LineupProvider> {
   const errors: string[] = [];
+  const requiredSides = Number(needed.home) + Number(needed.away);
+  let best: LineupProvider | null = null;
+  let bestCoverage = 0;
+  const consider = (provider: LineupProvider) => {
+    const coverage = Number(needed.home && Boolean(provider.bundle.home)) + Number(needed.away && Boolean(provider.bundle.away));
+    if (coverage > bestCoverage) {
+      best = provider;
+      bestCoverage = coverage;
+    }
+    return bestCoverage === requiredSides;
+  };
   if (process.env.HIGHLIGHTLY_API_KEY) {
     try {
-      return {
+      const bundle = await fetchHighlightlyLineups(internal);
+      if (consider({
         name: "Highlightly",
         source: RICH_DATA_SOURCES.highlightly,
-        bundle: await fetchHighlightlyLineups(internal),
-      };
+        bundle,
+      })) return best!;
+      if (!bestCoverage) errors.push("Highlightly: fixture found, but no needed starting XI is published yet.");
     } catch (error) {
       errors.push(`Highlightly: ${error instanceof Error ? error.message : String(error)}`);
     }
@@ -2439,35 +2475,57 @@ async function preferredLineupProvider(internal: MatchIdentityInput): Promise<Li
   }
   if (process.env.GOAL_API_KEY) {
     try {
-      return {
+      const provider: LineupProvider = {
         name: "GOAL",
         source: RICH_DATA_SOURCES.goal,
         bundle: await fetchGoalMatchBundle(internal),
       };
+      if (consider(provider)) return best!;
+      if (!bestCoverage) errors.push("GOAL: no needed starting XI is published yet.");
     } catch (error) {
       errors.push(`GOAL: ${error instanceof Error ? error.message : String(error)}`);
     }
   } else {
     errors.push("GOAL: GOAL_API_KEY is not configured.");
   }
+  try {
+    const bundle = await fetchOfficialMatchLineups(internal);
+    if (bundle) {
+      if (consider({ name: "FC Barcelona match feed", source: RICH_DATA_SOURCES.officialBarcelona, bundle })) return best!;
+    }
+    if (!bestCoverage) errors.push("FC Barcelona match feed: no confirmed XI published for the needed side.");
+  } catch (error) {
+    errors.push(`FC Barcelona match feed: ${error instanceof Error ? error.message : String(error)}`);
+  }
+  try {
+    const bundle = await fetchOfficialBarcelonaLineup(internal, matchId);
+    if (bundle) {
+      if (consider({ name: "FC Barcelona", source: RICH_DATA_SOURCES.officialBarcelona, bundle })) return best!;
+    }
+    if (!bestCoverage) errors.push("FC Barcelona: no explicitly confirmed starting XI published for this fixture.");
+  } catch (error) {
+    errors.push(`FC Barcelona: ${error instanceof Error ? error.message : String(error)}`);
+  }
+  if (best) return best;
   throw new Error(`No confirmed-lineup provider succeeded. ${errors.join(" | ")}`);
 }
 
 async function syncLineups(
   input: { matchId: string; dryRun: boolean },
-  loadProvider: (internal: MatchIdentityInput) => Promise<LineupProvider>,
+  loadProvider: (internal: MatchIdentityInput, needed: { home: boolean; away: boolean }, matchId: string) => Promise<LineupProvider>,
 ) {
   const { match, internal } = await loadMatchContext(input.matchId, { allowScheduledLineup: true });
   const existing = await db.orm.public.Lineup.where({ matchId: match.id }).include("players").all();
   const initial = lineupNeedsBackfill(match.homeTeamId, match.awayTeamId, existing);
-  if (initial.home === "partial" || initial.away === "partial") {
-    throw new Error("A partial or unconfirmed lineup needs manual review; refusing to merge it automatically.");
-  }
   if (initial.home === "complete" && initial.away === "complete") {
     return { matchId: match.id, status: "unchanged" as const, home: initial.home, away: initial.away, persisted: false };
   }
+  // Existing partial sides require review; there is no missing side to fetch.
+  if (initial.home !== "missing" && initial.away !== "missing") {
+    return { matchId: match.id, status: "needs-review" as const, home: initial.home, away: initial.away, persisted: false };
+  }
 
-  const provider = await loadProvider(internal);
+  const provider = await loadProvider(internal, { home: initial.home === "missing", away: initial.away === "missing" }, match.id);
   const bundle = provider.bundle;
   const summary = {
     matchId: match.id,
@@ -2476,15 +2534,16 @@ async function syncLineups(
     requests: bundle.requestCount,
     home: initial.home,
     away: initial.away,
-    homeStarters: bundle.home.players.filter((player) => player.role === "starter").length,
-    awayStarters: bundle.away.players.filter((player) => player.role === "starter").length,
-    homeSubstitutes: bundle.home.players.filter((player) => player.role === "substitute").length,
-    awaySubstitutes: bundle.away.players.filter((player) => player.role === "substitute").length,
-    homeFormation: bundle.home.formation,
-    awayFormation: bundle.away.formation,
+    homeStarters: bundle.home?.players.filter((player) => player.role === "starter").length ?? 0,
+    awayStarters: bundle.away?.players.filter((player) => player.role === "starter").length ?? 0,
+    homeSubstitutes: bundle.home?.players.filter((player) => player.role === "substitute").length ?? 0,
+    awaySubstitutes: bundle.away?.players.filter((player) => player.role === "substitute").length ?? 0,
+    homeFormation: bundle.home?.formation ?? null,
+    awayFormation: bundle.away?.formation ?? null,
   };
-  if (summary.homeStarters !== 11 || summary.awayStarters !== 11) {
-    throw new Error(`${provider.name} did not supply exactly 11 starters for both sides.`);
+  if ((bundle.home && summary.homeStarters !== 11) || (bundle.away && summary.awayStarters !== 11) ||
+      ((initial.home === "missing" && !bundle.home) && (initial.away === "missing" && !bundle.away))) {
+    throw new Error(`${provider.name} did not supply a complete confirmed XI for a missing side.`);
   }
   if (input.dryRun) return { ...summary, status: "preview" as const, persisted: false };
 
@@ -2492,9 +2551,6 @@ async function syncLineups(
     const orm = tx.orm;
     const latest = await orm.public.Lineup.where({ matchId: match.id }).include("players").all();
     const coverage = lineupNeedsBackfill(match.homeTeamId, match.awayTeamId, latest);
-    if (coverage.home === "partial" || coverage.away === "partial") {
-      throw new Error("Lineup changed to partial or unconfirmed during recovery; refusing to merge it.");
-    }
     const changes = emptySyncCounts();
     if (coverage.home === "complete" && coverage.away === "complete") return changes;
     const lineupSource = await ensureDataSource(orm, provider.source, changes);
@@ -2506,7 +2562,7 @@ async function syncLineups(
       { side: bundle.home, teamId: match.homeTeamId, state: coverage.home },
       { side: bundle.away, teamId: match.awayTeamId, state: coverage.away },
     ]) {
-      if (state === "complete") continue;
+      if (state !== "missing" || !side) continue;
       await ensureMapping(orm, changes, {
         dataSourceId: lineupSource.id, entityType: "team", internalId: teamId,
         providerId: side.providerTeamId,
@@ -2517,6 +2573,10 @@ async function syncLineups(
           orm, changes, lineupSource.id, match.seasonId, teamId,
           side.providerTeamId, player, resolved,
         ));
+      }
+      const starters = resolved.filter((row) => row.player.role === "starter");
+      if (starters.length !== 11 || new Set(starters.map((row) => row.playerId)).size !== 11) {
+        throw new Error(`${provider.name} starters did not resolve to 11 distinct canonical players.`);
       }
       await ensureLineupSide(orm, changes, match.id, teamId, side, resolved);
     }

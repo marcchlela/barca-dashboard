@@ -43,7 +43,7 @@ export default function NotificationsSettings({ signedIn }: { signedIn: boolean 
       const subscription = await registration.pushManager.getSubscription() ?? await registration.pushManager.subscribe({
         userVisibleOnly: true, applicationServerKey: applicationServerKey(data.publicKey),
       });
-      await post({ action: "subscribe", subscription: subscription.toJSON() });
+      await post({ action: "subscribe", subscription: subscription.toJSON(), timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone });
       setEnabled(true); setMessage("Notifications enabled on this device.");
     } catch (error) { setMessage(error instanceof Error ? error.message : "Could not enable notifications."); }
     finally { setBusy(false); }

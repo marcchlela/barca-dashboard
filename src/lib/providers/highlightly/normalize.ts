@@ -76,13 +76,11 @@ function substitutePlayer(value: unknown): GoalLineupPlayer | null {
   return lineupPlayer(value, "substitute", null);
 }
 
-function lineupSide(value: unknown, side: "home" | "away"): GoalLineupSide {
+function lineupSide(value: unknown): GoalLineupSide | null {
   const row = asObject(value);
   const providerTeamId = stringValue(row, "id");
   const rawName = stringValue(row, "name");
-  if (!providerTeamId || !rawName) {
-    throw new Error(`Highlightly lineup response is missing ${side} team identity.`);
-  }
+  if (!providerTeamId || !rawName) return null;
   const starters = asArray(row?.initialLineup)
     .flatMap((line) => asArray(line))
     .map((player, index) => lineupPlayer(player, "starter", index + 1));
@@ -91,9 +89,7 @@ function lineupSide(value: unknown, side: "home" | "away"): GoalLineupSide {
       const normalized = substitutePlayer(player);
       return normalized ? [normalized] : [];
     });
-  if (starters.length !== 11) {
-    throw new Error(`Highlightly returned ${starters.length} ${side} starters; expected 11.`);
-  }
+  if (starters.length !== 11 || new Set(starters.map((player) => player.providerId)).size !== 11) return null;
   const coach = asObject(row?.coach);
   return {
     providerTeamId,
@@ -105,9 +101,13 @@ function lineupSide(value: unknown, side: "home" | "away"): GoalLineupSide {
 }
 
 export function normalizeHighlightlyLineups(value: JsonObject) {
+  const recover = (side: "home" | "away") => {
+    try { return lineupSide(side === "home" ? value.homeTeam : value.awayTeam); }
+    catch { return null; }
+  };
   return {
-    home: lineupSide(value.homeTeam, "home"),
-    away: lineupSide(value.awayTeam, "away"),
+    home: recover("home"),
+    away: recover("away"),
   };
 }
 
