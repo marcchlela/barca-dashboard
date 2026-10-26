@@ -3,7 +3,7 @@ import "server-only";
 import { Temporal } from "temporal-polyfill";
 import { db } from "../../prisma/db";
 import { deliverNotification, queueNotification, pushConfiguration } from "./delivery";
-import { formatNotificationKickoffTime, type NotificationKind } from "./catalog";
+import type { NotificationKind } from "./catalog";
 import { discoverOfficialSquad } from "./official-squad";
 import { confirmedLineupNotificationDue } from "./policy";
 import { liveEventSemanticKey } from "../providers/shared/live-event-identity";
@@ -71,7 +71,8 @@ export async function runNotificationWorker(now = Date.now()) {
       ]);
       const eventValues = Object.fromEntries(events.map((event) => [notificationEventKey(event),
         `${event.type}:${event.primaryPlayerId ?? ""}:${event.relatedPlayerId ?? ""}:${event.minute ?? ""}:${event.teamId ?? ""}:${event.outcome ?? ""}`]));
-      const lineup = lineups.length >= 2 && lineups.every((row) => row.isConfirmed && row.players.filter((player) => player.role === "starter").length === 11);
+      const barcelonaTeamId = match.homeTeam.isBarcelona ? match.homeTeamId : match.awayTeamId;
+      const lineup = lineups.some((row) => row.teamId === barcelonaTeamId && row.isConfirmed && row.players.filter((player) => player.role === "starter").length === 11);
       const mediaIds = media.map((item) => item.id);
       const liveRun = await db.orm.public.GoalMediaSyncRun.where({ mode: "live-match-sync" }).orderBy((row) => row.startedAt.desc()).first();
       const liveResult = object(liveRun?.result);
@@ -85,8 +86,7 @@ export async function runNotificationWorker(now = Date.now()) {
       const opponent = match.homeTeam.isBarcelona ? match.awayTeam.name : match.homeTeam.name;
       const values = { home: match.homeTeam.name, away: match.awayTeam.name, opponent,
         homeScore: String(match.homeScore ?? "–"), awayScore: String(match.awayScore ?? "–"),
-        kickoff: new Date(kickoff).toLocaleString("en-GB", { timeZone: "Asia/Beirut", dateStyle: "medium", timeStyle: "short" }),
-        kickoffTime: formatNotificationKickoffTime(kickoff) };
+        kickoff: "{localKickoff}", kickoffTime: "{localKickoffTime}" };
       const url = `/matches/${match.id}`;
       const emit = async (kind: NotificationKind, suffix: string, more: Record<string, string> = {}, iconUrl?: string | null) => {
         const result = await queueNotification({ key: `${kind}:${match.id}:${suffix}`, kind, matchId: match.id, values: { ...values, ...more }, url, iconUrl });
@@ -101,6 +101,8 @@ export async function runNotificationWorker(now = Date.now()) {
           if (result.created) queued += 1;
         }
       }
+      if (confirmedLineupNotificationDue({ previousLineup: previous?.lineup ?? false, currentLineup: lineup,
+        status: match.status, kickoff, now })) await emit("confirmed_lineup", "confirmed");
       if (previous) {
         const fixtureIsActive = ["live", "halftime", "extra_time", "penalties"].includes(match.status);
         if (previous.kickoff !== kickoff && match.status === "scheduled") await emit("kickoff_changed", kickoff);
@@ -110,8 +112,6 @@ export async function runNotificationWorker(now = Date.now()) {
           if (match.status === "finished") await emit("fulltime", "fulltime");
           if (match.status === "cancelled" || match.status === "postponed") await emit("fixture_cancelled", match.status, { status: match.status });
         }
-        if (confirmedLineupNotificationDue({ previousLineup: previous.lineup, currentLineup: lineup,
-          status: match.status, kickoff, now })) await emit("confirmed_lineup", "confirmed");
         if (period === 2 && previous.period !== 2 && ["live", "halftime"].includes(previous.status)) await emit("second_half", "started");
         const scoreReduced = (match.homeScore !== null && previous.homeScore !== null && match.homeScore < previous.homeScore) ||
           (match.awayScore !== null && previous.awayScore !== null && match.awayScore < previous.awayScore);

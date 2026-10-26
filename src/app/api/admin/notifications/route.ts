@@ -24,7 +24,8 @@ export async function GET() {
   }
   return Response.json({ ok: true, configured: Boolean(pushConfiguration()), subscribers: subscriptions.length,
     kinds: notificationKinds, templates: Object.fromEntries(templates.map((item) => [item.kind, { title: item.title, body: item.body }])),
-    history: events.map((event) => ({ id: event.id, kind: event.kind, title: event.title, body: event.body, audience: event.audience,
+    history: events.map((event) => ({ id: event.id, kind: event.kind, title: event.title,
+      body: event.body.replaceAll("{localKickoffTime}", "each recipient's local time").replaceAll("{localKickoff}", "each recipient's local date and time"), audience: event.audience,
       createdAt: event.createdAt.toString(), ...counts.get(event.id) ?? { accepted: 0, failed: 0, pending: 0 } })) },
   { headers: { "cache-control": "no-store" } });
 }

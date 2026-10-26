@@ -1,6 +1,6 @@
 import { db } from "../../../prisma/db";
 import { getViewer, requireSameOrigin } from "../../../lib/auth/session";
-import { notificationKinds, notificationKindIds } from "../../../lib/notifications/catalog";
+import { notificationKinds, notificationKindIds, validNotificationTimeZone } from "../../../lib/notifications/catalog";
 import { allowedPushEndpoint, pushConfiguration } from "../../../lib/notifications/delivery";
 
 export const dynamic = "force-dynamic";
@@ -40,14 +40,21 @@ export async function POST(request: Request) {
       return Response.json({ ok: false, error: "Invalid push subscription." }, { status: 400 });
     }
     const prior = await db.orm.public.PushSubscription.where({ endpoint: row.endpoint }).first();
+    const timeZone = validNotificationTimeZone(data.timeZone) ? data.timeZone : "UTC";
     if (prior && prior.userId !== viewer.id) return Response.json({ ok: false, error: "This device is linked to another account. Disable its old subscription first." }, { status: 409 });
+    let subscription = prior;
     if (prior) await db.orm.public.PushSubscription.where({ id: prior.id }).update({ p256dh: keys.p256dh, auth: keys.auth, disabledAt: null });
     else {
       const devices = await db.orm.public.PushSubscription.where({ userId: viewer.id }).all();
       if (devices.filter((item) => !item.disabledAt).length >= 8) return Response.json({ ok: false, error: "Eight active devices is the current limit." }, { status: 429 });
-      await db.orm.public.PushSubscription.create({ userId: viewer.id, endpoint: row.endpoint, p256dh: keys.p256dh, auth: keys.auth,
+      subscription = await db.orm.public.PushSubscription.create({ userId: viewer.id, endpoint: row.endpoint, p256dh: keys.p256dh, auth: keys.auth,
         userAgent: request.headers.get("user-agent")?.slice(0, 240) ?? null });
     }
+    if (!subscription) return Response.json({ ok: false, error: "Could not save push subscription." }, { status: 500 });
+    const zoneKey = `push-timezone:${subscription.id}`;
+    const savedZone = await db.orm.public.NotificationCursor.where({ key: zoneKey }).first();
+    if (savedZone) await db.orm.public.NotificationCursor.where({ key: zoneKey }).update({ snapshot: { timeZone } });
+    else await db.orm.public.NotificationCursor.create({ key: zoneKey, snapshot: { timeZone } });
     return Response.json({ ok: true });
   }
   if (data.action === "unsubscribe") {

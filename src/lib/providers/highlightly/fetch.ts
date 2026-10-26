@@ -6,6 +6,7 @@ import { HighlightlyClient } from "./client";
 import { highlightlyCandidate, normalizeHighlightlyLineups } from "./normalize";
 
 const BUNDLE_TTL_MS = 15 * 60_000;
+const INCOMPLETE_BUNDLE_TTL_MS = 60_000;
 
 type HighlightlyLineupBundle = ReturnType<typeof normalizeHighlightlyLineups> & {
   providerMatchId: string;
@@ -75,10 +76,19 @@ export function fetchHighlightlyLineups(internal: MatchIdentityInput) {
   const cached = cache.get(key);
   if (cached && cached.expiresAt > Date.now()) return cached.promise;
   if (cached) cache.delete(key);
-  const promise = fetchUncached(internal).catch((error) => {
-    if (cache.get(key)?.promise === promise) cache.delete(key);
-    throw error;
-  });
+  const promise = fetchUncached(internal)
+    .then((bundle) => {
+      // A fixture can exist before its lineups do. Recheck incomplete responses
+      // promptly instead of treating an empty XI as fresh for fifteen minutes.
+      if ((!bundle.home || !bundle.away) && cache.get(key)?.promise === promise) {
+        cache.set(key, { expiresAt: Date.now() + INCOMPLETE_BUNDLE_TTL_MS, promise });
+      }
+      return bundle;
+    })
+    .catch((error) => {
+      if (cache.get(key)?.promise === promise) cache.delete(key);
+      throw error;
+    });
   cache.set(key, { expiresAt: Date.now() + BUNDLE_TTL_MS, promise });
   return promise;
 }

@@ -3,7 +3,7 @@ import "server-only";
 import webpush from "web-push";
 import { Temporal } from "temporal-polyfill";
 import { db } from "../../prisma/db";
-import { notificationKinds, renderNotificationTemplate, type NotificationKind } from "./catalog";
+import { formatNotificationKickoffTime, notificationKinds, renderNotificationTemplate, validNotificationTimeZone, type NotificationKind } from "./catalog";
 import { shouldRetryDelivery } from "./delivery-policy";
 
 export { allowedPushEndpoint } from "./delivery-policy";
@@ -64,6 +64,8 @@ export async function deliverNotification(eventId: string, onlyUserId?: string) 
   if (!event) return { sent: 0, failed: 0, reason: "Notification not found." };
   webpush.setVapidDetails(configuration.contact, configuration.publicKey, configuration.privateKey);
   const subscriptions = await db.orm.public.PushSubscription.where({ disabledAt: null }).include("user").all();
+  const match = event.matchId && (event.body.includes("{localKickoffTime}") || event.body.includes("{localKickoff}"))
+    ? await db.orm.public.Match.where({ id: event.matchId }).first() : null;
   let sent = 0, failed = 0;
   for (const subscription of subscriptions) {
     if (onlyUserId && subscription.userId !== onlyUserId) continue;
@@ -88,8 +90,19 @@ export async function deliverNotification(eventId: string, onlyUserId?: string) 
     }
     if (!delivery) continue;
     try {
+      const zoneRow = match ? await db.orm.public.NotificationCursor.where({ key: `push-timezone:${subscription.id}` }).first() : null;
+      const zoneSnapshot = zoneRow?.snapshot && typeof zoneRow.snapshot === "object" && !Array.isArray(zoneRow.snapshot) ? zoneRow.snapshot as Record<string, unknown> : null;
+      const timeZone = validNotificationTimeZone(zoneSnapshot?.timeZone) ? zoneSnapshot.timeZone : null;
+      const kickoff = match?.kickoff.toString() ?? "";
+      const body = (timeZone ? event.body : event.body
+        .replace("starts at {localKickoffTime}", "starts in 30 minutes")
+        .replace("is now scheduled for {localKickoff}", "has a new kickoff time; open Match Center"))
+        .replaceAll("{localKickoffTime}", kickoff && timeZone ? formatNotificationKickoffTime(kickoff, timeZone) : "")
+        .replaceAll("{localKickoff}", kickoff && timeZone ? new Intl.DateTimeFormat("en-US", {
+          timeZone, day: "numeric", month: "short", year: "numeric", hour: "numeric", minute: "2-digit", hour12: true,
+        }).format(new Date(kickoff)) : "");
       await webpush.sendNotification({ endpoint: subscription.endpoint, keys: { p256dh: subscription.p256dh, auth: subscription.auth } },
-        JSON.stringify({ title: event.title, body: event.body, url: event.url, iconUrl: event.iconUrl || APP_ICON,
+        JSON.stringify({ title: event.title, body, url: event.url, iconUrl: event.iconUrl || APP_ICON,
           imageUrl: event.iconUrl && event.iconUrl !== APP_ICON ? event.iconUrl : null, tag: event.key }),
         { TTL: 3600, urgency: event.kind.includes("goal") ? "high" : "normal", timeout: 10000 });
       await db.orm.public.NotificationDelivery.where({ id: delivery.id }).update({ status: "accepted", sentAt: Temporal.Instant.from(new Date().toISOString()) });
